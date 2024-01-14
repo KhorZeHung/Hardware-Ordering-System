@@ -29,12 +29,13 @@ const SalesCard = () => {
   return (
     <div className="subBody">
       <div className="smallCardSec">
-        {smlCardValue.map(({ value, description, title }) => {
+        {smlCardValue.map(({ value, description, title, compare }) => {
           return (
             <ReportSmlTxtCard
               key={title}
               value={value}
               description={description}
+              compare={compare}
               title={title}
             />
           );
