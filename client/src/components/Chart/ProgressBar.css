@@ -1,0 +1,39 @@
+@import "../index.css";
+
+.progressBarWrapper {
+  height: auto;
+  position: relative;
+  padding: 10px;
+  background-color: transparent;
+}
+
+.large {
+  width: 200px !important;
+}
+
+.small {
+  max-width: 100px;
+}
+
+.progressBarWrapper span {
+  position: absolute;
+  background-color: transparent;
+  user-select: none;
+}
+
+.percentage {
+  font-size: 40px;
+  top: 30%;
+}
+
+.percentageSml {
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.title {
+  font-weight: 200;
+  word-wrap: break-word;
+  max-width: 100px;
+  bottom: 20%;
+}

@@ -1,0 +1,37 @@
+@import "./index.css";
+
+form {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  width: 300px;
+  background-color: var(--bckgrd-2);
+  margin: 20px auto;
+  box-shadow: var(--box-shadow-1);
+}
+
+label {
+  padding: 0.8rem 0;
+  text-transform: uppercase;
+}
+
+input {
+  padding: 5px 10px;
+  min-width: 250px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+input[type="submit"] {
+  text-transform: uppercase;
+  width: 100px;
+  margin: 20px auto 0;
+  background-color: var(--primary-color-3);
+  color: var(--bckgrd-2);
+  font-weight: 500;
+  border: none;
+  border-radius: 30px;
+  min-width: 0 !important;
+  cursor: pointer;
+  padding: 10px;
+}

@@ -1,0 +1,102 @@
+:root {
+  --primary-color-1: #81d8d0;
+  --primary-color-2: #74c2bb;
+  --primary-color-3: #67ada6;
+  --primary-color-4: #5a9792;
+  --primary-color-5: #416c68;
+  --primary-color-6: #345653;
+  --primary-color-7: #27413e;
+  --primary-color-8: #1a2b2a;
+
+  --secondary-color-1: rgb(16, 19, 19);
+
+  --bckgrd-1: rgb(243, 240, 240);
+  --bckgrd-2: rgb(251, 251, 255);
+  --bckgrd-3: rgb(230, 226, 226);
+
+  --box-shadow-1: 3px 5px 10px rgba(50, 50, 50, 0.557);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  scroll-behavior: smooth;
+}
+
+body,
+html,
+.App,
+#root {
+  background-color: var(--bckgrd-2);
+  height: 100%;
+  width: 100%;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  transition: color 0.3s ease, background-color 0.3s ease;
+}
+
+* ::selection {
+  color: white;
+  background-color: var(--primary-color-5);
+}
+
+* ::-moz-selection {
+  color: white;
+  background-color: var(--primary-color-5);
+}
+
+* ::-webkit-selection {
+  color: white;
+  background-color: var(--primary-color-5);
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: grey;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: grey #f1f1f1;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: grey;
+}
+
+.spaceBetween {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: row;
+}
+
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+h6 {
+  font-size: 18px;
+  text-transform: capitalize;
+  font-weight: normal;
+  text-align: center;
+  padding: 1rem 0;
+}
+
+hr {
+  max-width: 90vw;
+  margin: 0 auto;
+}
+
+body > iframe {
+  display: none;
+}

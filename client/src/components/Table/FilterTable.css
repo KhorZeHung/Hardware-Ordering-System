@@ -1,0 +1,89 @@
+@import "../index.css";
+
+.filterSec {
+  padding: 10px 0;
+}
+
+.searchBar {
+  position: relative;
+  width: 40%;
+  border: 1px solid grey;
+  background-color: white;
+}
+
+.searchBar > input {
+  padding: 5px;
+  width: calc(100% - 35px);
+  box-sizing: border-box;
+  border: none;
+}
+
+.searchBar > input:focus {
+  outline: none;
+}
+.searchBarIcon {
+  position: absolute;
+  height: 100%;
+  bottom: 0;
+  right: 5px;
+}
+
+.searchBarIcon > span {
+  color: grey;
+  font-size: 1rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.filterOpt {
+  padding-right: 5px;
+  max-width: 30%;
+}
+
+.tableSec {
+  max-height: 50vh;
+  margin: 10px 0;
+  overflow: auto;
+}
+
+.tableSec table {
+  width: 100%;
+  margin: 0 auto;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+tr {
+  height: 40px;
+  cursor: pointer;
+}
+
+tr:nth-child(odd) {
+  background-color: var(--bckgrd-2);
+}
+
+tbody tr:nth-child(even),
+tr:hover {
+  background-color: var(--bckgrd-3);
+}
+
+.tableSec th,
+.tableSec td {
+  font-size: 1rem;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0 5px;
+}
+
+.tableSec td:not(:last-child) {
+  border-right: 1px solid black;
+}
+
+thead th {
+  position: sticky;
+  top: 0;
+  background-color: var(--primary-color-5);
+  color: white;
+}

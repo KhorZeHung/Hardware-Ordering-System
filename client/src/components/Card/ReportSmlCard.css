@@ -1,0 +1,38 @@
+@import "../index.css";
+
+.contentBody {
+  background-color: var(--bckgrd-2);
+  box-shadow: var(--box-shadow-1);
+  padding: 1rem;
+  margin: 0.5rem;
+  border-radius: 10px;
+  min-width: 100px;
+  max-width: 200px;
+  height: 100px;
+}
+
+.contentBody > * {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.title {
+  text-align: left;
+  font-size: 0.8rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.value {
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: 300;
+  text-transform: capitalize;
+  padding: 20px 5px;
+}
+
+.description {
+  text-align: right;
+  font-size: 0.8rem;
+}
