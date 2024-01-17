@@ -3,7 +3,7 @@
 #reportSec {
   padding: 10px 0;
   height: auto;
-  max-width: 1000px;
+  max-width: 1200px;
   margin: 0 auto;
 }
 
@@ -40,7 +40,7 @@
 }
 
 #reportSec .content {
-  padding: 1rem;
+  padding: 1rem 0;
   min-height: 300px;
 }
 
@@ -50,6 +50,13 @@
   grid-auto-rows: auto;
   grid-gap: 10px;
   padding: 1rem 0;
+  width: 100%;
+  align-items: end;
+}
+
+.twoByfour {
+  grid-column: 1 / span 2;
+  grid-row: 1 / span 2;
 }
 
 @media (max-width: 900px) {
@@ -62,7 +69,13 @@
     grid-template-columns: repeat(2, 1fr);
   }
 }
+@media (max-width: 400px) {
+  .smallCardSec {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
 .subBody {
   display: flex;
   flex-direction: column;
+  width: 90%;
 }

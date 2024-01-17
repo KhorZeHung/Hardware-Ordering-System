@@ -52,7 +52,7 @@
 .navBar a {
   text-decoration: none;
   color: var(--secondary-color-1);
-  padding: 5px 10px;
+  padding: 5px;
 }
 
 .navBar ul {
@@ -111,7 +111,7 @@
   transform: rotate(-45deg) translateY(-13px);
 }
 
-@media (max-width: 600px) {
+@media (max-width: 680px) {
   .navBar .hamburger {
     display: flex;
   }
@@ -132,7 +132,6 @@
   .navBar li {
     display: block;
     border: none !important;
-    font-size: 1rem;
   }
 
   .navBar .sideBar {

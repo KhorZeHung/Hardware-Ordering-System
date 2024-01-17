@@ -2,6 +2,8 @@ import React from "react";
 import "./ReportCard.css";
 import FilterTable from "../Table/FilterTable";
 import ReportSmlTxtCard from "./ReportSmlTxtCard";
+import BarChart from "../Chart/BarChart";
+import ReportSmlDonutChart from "./ReportSmlDonutChart";
 
 const MarketingCard = () => {
   const smlCardValue = [
@@ -28,7 +30,9 @@ const MarketingCard = () => {
   ];
   return (
     <div className="subBody">
+      <BarChart />
       <div className="smallCardSec">
+        <ReportSmlDonutChart title="chart title" description="last month" />
         {smlCardValue.map(({ value, description, title }) => {
           return (
             <ReportSmlTxtCard

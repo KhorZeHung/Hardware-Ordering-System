@@ -1,35 +1,51 @@
 import React from "react";
-import { Bar } from "react-chartjs-2";
-// eslint-disable-next-line
+import Chart from "react-apexcharts";
 
 const BarChart = () => {
+  const chartInfo = {
+    options: {
+      xaxis: {
+        categories: [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998],
+      },
+      title: {
+        text: "Marketing and sales comparison",
+        margin: 20,
+        align: "center",
+        style: {
+          fontSize: "15px",
+          fontWeight: "200",
+        },
+      },
+      plotOptions: {
+        bar: {
+          columnWidth: "15px",
+        },
+      },
+      dataLabels: {
+        enabled: false,
+      },
+      colors: ["#74c2bb", "#27413e"],
+    },
+    series: [
+      {
+        name: "marketing",
+        data: [30, 40, 45, 50, 49, 60, 70, 91],
+      },
+      {
+        name: "sales",
+        data: [70, 66, 88, 100, 99, 80, 100, 121],
+      },
+    ],
+  };
+
   return (
     <>
-      <Bar
-        data={{
-          labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug"],
-          datasets: [
-            {
-              label: "Sales",
-              data: [1, 2, 3, 4, 5, 4, 3, 2, 3],
-              borderColor: "none",
-              backgroundColor: "#81d8d0",
-            },
-            {
-              label: "Marketing",
-              data: [2, 3, 4, 2, 1, 3, 2, 5, 4],
-              borderColor: "none",
-              backgroundColor: "#27413e",
-            },
-          ],
-          options: {
-            layout: {
-              padding: {
-                left: 50,
-              },
-            },
-          },
-        }}
+      <Chart
+        options={chartInfo.options}
+        series={chartInfo.series}
+        type="bar"
+        width="100%"
+        height="300px"
       />
     </>
   );

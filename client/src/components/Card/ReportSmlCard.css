@@ -11,6 +11,18 @@
   height: 100px;
 }
 
+.donutChart {
+  min-height: 290px !important;
+  box-sizing: border-box;
+  max-width: none !important;
+  grid-column: 1 / span 2;
+  grid-row: 1 / span 2;
+}
+
+.chartObj {
+  height: 80%;
+}
+
 .contentBody > * {
   white-space: nowrap;
   overflow: hidden;
