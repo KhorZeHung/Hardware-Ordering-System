@@ -2,7 +2,8 @@ import React from "react";
 import "./ReportSmlCard.css";
 import DonutChart from "../Chart/DonutChart";
 
-const ReportSmlDonutChart = ({ title, description }) => {
+const ReportSmlDonutChart = (props) => {
+  const { title = null, description = null } = props;
   return (
     <div className="contentBody donutChart">
       <div className="title">{title}</div>

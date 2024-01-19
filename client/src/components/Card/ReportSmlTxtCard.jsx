@@ -1,7 +1,9 @@
 import React from "react";
 import "./ReportSmlCard.css";
 
-const ReportSmlCard = ({ title, value, description }) => {
+const ReportSmlCard = (props) => {
+  const { title = null, description = null, value = null } = props;
+
   return (
     <div className="contentBody">
       <div className="title">{title}</div>

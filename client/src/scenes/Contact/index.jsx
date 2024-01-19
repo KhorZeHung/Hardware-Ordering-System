@@ -1,9 +1,24 @@
-import React from "react";
-import FilterTable from "../../components/Table/FilterTable";
+import React, { useState } from "react";
+import TableWithSmlCard from "../../components/Table/TableWithSmlCard";
+import { contactData } from "../../data";
+import "../index.css";
+
 const Contact = () => {
+  const [supplierPage, setSupplierPage] = useState("supplier");
+
   return (
-    <div style={{ width: "90vw", margin: "0 auto" }}>
-      <FilterTable />
+    <div className="contentMainBody">
+      <ul className="subPageOption">
+        {["supplier", "product"].map((pages, index) => (
+          <li
+            key={index}
+            onClick={() => setSupplierPage(pages)}
+            className={supplierPage === pages ? "selected" : ""}>
+            {pages}
+          </li>
+        ))}
+      </ul>
+      <TableWithSmlCard datas={contactData[supplierPage]} />
     </div>
   );
 };

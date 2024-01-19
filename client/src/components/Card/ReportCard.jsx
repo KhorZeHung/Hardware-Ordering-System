@@ -1,16 +1,13 @@
 import React, { useState } from "react";
 import "./ReportCard.css";
-import MarketingCard from "./MarketingCard";
-import SalesCard from "./SalesCard";
-import ProjectCard from "./ProjectCard";
-import AccountCard from "./AccountCard";
+import { dashBoardData } from "../../data";
+import TableWithSmlCard from "../Table/TableWithSmlCard";
 
 const ReportCard = () => {
   const [subPages, setSubPages] = useState("marketing");
   return (
     <>
       <div id="reportSec">
-        <hr />
         <h6>report</h6>
         <div className="body">
           <ul>
@@ -24,20 +21,7 @@ const ReportCard = () => {
             ))}
           </ul>
           <div className="content center">
-            {(() => {
-              switch (subPages) {
-                case "marketing":
-                  return <MarketingCard />;
-                case "sales":
-                  return <SalesCard />;
-                case "project":
-                  return <ProjectCard />;
-                case "account":
-                  return <AccountCard />;
-                default:
-                  break;
-              }
-            })()}
+            {<TableWithSmlCard datas={dashBoardData[subPages]} />}
           </div>
         </div>
       </div>

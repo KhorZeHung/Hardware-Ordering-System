@@ -1,0 +1,34 @@
+@import "../components/index.css";
+
+.contentMainBody {
+  width: 90vw;
+  margin: 1rem auto;
+}
+
+.contentMainBody ul {
+  display: flex;
+  flex-direction: row;
+  list-style-type: none;
+  justify-content: space-around;
+  align-items: center;
+  box-sizing: border-box;
+  overflow: hidden;
+  max-width: 300px;
+  margin: 1.5rem 0;
+}
+
+.contentMainBody .selected {
+  border-color: black;
+  font-weight: 600;
+}
+
+.contentMainBody ul li {
+  text-align: center;
+  cursor: pointer;
+  width: 100px;
+  line-height: 30px;
+  height: 30px;
+  font-size: 15px;
+  user-select: none;
+  border-bottom: 2px solid transparent;
+}

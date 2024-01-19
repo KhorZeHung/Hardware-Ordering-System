@@ -1,9 +1,13 @@
-import React from 'react'
+import React from "react";
+import TableWithSmlCard from "../../components/Table/TableWithSmlCard";
+import { notificationData } from "../../data";
 
 const Notification = () => {
   return (
-    <div>Notification</div>
-  )
-}
+    <div className="contentMainBody">
+      <TableWithSmlCard datas={notificationData} />
+    </div>
+  );
+};
 
-export default Notification
+export default Notification;

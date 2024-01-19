@@ -1,9 +1,14 @@
-import React from 'react'
+import React from "react";
+import "../index.css";
+import TableWithSmlCard from "../../components/Table/TableWithSmlCard";
+import { projectData } from "../../data";
 
 const Project = () => {
   return (
-    <div>Project</div>
-  )
-}
+    <div className="contentMainBody">
+      <TableWithSmlCard datas={projectData} />
+    </div>
+  );
+};
 
-export default Project
+export default Project;

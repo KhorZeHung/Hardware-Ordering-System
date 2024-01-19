@@ -1,5 +1,5 @@
-import React from 'react';
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import React from "react";
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import Login from "./scenes/Login";
 import Dashboard from "./scenes/Dashboard";
 import Order from "./scenes/Order";
@@ -20,11 +20,15 @@ function App() {
           <Route path="/" element={<Dashboard />} />
           <Route path="/order" element={<Order />} />
           <Route path="/contact" element={<Contact />} />
+          {/* sub pages ofr contact, new contact, new product */}
+          <Route path="/contact/supplier/:supplier_id" element={<Contact />} />
+          <Route path="/contact/product/:product_id" element={<Contact />} />
+
           <Route path="/user" element={<User />} />
           <Route path="/project" element={<Project />} />
           <Route path="/quotation" element={<Quotation />} />
           <Route path="/notification" element={<Notification />} />
-          <Route path="*" element={<Dashboard />} />
+          <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </BrowserRouter>
     </div>
