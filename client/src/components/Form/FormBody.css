@@ -1,0 +1,384 @@
+@import "../index.css";
+
+.formBody {
+  background-color: var(--bckgrd-2);
+  min-width: 300px;
+  width: 70%;
+  min-width: 310px;
+  margin: 0 auto;
+  padding: 1rem;
+  box-sizing: border-box;
+  border-radius: 10px;
+
+  /* Chrome, Safari, Edge, Opera */
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}
+
+.formInputLists {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: auto;
+  gap: 2rem;
+}
+
+.formBody input[type="files"],
+.formBody input[type="select"] {
+  grid-row: span 2;
+}
+
+.formBody textarea,
+.formBody .checkBoxList {
+  grid-row: span 3;
+  font: inherit;
+  font-size: 13px;
+}
+
+@media (max-width: 900px) {
+  .formInputLists {
+    grid-template-columns: repeat(1, 1fr);
+    gap: 1rem;
+  }
+}
+
+.formBody .title {
+  font-size: 1.5rem;
+  font-weight: 400;
+  width: 100%;
+  padding: 1.5rem 0;
+  text-align: center;
+  text-transform: uppercase;
+  color: var(--primary-color-6);
+}
+
+.formBody .normalInput {
+  position: relative;
+  background-color: inherit;
+  margin-top: 20px;
+}
+
+.formBody .normalInput input,
+.formBody textarea,
+.formBody select {
+  outline: none;
+  padding: 0.7rem;
+  border: 1px solid var(--primary-color-6);
+  background-color: inherit;
+  border-radius: 5px;
+  width: 100%;
+  min-width: 280px;
+  box-sizing: border-box;
+  resize: none;
+}
+
+.formBody textarea {
+  min-height: 150px;
+}
+
+.formBody label {
+  background-color: inherit;
+  color: var(--primary-color-5);
+  font-size: 0.9rem;
+  user-select: none;
+  padding: 1rem;
+  display: block;
+  text-transform: capitalize;
+  background-color: var(--bckgrd-2);
+}
+
+.formBody .normalInput > label {
+  position: absolute;
+  padding: 0 2px !important;
+  top: -10px;
+  left: 8px;
+}
+
+.formBody .normalInput span.addToListBtn {
+  position: absolute;
+  right: 5px;
+  top: -4px;
+  font-size: 2rem;
+  color: var(--primary-color-5);
+  cursor: pointer;
+  user-select: none;
+}
+
+.formBody label span {
+  color: rgb(217, 13, 13);
+  padding-left: 3px;
+  vertical-align: text-bottom;
+  user-select: none;
+}
+
+.formBody .checkBoxList .scrollable {
+  height: 160px;
+  overflow-y: auto;
+  background-color: var(--bckgrd-2);
+}
+.formBody .checkBoxList .scrollable > div {
+  display: flex;
+  height: 30px;
+  padding: 0.5rem;
+}
+
+.formBody .checkBoxList .scrollable > div > input {
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+.formBody .checkBoxList .scrollable > div > p {
+  line-height: 30px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.formBody select {
+  cursor: pointer;
+}
+
+.formBody input[type="button"]:not(.fileList) {
+  background-color: var(--bckgrd-2);
+  color: var(--primary-color-4);
+  padding: 0.5rem;
+  padding-left: 0 !important;
+  border: 1.5px dashed var(--primary-color-5);
+  border-radius: 5px;
+  width: 200px;
+  cursor: pointer;
+}
+
+.filesName {
+  padding: 0.5rem 0;
+  width: 100%;
+  max-height: 50px;
+  overflow-x: auto;
+  list-style: none;
+  white-space: nowrap;
+  height: 50px;
+}
+
+.filesName > ul > li {
+  display: inline-block;
+  position: relative;
+  margin: 0.5rem;
+  padding-right: 10px;
+  max-width: 200px !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  overflow-wrap: unset;
+}
+
+.descriptionList > li {
+  position: relative;
+  margin: 0.5rem;
+  padding-right: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  overflow-wrap: unset;
+}
+
+.filesName .fileList,
+.descriptionList input[type="button"] {
+  position: absolute;
+  border: none;
+  right: 0;
+  top: 0;
+  font-size: 1rem;
+  color: var(--primary-color-5);
+  cursor: pointer;
+  background-color: transparent;
+}
+
+.formAction {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  padding: 2rem 0 1rem;
+}
+
+.formAction input {
+  padding: 0.5rem;
+  border-radius: 2rem;
+  width: 40%;
+  max-width: 200px;
+  background-color: var(--primary-color-4);
+  font-size: 0.9rem;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  color: var(--bckgrd-2);
+  height: 40px;
+}
+
+.formBody {
+  .mainBar {
+    background-color: var(--bckgrd-3);
+    box-shadow: var(--box-shadow-1);
+    box-sizing: border-box;
+    position: relative;
+    width: 100%;
+    color: var(--primary-color-5);
+    min-height: 50px;
+
+    .secClose {
+      font-size: 1.5rem;
+      position: absolute;
+      right: 10px;
+      top: 15px;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.2s ease-in;
+    }
+
+    .rotate {
+      transform: rotate(180deg);
+    }
+
+    input[type="text"] {
+      font: inherit;
+      font-size: 1.2rem;
+      border: none;
+      background-color: inherit;
+      color: inherit;
+      margin: 0.5rem 1rem;
+      border-bottom: 1.5px solid transparent;
+
+      &:focus {
+        outline: none;
+        border-color: var(--primary-color-5);
+      }
+    }
+  }
+}
+
+.formBody .barContent {
+  max-height: 0;
+  box-sizing: border-box;
+  margin: 0;
+  overflow: hidden;
+  position: relative;
+  transition: all 0.2s ease-in;
+
+  .addProduct {
+    background-color: var(--primary-color-5);
+    color: var(--bckgrd-2);
+    box-shadow: var(--box-shadow-1);
+    width: 30px;
+    aspect-ratio: 1/1;
+    border-radius: 40px;
+    text-align: center;
+    font-size: 2rem;
+    line-height: 23px;
+    user-select: none;
+    cursor: pointer;
+    position: sticky;
+    bottom: -40px;
+    left: calc(50% - 15px);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+
+    thead {
+      background-color: var(--primary-color-5);
+      color: var(--bckgrd-3);
+      th {
+        padding: 0.5rem 0.2rem;
+        cursor: pointer;
+      }
+    }
+
+    tr {
+      height: 60px;
+
+      input[type="text"],
+      input[type="number"],
+      p {
+        font-size: 0.9rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 100%;
+        overflow-wrap: unset;
+      }
+
+      input[type="text"] {
+        padding: 5px;
+        width: 80% !important;
+      }
+
+      input[type="number"] {
+        border: none;
+        font-size: 0.9rem;
+        background-color: inherit;
+        width: 100px;
+        text-align: center;
+        color: inherit;
+      }
+
+      input[type="number"]:focus {
+        outline: none;
+      }
+    }
+
+    tr:not(:last-child) {
+      border-bottom: 1px solid var(--primary-color-5);
+    }
+
+    td:not(:nth-child(2)) {
+      text-align: center;
+    }
+
+    .productListAction {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      input[type="number"] {
+        outline: none;
+        background-color: inherit;
+        border: 1px solid var(--primary-color-5);
+        color: var(--primary-color-5);
+        border-radius: 3px;
+        width: 30px;
+        padding: 3px;
+        text-align: center;
+        margin: 0 5px;
+      }
+
+      button {
+        border-radius: 100%;
+        border: none;
+        background-color: inherit;
+        color: inherit;
+        cursor: pointer;
+        text-align: center;
+      }
+
+      button:active {
+        background-color: #999999;
+        transition: all 0.1s ease-in;
+      }
+    }
+  }
+
+  &.open {
+    max-height: 500px;
+    overflow: auto !important;
+    margin: 10px 0;
+    padding-bottom: 10px;
+  }
+  &.open .addProduct {
+    display: block;
+    bottom: 0px;
+  }
+}

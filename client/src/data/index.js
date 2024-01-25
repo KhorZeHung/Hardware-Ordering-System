@@ -115,6 +115,53 @@ export const contactData = {
         title: "total supplier",
       },
     ],
+    newModalForm: {
+      title: "new supplier",
+      submitValue: "add supplier",
+      inputLists: [
+        {
+          type: "text",
+          name: "splr_company",
+          label: "supplier company name",
+          placeholder: "Example sdn bhd",
+        },
+        {
+          type: "checkbox",
+          name: "splr_cat",
+          label: "Supplier category",
+          options: [
+            "furniture",
+            "carpentry",
+            "curtain",
+            "decoration",
+            "general hardware",
+            "electrical hardware",
+            "plumbing hardware",
+            "electrical service",
+            "plumbing service",
+          ].sort(),
+        },
+        {
+          type: "text",
+          name: "personInCharge",
+          label: "Person In-charge",
+          placeholder: "Full name with title",
+        },
+        {
+          type: "email",
+          name: "splr_email",
+          label: "Company E-mail",
+          placeholder: "example@gmail.com",
+          required: false,
+        },
+        {
+          type: "tel",
+          name: "splr_contact",
+          label: "Contact number",
+          placeholder: "03-XXXX XXXX",
+        },
+      ],
+    },
   },
   product: {
     tableData: { checkBox: true },
@@ -124,6 +171,83 @@ export const contactData = {
         title: "total product",
       },
     ],
+    newModalForm: {
+      title: "new product / service",
+      submitValue: "add product",
+      inputLists: [
+        {
+          type: "text",
+          name: "product_name",
+          label: "Product/Service name",
+          placeholder: "Cement 50kg 1pack ...",
+        },
+        {
+          type: "text",
+          name: "product_cost",
+          label: "Cost (RM)",
+          placeholder: "XXX.XX",
+        },
+        {
+          type: "text",
+          name: "product_price",
+          label: "Charging Price (RM)",
+          placeholder: "+15% to cost as default",
+        },
+        {
+          type: "text",
+          name: "product_brand",
+          label: "Product Brand ",
+          required: false,
+          default: 1,
+        },
+        {
+          type: "checkbox",
+          name: "product_cat",
+          label: "Supplier",
+          options: [
+            "supplier 1",
+            "supplier 2",
+            "supplier 3",
+            "supplier 4",
+            "supplier 5",
+            "supplier 6",
+            "supplier 7",
+            "supplier 8",
+            "supplier 9",
+            "supplier 10",
+          ].sort(),
+        },
+        {
+          type: "checkbox",
+          name: "splr_cat",
+          label: "Product category",
+          options: [
+            "furniture",
+            "carpentry",
+            "curtain",
+            "decoration",
+            "general hardware",
+            "electrical hardware",
+            "plumbing hardware",
+            "electrical service",
+            "plumbing service",
+          ].sort(),
+        },
+        {
+          type: "textarea",
+          name: "product_detail",
+          label: "product detail",
+          required: false,
+          placeholder: "Record anything for internal use.",
+        },
+        {
+          type: "multipletext",
+          name: "product_description",
+          label: "product description",
+          placeholder: "Description for Quotation, hit enter to record",
+        },
+      ],
+    },
   },
 };
 export const notificationData = {
@@ -196,4 +320,34 @@ export const projectData = {
 };
 export const userData = {
   tableData: { checkBox: true },
+  newModalForm: {
+    title: "new user",
+    submitValue: "add user",
+    inputLists: [
+      {
+        type: "text",
+        name: "user_name",
+        label: "user name",
+        placeholder: "Full name without title",
+      },
+      {
+        type: "option",
+        name: "user_authority",
+        label: "Autority",
+        options: ["super user", "manager", "admin"],
+      },
+      {
+        type: "email",
+        name: "user_email",
+        label: "E-mail",
+        placeholder: "example@email.com",
+      },
+      {
+        type: "tel",
+        name: "user_contact",
+        label: "Contact number",
+        placeholder: "01X-XXX XXXX",
+      },
+    ],
+  },
 };

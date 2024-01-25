@@ -9,6 +9,7 @@ import Project from "./scenes/Project";
 import Quotation from "./scenes/Quotation";
 import Notification from "./scenes/Notification";
 import Navbar from "./components/NavBar/Navbar";
+import NewQuote from "./scenes/Quotation/NewQuote";
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
           <Route path="/user" element={<User />} />
           <Route path="/project" element={<Project />} />
           <Route path="/quotation" element={<Quotation />} />
+          <Route path="/quotation/new-quote" element={<NewQuote />} />
           <Route path="/notification" element={<Notification />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>

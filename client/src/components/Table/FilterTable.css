@@ -51,20 +51,27 @@
   margin: 0 auto;
   table-layout: auto;
   border-collapse: collapse;
-}
 
-tr {
-  height: 40px;
-  cursor: pointer;
-}
+  tr {
+    height: 40px;
+    cursor: pointer;
+  }
 
-tr:nth-child(odd) {
-  background-color: var(--bckgrd-2);
-}
+  tr:nth-child(odd) {
+    background-color: var(--bckgrd-2);
+  }
 
-tbody tr:nth-child(even),
-tr:hover {
-  background-color: var(--bckgrd-3);
+  tbody tr:nth-child(even),
+  tr:hover {
+    background-color: var(--bckgrd-3);
+  }
+
+  thead th {
+    position: sticky;
+    top: 0;
+    background-color: var(--primary-color-5);
+    color: white;
+  }
 }
 
 .tableSec th,
@@ -80,13 +87,6 @@ tr:hover {
 
 .tableSec td:not(:last-child) {
   border-right: 1px solid black;
-}
-
-thead th {
-  position: sticky;
-  top: 0;
-  background-color: var(--primary-color-5);
-  color: white;
 }
 
 .deleteRowIcon {

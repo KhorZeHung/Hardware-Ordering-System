@@ -54,7 +54,7 @@ const FilterTable = (props) => {
   const checkBoxHandler = (event) => {
     const checked = event.target.checked;
     const normalCheckBox = document.querySelectorAll(
-      "input[type='checkbox']:not(#mainCheckBox)"
+      ".tableSec input[type='checkbox']:not(#mainCheckBox)"
     );
 
     let newCheckedBoxArray = [];

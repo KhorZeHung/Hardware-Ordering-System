@@ -32,3 +32,20 @@
   user-select: none;
   border-bottom: 2px solid transparent;
 }
+
+.addNewItem {
+  position: fixed;
+  right: 5%;
+  font-size: 2rem;
+  bottom: 5%;
+  background: var(--primary-color-5);
+  box-shadow: var(--box-shadow-1);
+  border-radius: 30px;
+  height: 40px;
+  aspect-ratio: 1/1;
+  text-align: center;
+  line-height: 32px;
+  color: var(--bckgrd-2);
+  cursor: pointer;
+  user-select: none;
+}

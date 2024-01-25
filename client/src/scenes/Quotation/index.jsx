@@ -7,6 +7,9 @@ const Quotation = () => {
   return (
     <div className="contentMainBody">
       <TableWithSmlCard datas={quoteData} />
+      <span className="addNewItem">
+        <a href="./quotation/new-quote">+</a>
+      </span>
     </div>
   );
 };

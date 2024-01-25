@@ -10,7 +10,7 @@
 
   --secondary-color-1: rgb(16, 19, 19);
 
-  --bckgrd-1: rgb(243, 240, 240);
+  --bckgrd-1: rgb(248, 245, 245);
   --bckgrd-2: rgb(251, 251, 255);
   --bckgrd-3: rgb(230, 226, 226);
 
@@ -21,6 +21,15 @@
   margin: 0;
   padding: 0;
   scroll-behavior: smooth;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+body {
+  position: relative;
 }
 
 body,

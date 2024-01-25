@@ -1,0 +1,30 @@
+@import "../index.css";
+
+.modal {
+  position: fixed;
+  top: 0;
+  overflow-y: auto;
+  box-sizing: border-box;
+  height: 100vh;
+  width: 100vw;
+  background-color: rgba(14, 12, 12, 0.813);
+  padding: 4rem 0;
+  margin: 0 auto;
+  backdrop-filter: blur(3px);
+  display: none;
+  z-index: 1000;
+}
+
+.open {
+  display: block;
+}
+
+.closeModal {
+  color: var(--primary-color-3);
+  position: absolute;
+  right: 5%;
+  top: 10px;
+  font-size: 1.7rem;
+  cursor: pointer;
+  user-select: none;
+}
