@@ -9,6 +9,8 @@ const NormalInput = ({ datas, formHandler }) => {
     label,
     placeholder = null,
     defaultValue = null,
+    min = null,
+    max = null,
   } = datas;
 
   return (
@@ -25,6 +27,8 @@ const NormalInput = ({ datas, formHandler }) => {
         placeholder={placeholder}
         onChange={formHandler}
         id={name}
+        min={min}
+        max={max}
       />
     </div>
   );

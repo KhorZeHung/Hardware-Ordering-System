@@ -351,3 +351,36 @@ export const userData = {
     ],
   },
 };
+
+export const newQuoteData = [
+  {
+    type: "text",
+    name: "quote_name",
+    label: "quote name",
+    placeholder: "Describe location or version",
+  },
+  {
+    type: "text",
+    name: "quote_client_name",
+    label: "Client name",
+    placeholder: "Full name with title",
+  },
+  {
+    type: "tel",
+    name: "quote_client_contact",
+    label: "Client contact number",
+    placeholder: "01X-XXX XXXX",
+  },
+  {
+    type: "location",
+    name: "quote_location",
+    label: "Location",
+    placeholder: "full address with unit",
+  },
+  {
+    type: "option",
+    name: "quote_prop_type",
+    label: "Type",
+    options: ["condo", "shoplot", "retail shop", "shopping mall", "terrace"],
+  },
+];

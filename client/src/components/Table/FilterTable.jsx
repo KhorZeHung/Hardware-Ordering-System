@@ -7,14 +7,17 @@ const FilterTable = (props) => {
   const {
     checkBox = false,
     endPoint = "https://dummyjson.com/products",
-    filterOption = null,
+    filter = null,
   } = props.datas;
 
   const [column, setColumn] = useState(null);
   const [asc, setAsc] = useState(false);
   const [tableData, setTableData] = useState(null);
+  const [oriData, setOriData] = useState(null);
   const searchTermRef = useRef(null);
   const [checkedBox, setCheckedBox] = useState([]);
+  const [filterValue, setFilterValue] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -22,6 +25,7 @@ const FilterTable = (props) => {
         const response = await axios.get(endPoint);
         const datas = response.data;
         setTableData(datas.products);
+        setOriData(datas.products);
 
         //need to change after back-end fully develop
         setColumn(Object.keys(datas.products[0]).slice(0, 4));
@@ -49,6 +53,7 @@ const FilterTable = (props) => {
 
   const clearSearch = () => {
     searchTermRef.current.value = "";
+    setTableData(filter ? filterData(filterValue, oriData) : oriData);
   };
 
   const checkBoxHandler = (event) => {
@@ -81,11 +86,56 @@ const FilterTable = (props) => {
     });
   };
 
+  const searchHandler = (e) => {
+    const checkValue = String(e.target.value).toLowerCase();
+    setSearchTerm(checkValue);
+
+    var newTableArray =
+      filterValue === "all" ? oriData : filterData(filterValue, oriData);
+    setTableData(searchData(checkValue, newTableArray));
+  };
+
+  const searchData = (searchTerm, referArray) => {
+    if (searchTerm.length > 1) {
+      return referArray.filter((item) =>
+        Object.values(item).some((value) =>
+          String(value).toLowerCase().includes(searchTerm)
+        )
+      );
+    }
+    return referArray;
+  };
+
+  const filterOptionHandler = (e) => {
+    e.preventDefault();
+    const checkValue = String(e.target.value).toLowerCase();
+    setFilterValue(checkValue);
+    var newTableValue =
+      searchTerm.length > 1 ? searchData(searchTerm, oriData) : oriData;
+
+    setTableData(filterData(checkValue, newTableValue));
+  };
+
+  const filterData = (category, referArray) => {
+    if (category === "all") {
+      return referArray;
+    }
+    return referArray.filter((value) => {
+      const rowValue = String(value[filter.column]).toLowerCase();
+      return rowValue.includes(String(category).toLowerCase());
+    });
+  };
+
   return (
     <div>
       <div className="filterSec spaceBetween">
         <div className="searchBar">
-          <input type="text" placeholder="Search..." ref={searchTermRef} />
+          <input
+            type="text"
+            placeholder="Search..."
+            ref={searchTermRef}
+            onChange={searchHandler}
+          />
           <div className="searchBarIcon center" onClick={clearSearch}>
             <span className="material-symbols-outlined">close</span>
             <span className="material-symbols-outlined">search</span>
@@ -103,10 +153,16 @@ const FilterTable = (props) => {
               </span>
             </>
           )}
-          {filterOption && checkedBox.length === 0 && (
+          {filter && checkedBox.length === 0 && (
             <>
-              <select name="tableFilter" style={{ minWidth: "50px" }}>
-                {filterOption.map((value) => {
+              <select
+                name="tableFilter"
+                style={{ minWidth: "50px" }}
+                onChange={filterOptionHandler}>
+                <option value="all" defaultChecked>
+                  all
+                </option>
+                {filter.options.map((value) => {
                   return <option value={value}>{value}</option>;
                 })}
               </select>
@@ -142,7 +198,7 @@ const FilterTable = (props) => {
               </tr>
             </thead>
             <tbody>
-              {tableData &&
+              {tableData.length > 0 ? (
                 tableData.map(({ id, title, description, price }) => (
                   <tr key={id}>
                     {checkBox && (
@@ -159,7 +215,18 @@ const FilterTable = (props) => {
                     <td>{description}</td>
                     <td>{price}</td>
                   </tr>
-                ))}
+                ))
+              ) : (
+                <div
+                  className="center"
+                  style={{
+                    height: "400px",
+                    width: "100vw",
+                    backgroundColor: "transparent",
+                  }}>
+                  not such datas
+                </div>
+              )}
             </tbody>
           </table>
         )}

@@ -2,16 +2,17 @@ import React, { useState, useEffect } from "react";
 import "../FormBody.css";
 
 const RoomMaterialInput = ({ datas }) => {
-  const { index, roomName = null, defaultProductList = [] } = datas;
+  const { index, defaultProductList, formHandler = null } = datas;
+
+  const numOfRoom = index + 1;
+  const indexOfArray = index;
 
   const [open, setOpen] = useState(false);
-  const [productLists, setProductLists] = useState(
-    defaultProductList.productLists || []
-  );
+  const [productLists, setProductLists] = useState(defaultProductList);
 
   useEffect(() => {
     const handleOutsideClick = (event) => {
-      const mainBar = document.querySelector("#mainBar" + index);
+      const mainBar = document.querySelector("#mainBar" + numOfRoom);
 
       if (mainBar && !mainBar.contains(event.target)) {
         setOpen(false);
@@ -31,39 +32,48 @@ const RoomMaterialInput = ({ datas }) => {
       document.removeEventListener("mousedown", handleOutsideClick);
       document.removeEventListener("keydown", handleKeyPress);
     };
-  }, [open]);
+  }, [open, numOfRoom]);
 
   const changeProductHandler = (key, index, e) => {
-    const newProductListsArray = [...productLists];
+    const newProductListsArray = { ...productLists };
     if (key === "delete") {
-      newProductListsArray.splice(index, 1);
+      newProductListsArray.productList.splice(index, 1);
     } else {
-      newProductListsArray[index][key] = e.target.value;
+      newProductListsArray.productList[index][key] = e.target.value;
     }
-
     setProductLists(newProductListsArray);
+    formHandler(e, "quote_product_lists", newProductListsArray, indexOfArray);
   };
 
-  const changeQuantityHandler = (index, add) => {
-    const newProductListsArray = [...productLists];
+  const changeQuantityHandler = (index, add, e) => {
+    const newProductListsArray = { ...productLists };
     if (add) {
-      newProductListsArray[index].quantity++;
+      newProductListsArray.productList[index].quantity++;
     } else {
-      newProductListsArray[index].quantity--;
+      newProductListsArray.productList[index].quantity--;
     }
+    setProductLists(newProductListsArray);
+    formHandler(e, "quote_product_lists", newProductListsArray, indexOfArray);
+  };
+
+  const changeRoomNameHandler = (e) => {
+    const newRoomName = e.target.value;
+    const newProductListsArray = { ...productLists, roomName: newRoomName };
 
     setProductLists(newProductListsArray);
+    formHandler(e, "quote_product_lists", newProductListsArray, indexOfArray);
   };
 
   return (
-    <div className="formBody" style={{ width: "90%" }}>
-      <div className="mainBar" id={"mainBar" + index}>
+    <div style={{ width: "100%", padding: "1rem 0" }}>
+      <div className="mainBar" id={"mainBar" + numOfRoom}>
         <input
           type="text"
           name="room1"
           id="room1"
-          value={roomName || "room " + index}
+          value={productLists.roomName}
           style={{ padding: "5px" }}
+          onChange={(e) => changeRoomNameHandler(e)}
         />
         <span
           className={

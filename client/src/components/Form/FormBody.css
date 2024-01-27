@@ -258,6 +258,23 @@
   }
 }
 
+.addProduct {
+  background-color: var(--primary-color-5);
+  color: var(--bckgrd-2);
+  box-shadow: var(--box-shadow-1);
+  width: 30px;
+  aspect-ratio: 1/1;
+  border-radius: 40px;
+  text-align: center;
+  font-size: 2rem;
+  line-height: 23px;
+  user-select: none;
+  cursor: pointer;
+  position: sticky;
+  bottom: -40px;
+  left: calc(50% - 15px);
+}
+
 .formBody .barContent {
   max-height: 0;
   box-sizing: border-box;
@@ -265,23 +282,6 @@
   overflow: hidden;
   position: relative;
   transition: all 0.2s ease-in;
-
-  .addProduct {
-    background-color: var(--primary-color-5);
-    color: var(--bckgrd-2);
-    box-shadow: var(--box-shadow-1);
-    width: 30px;
-    aspect-ratio: 1/1;
-    border-radius: 40px;
-    text-align: center;
-    font-size: 2rem;
-    line-height: 23px;
-    user-select: none;
-    cursor: pointer;
-    position: sticky;
-    bottom: -40px;
-    left: calc(50% - 15px);
-  }
 
   table {
     width: 100%;

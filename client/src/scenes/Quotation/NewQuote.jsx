@@ -1,10 +1,48 @@
 import React, { useState, useEffect } from "react";
-import FormBody from "../../components/Form/FormBody";
 import CircularProgress from "@mui/material-next/CircularProgress";
 import RoomMaterialInput from "../../components/Form/Input/RoomMaterialInput";
+import NormalInput from "../../components/Form/Input/NormalInput";
+import InputOption from "../../components/Form/Input/InputOption";
+import { newQuoteData } from "../../data";
 
 const NewQuote = () => {
   const [currentLocation, setCurrentLocation] = useState(undefined);
+  const [formInputValue, setFormInputValue] = useState({
+    quote_product_lists: [{ roomName: "room 1", productList: [] }],
+  });
+  const [totalNumRoom, setTotalNumRoom] = useState(1);
+
+  var inputLists = newQuoteData;
+
+  const formHandler = (e, name, value, index = null) => {
+    const inputValue = value || e.target.value;
+
+    setFormInputValue((prev) => {
+      if (Array.isArray(prev[name])) {
+        return {
+          ...prev,
+          [name]: (prev[name][index] = value),
+        };
+      }
+      return { ...prev, [name]: inputValue };
+    });
+  };
+
+  const addRoomHandler = (e) => {
+    e.preventDefault();
+    var numOfRooms = totalNumRoom + 1;
+
+    var productListArray = [
+      ...formInputValue.quote_product_lists,
+      {
+        roomName: `room ${numOfRooms}`,
+        product_list: [],
+      },
+    ];
+
+    setTotalNumRoom(numOfRooms);
+    formHandler(null, "quote_product_lists", productListArray);
+  };
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition((position) => {
@@ -21,6 +59,7 @@ const NewQuote = () => {
             setCurrentLocation(null);
           } else {
             const result = data.display_name;
+            formHandler(null, "quote_location", result);
             setCurrentLocation(result);
           }
         })
@@ -31,58 +70,71 @@ const NewQuote = () => {
     });
   }, []);
 
-  const inputLists = [
-    {
-      type: "text",
-      name: "quote_name",
-      label: "quote name",
-      placeholder: "Describe location or version",
-    },
-    {
-      type: "text",
-      name: "quote_client_name",
-      label: "Client name",
-      placeholder: "Full name with title",
-    },
-    {
-      type: "tel",
-      name: "quote_client_contact",
-      label: "Client contact number",
-      placeholder: "01X-XXX XXXX",
-    },
-    {
-      type: "location",
-      name: "quote_location",
-      label: "Location",
-      defaultValue: currentLocation || "",
-      placeholder: "full address with unit",
-    },
-    {
-      type: "option",
-      name: "quote_prop_type",
-      label: "Type",
-      options: ["condo", "shoplot", "retail shop", "shopping mall", "terrace"],
-    },
-    {
-      type: "number",
-      name: "quote_num_of_room",
-      label: "Total room",
-      placeholder: "Room + bathroom",
-    },
-  ];
+  const createRoomHandler = Array.from({ length: totalNumRoom }, (_, index) => (
+    <RoomMaterialInput
+      key={index}
+      datas={{
+        index: index,
+        formHandler: formHandler,
+        defaultProductList: formInputValue.quote_product_lists[index],
+      }}
+    />
+  ));
 
   return (
     <>
       {currentLocation !== undefined ? (
-        <FormBody inputLists={inputLists} submitValue="create quote" />
+        <form method="post" className="formBody" style={{ width: "80%" }}>
+          <p className="title">new quote</p>
+          <div className="formInputLists" style={{ marginBottom: "3rem" }}>
+            <NormalInput
+              datas={inputLists[0]}
+              formHandler={(e) => formHandler(e, inputLists[0].name)}
+            />
+            <NormalInput
+              datas={inputLists[1]}
+              formHandler={(e) => formHandler(e, inputLists[1].name)}
+            />
+            <NormalInput
+              datas={inputLists[2]}
+              formHandler={(e) => formHandler(e, inputLists[2].name)}
+            />
+            <NormalInput
+              datas={{ ...inputLists[3], defaultValue: currentLocation }}
+              formHandler={(e) => formHandler(e, inputLists[3].name)}
+            />
+            <InputOption
+              datas={inputLists[4]}
+              formHandler={(e) => formHandler(e, inputLists[4].name)}
+            />
+          </div>
+          {
+            <>
+              <div style={{ margin: "1rem 0" }}>{createRoomHandler}</div>
+              <button
+                style={{
+                  display: "block",
+                  margin: "0 auto",
+                  fontSize: "1.5rem",
+                  borderRadius: "100%",
+                  padding: 0,
+                  width: "30px",
+                  height: "30px",
+                }}
+                onClick={(e) => addRoomHandler(e)}>
+                +
+              </button>
+              <div className="formAction" style={{ marginTop: "3rem" }}>
+                <input type="submit" value="create quote" />
+              </div>
+            </>
+          }
+        </form>
       ) : (
         <div className="center" style={{ height: "400px", width: "100%" }}>
           <CircularProgress />
         </div>
       )}
-      <RoomMaterialInput datas={{ index: 1 }} />
-      <RoomMaterialInput datas={{ index: 2 }} />
-      <RoomMaterialInput datas={{ index: 3 }} />
     </>
   );
 };

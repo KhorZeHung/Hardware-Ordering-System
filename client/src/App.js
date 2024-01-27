@@ -1,7 +1,7 @@
 import React from "react";
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import Login from "./scenes/Login";
-import Dashboard from "./scenes/Dashboard";
+// import Dashboard from "./scenes/Dashboard";
 import Order from "./scenes/Order";
 import Contact from "./scenes/Contact";
 import User from "./scenes/User";
@@ -10,6 +10,7 @@ import Quotation from "./scenes/Quotation";
 import Notification from "./scenes/Notification";
 import Navbar from "./components/NavBar/Navbar";
 import NewQuote from "./scenes/Quotation/NewQuote";
+import FilterTable from "./components/Table/FilterTable";
 
 function App() {
   return (
@@ -18,7 +19,17 @@ function App() {
         <Navbar />
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route path="/" element={<Dashboard />} />
+          {/* <Route path="/" element={<Dashboard />} /> */}
+          <Route
+            path="/"
+            element={
+              <FilterTable
+                datas={{
+                  filter: { options: ["iPhone", "2", "3"], column: "title" },
+                }}
+              />
+            }
+          />
           <Route path="/order" element={<Order />} />
           <Route path="/contact" element={<Contact />} />
           {/* sub pages ofr contact, new contact, new product */}

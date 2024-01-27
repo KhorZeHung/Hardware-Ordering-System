@@ -110,3 +110,32 @@ hr {
 body > iframe {
   display: none;
 }
+
+button {
+  padding: 0.5rem 1rem;
+  border: none;
+  background-color: var(--primary-color-4);
+  color: var(--bckgrd-2);
+  font-size: 0.8rem;
+  box-shadow: var(--box-shadow-1);
+  transition: all 0.1s ease-in-out;
+  border-radius: 1rem;
+  cursor: pointer;
+}
+
+button:hover,
+button:active {
+  background-color: var(--primary-color-6);
+  scale: 0.99;
+}
+
+select {
+  background-color: inherit;
+  border: 1px solid var(--primary-color-5);
+  border-radius: 5px;
+  font-size: 0.8rem;
+  padding: 4px;
+  width: 100px;
+  outline: none;
+  color: var(--primary-color-8);
+}
