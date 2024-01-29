@@ -8,40 +8,62 @@ import { newQuoteData } from "../../data";
 const NewQuote = () => {
   const [currentLocation, setCurrentLocation] = useState(undefined);
   const [formInputValue, setFormInputValue] = useState({
-    quote_product_lists: [{ roomName: "room 1", productList: [] }],
+    quote_product_lists: [
+      {
+        roomName: "room 1",
+        productList: [{ name: "product 1", quantity: 2, unit_price: 12.49 }],
+      },
+      {
+        roomName: "room 2",
+        productList: [{ name: "product 1", quantity: 2, unit_price: 12.49 }],
+      },
+    ],
   });
-  const [totalNumRoom, setTotalNumRoom] = useState(1);
-
+  const [totalNumRoom, setTotalNumRoom] = useState(2);
   var inputLists = newQuoteData;
 
   const formHandler = (e, name, value, index = null) => {
     const inputValue = value || e.target.value;
 
     setFormInputValue((prev) => {
-      if (Array.isArray(prev[name])) {
+      if (Array.isArray(prev[name]) && index !== null) {
         return {
           ...prev,
-          [name]: (prev[name][index] = value),
+          [name]: prev[name].map((item, i) =>
+            i === index ? { ...item, ...inputValue } : item
+          ),
         };
       }
       return { ...prev, [name]: inputValue };
     });
   };
 
-  const addRoomHandler = (e) => {
+  const addRoomHandler = (e, defaultValue = []) => {
     e.preventDefault();
     var numOfRooms = totalNumRoom + 1;
 
-    var productListArray = [
+    const productListArray = [
       ...formInputValue.quote_product_lists,
       {
         roomName: `room ${numOfRooms}`,
-        product_list: [],
+        productList: defaultValue,
       },
     ];
 
     setTotalNumRoom(numOfRooms);
     formHandler(null, "quote_product_lists", productListArray);
+  };
+
+  const deleteRoomHandler = (index) => {
+    setTotalNumRoom((prev) => prev - 1);
+    setFormInputValue((prev) => {
+      const newProductList = [...prev.quote_product_lists];
+      newProductList.splice(index, 1);
+      return {
+        ...prev,
+        quote_product_lists: newProductList,
+      };
+    });
   };
 
   useEffect(() => {
@@ -70,16 +92,22 @@ const NewQuote = () => {
     });
   }, []);
 
-  const createRoomHandler = Array.from({ length: totalNumRoom }, (_, index) => (
-    <RoomMaterialInput
-      key={index}
-      datas={{
-        index: index,
-        formHandler: formHandler,
-        defaultProductList: formInputValue.quote_product_lists[index],
-      }}
-    />
-  ));
+  const createRoomHandler = () => {
+    return formInputValue.quote_product_lists.map((value, index) => {
+      return (
+        <RoomMaterialInput
+          key={"room" + index}
+          datas={{
+            index: index,
+            formHandler: formHandler,
+            defaultProductList: value,
+            addRoomHandler: addRoomHandler,
+            deleteRoomHandler: deleteRoomHandler,
+          }}
+        />
+      );
+    });
+  };
 
   return (
     <>
@@ -108,27 +136,30 @@ const NewQuote = () => {
               formHandler={(e) => formHandler(e, inputLists[4].name)}
             />
           </div>
-          {
-            <>
-              <div style={{ margin: "1rem 0" }}>{createRoomHandler}</div>
-              <button
-                style={{
-                  display: "block",
-                  margin: "0 auto",
-                  fontSize: "1.5rem",
-                  borderRadius: "100%",
-                  padding: 0,
-                  width: "30px",
-                  height: "30px",
-                }}
-                onClick={(e) => addRoomHandler(e)}>
-                +
-              </button>
-              <div className="formAction" style={{ marginTop: "3rem" }}>
-                <input type="submit" value="create quote" />
-              </div>
-            </>
-          }
+          <div style={{ margin: "1rem 0" }}>{createRoomHandler()}</div>
+          <button
+            style={{
+              display: "block",
+              margin: "0 auto",
+              fontSize: "1.5rem",
+              borderRadius: "100%",
+              padding: 0,
+              width: "30px",
+              height: "30px",
+            }}
+            onClick={addRoomHandler}>
+            +
+          </button>
+          <div className="formAction" style={{ marginTop: "3rem" }}>
+            <button className="center">
+              <span
+                class="material-symbols-outlined"
+                style={{ paddingRight: "0.5rem", fontSize: "1rem" }}>
+                picture_as_pdf
+              </span>
+              create pdf
+            </button>
+          </div>
         </form>
       ) : (
         <div className="center" style={{ height: "400px", width: "100%" }}>

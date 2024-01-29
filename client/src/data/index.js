@@ -372,9 +372,9 @@ export const newQuoteData = [
     placeholder: "01X-XXX XXXX",
   },
   {
-    type: "location",
-    name: "quote_location",
-    label: "Location",
+    type: "text",
+    name: "quote_address",
+    label: "address",
     placeholder: "full address with unit",
   },
   {

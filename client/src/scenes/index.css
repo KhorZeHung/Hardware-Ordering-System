@@ -38,7 +38,7 @@
   right: 5%;
   font-size: 2rem;
   bottom: 5%;
-  background: var(--primary-color-5);
+  background-color: var(--primary-color-4);
   box-shadow: var(--box-shadow-1);
   border-radius: 30px;
   height: 40px;
@@ -48,4 +48,9 @@
   color: var(--bckgrd-2);
   cursor: pointer;
   user-select: none;
+  transition: all 0.3s ease-in;
+
+  &:hover {
+    background-color: var(--primary-color-5);
+  }
 }

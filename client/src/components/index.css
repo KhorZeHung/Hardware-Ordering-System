@@ -124,9 +124,11 @@ button {
 }
 
 button:hover,
-button:active {
+button:active,
+input[type="submit"]:hover,
+input[type="submit"]:active {
   background-color: var(--primary-color-6);
-  scale: 0.99;
+  transition: background-color 0.2s ease-in;
 }
 
 select {

@@ -14,10 +14,11 @@ const FilterTable = (props) => {
   const [asc, setAsc] = useState(false);
   const [tableData, setTableData] = useState(null);
   const [oriData, setOriData] = useState(null);
-  const searchTermRef = useRef(null);
   const [checkedBox, setCheckedBox] = useState([]);
+  const [tableIsLoading, setTableIsLoading] = useState(false);
   const [filterValue, setFilterValue] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const searchTermRef = useRef(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -26,9 +27,10 @@ const FilterTable = (props) => {
         const datas = response.data;
         setTableData(datas.products);
         setOriData(datas.products);
+        setTableIsLoading(true);
 
         //need to change after back-end fully develop
-        setColumn(Object.keys(datas.products[0]).slice(0, 4));
+        setColumn(Object.keys(datas.products[0]).slice(0, 5));
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -162,9 +164,11 @@ const FilterTable = (props) => {
                 <option value="all" defaultChecked>
                   all
                 </option>
-                {filter.options.map((value) => {
-                  return <option value={value}>{value}</option>;
-                })}
+                {filter.options.map((value) => (
+                  <option key={value} value={value}>
+                    {value}
+                  </option>
+                ))}
               </select>
             </>
           )}
@@ -172,63 +176,68 @@ const FilterTable = (props) => {
       </div>
       <hr />
       <div className="tableSec">
-        {!column ? (
+        {!tableIsLoading ? (
           <div className="center" style={{ height: "400px", width: "100%" }}>
             <CircularProgress />
           </div>
         ) : (
-          <table>
-            <thead>
-              <tr>
-                {checkBox && column.length && (
-                  <th>
-                    <input
-                      type="checkbox"
-                      onChange={checkBoxHandler}
-                      id="mainCheckBox"
-                    />
-                  </th>
-                )}
-                {column &&
-                  column.map((value, index) => (
-                    <th key={index} onClick={() => sortTable(value)}>
-                      {value}
-                    </th>
-                  ))}
-              </tr>
-            </thead>
-            <tbody>
-              {tableData.length > 0 ? (
-                tableData.map(({ id, title, description, price }) => (
-                  <tr key={id}>
-                    {checkBox && (
+          <>
+            {tableData.length > 0 ? (
+              <table>
+                <thead>
+                  <tr>
+                    {checkBox && column.length && (
                       <th>
                         <input
                           type="checkbox"
-                          value={id}
-                          onClick={editCheckedBox}
+                          onChange={checkBoxHandler}
+                          id="mainCheckBox"
                         />
                       </th>
                     )}
-                    <td>{id}</td>
-                    <td>{title}</td>
-                    <td>{description}</td>
-                    <td>{price}</td>
+                    {column &&
+                      column.map((value, index) => (
+                        <th key={index} onClick={() => sortTable(value)}>
+                          {value}
+                        </th>
+                      ))}
                   </tr>
-                ))
-              ) : (
-                <div
-                  className="center"
-                  style={{
-                    height: "400px",
-                    width: "100vw",
-                    backgroundColor: "transparent",
-                  }}>
-                  not such datas
-                </div>
-              )}
-            </tbody>
-          </table>
+                </thead>
+                <tbody>
+                  {tableData.map(
+                    ({ id, title, description, price, discountPercentage }) => (
+                      <tr key={id}>
+                        {checkBox && (
+                          <th>
+                            <input
+                              type="checkbox"
+                              value={id}
+                              onClick={editCheckedBox}
+                            />
+                          </th>
+                        )}
+                        <td>{id}</td>
+                        <td>{title}</td>
+                        <td>{description}</td>
+                        <td>{price}</td>
+                        <td>{discountPercentage}</td>
+                      </tr>
+                    )
+                  )}
+                </tbody>
+              </table>
+            ) : (
+              <div
+                className="center"
+                style={{
+                  height: "400px",
+                  width: "100%",
+                  backgroundColor: "transparent",
+                }}>
+                No such data
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
