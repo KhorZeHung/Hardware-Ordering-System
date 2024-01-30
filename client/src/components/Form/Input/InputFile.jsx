@@ -2,7 +2,7 @@ import React, { useRef, useState } from "react";
 import "../FormBody.css";
 
 const InputFile = ({ datas, formHandler }) => {
-  const { required = true, name, label, limit = 1 } = datas;
+  const { required = true, name, label, limit = 1, disable = false } = datas;
 
   const fileInput = useRef();
   const [files, setFiles] = useState([]);
@@ -38,6 +38,7 @@ const InputFile = ({ datas, formHandler }) => {
           ref={fileInput}
           style={{ display: "none" }}
           onChange={filesHandler}
+          disabled={disable}
         />
         <input type="button" onClick={uploadFileHandler} value={"+ add file"} />
         <div className="filesName">

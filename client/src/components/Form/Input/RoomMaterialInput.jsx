@@ -1,14 +1,16 @@
 import React, { useState, useEffect, useRef } from "react";
-import "../FormBody.css";
 import ConfirmModal from "../../Modal/ConfirmModal";
 import ProductListModal from "../../Modal/ProductListModal";
+import ProductListTable from "../../Table/ProductListTable";
+import "../FormBody.css";
 
-const calculateSubTotal = (productLists) => {
+export const calculateSubTotal = (productLists) => {
   if (productLists.length < 1) {
-    return;
+    return 0;
   }
   return productLists.reduce(
-    (total, item) => total + item.quantity * item.unit_price,
+    (total, item) =>
+      total + parseInt(item.quantity) * parseFloat(item.unit_price),
     0
   );
 };
@@ -20,6 +22,7 @@ const RoomMaterialInput = ({ datas }) => {
     formHandler = null,
     addRoomHandler = null,
     deleteRoomHandler = null,
+    disable = false,
   } = datas;
 
   const numOfRoom = index + 1;
@@ -98,29 +101,41 @@ const RoomMaterialInput = ({ datas }) => {
         changeValue = parseInt(product.quantity) * e.target.value;
       }
     }
-    setSubTotal((prev) => prev - currentProductTotal + changeValue);
+    changeValue -= currentProductTotal;
+    setSubTotal((prev) => prev + changeValue);
     setProductLists(newProductListsArray);
-    formHandler(e, "quote_product_lists", newProductListsArray, indexOfArray);
+    formHandler(
+      e,
+      "quote_product_lists",
+      newProductListsArray,
+      indexOfArray,
+      changeValue
+    );
   };
 
   const changeQuantityHandler = (index, add, e) => {
     e.preventDefault();
     const newProductListsArray = { ...productLists };
-    let unit_price = parseFloat(
+    var unit_price = parseFloat(
       newProductListsArray.productList[index].unit_price
     );
     let newSubTotal = subTotal;
     if (add) {
       newProductListsArray.productList[index].quantity++;
-      newSubTotal += unit_price;
+      unit_price = -unit_price;
     } else {
       newProductListsArray.productList[index].quantity--;
-      newSubTotal -= unit_price;
     }
-
+    newSubTotal -= unit_price;
     setSubTotal(newSubTotal);
     setProductLists(newProductListsArray);
-    formHandler(e, "quote_product_lists", newProductListsArray, indexOfArray);
+    formHandler(
+      e,
+      "quote_product_lists",
+      newProductListsArray,
+      indexOfArray,
+      unit_price
+    );
   };
 
   const changeRoomNameHandler = (e) => {
@@ -147,11 +162,12 @@ const RoomMaterialInput = ({ datas }) => {
             value={productLists.roomName}
             style={{ padding: "5px" }}
             onChange={(e) => changeRoomNameHandler(e)}
+            disabled={disable}
           />
           <span
             ref={mainBarActionRef}
             className="material-symbols-outlined mainBarAction"
-            onClick={() => setIsActionMenuOpen(!isActionMenuOpen)}>
+            onClick={() => !disable && setIsActionMenuOpen(!isActionMenuOpen)}>
             more_vert
           </span>
           <span
@@ -161,12 +177,12 @@ const RoomMaterialInput = ({ datas }) => {
             }>
             <div
               onClick={(e) => {
-                addRoomHandler(e, productLists.productList);
+                !disable && addRoomHandler(e, productLists.productList);
               }}>
               <span className="material-symbols-outlined">content_copy</span>
               <p>make a copy</p>
             </div>
-            <div onClick={() => setIsModalOpen(true)}>
+            <div onClick={() => !disable && setIsModalOpen(true)}>
               <span className="material-symbols-outlined">delete</span>
               <p>delete room</p>
             </div>
@@ -183,87 +199,12 @@ const RoomMaterialInput = ({ datas }) => {
           </span>
           <div className={open ? "barContent open" : "barContent"}>
             {productLists.productList.length > 0 ? (
-              <table>
-                <thead>
-                  <tr>
-                    <th>Product</th>
-                    <th style={{ maxWidth: "100px" }}>Quantity</th>
-                    <th style={{ maxWidth: "100px" }}>Unit Price</th>
-                    <th style={{ maxWidth: "100px" }}>Sub-total</th>
-                    <th style={{ maxWidth: "40px" }}></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {productLists.productList.map((product, index) => (
-                    <tr key={index}>
-                      <td>
-                        <input
-                          type="text"
-                          value={product.name}
-                          onChange={(e) =>
-                            changeProductHandler("name", index, e)
-                          }
-                        />
-                      </td>
-                      <td>
-                        <span className="productListAction">
-                          <button>
-                            <span
-                              className="material-symbols-outlined"
-                              onClick={(e) =>
-                                changeQuantityHandler(index, false, e)
-                              }>
-                              remove
-                            </span>
-                          </button>
-                          <input
-                            type="number"
-                            name="product_quantity"
-                            value={product.quantity}
-                            onChange={(e) =>
-                              changeProductHandler("quantity", index, e)
-                            }
-                          />
-                          <button>
-                            <span
-                              className="material-symbols-outlined"
-                              onClick={(e) =>
-                                changeQuantityHandler(index, true, e)
-                              }>
-                              add
-                            </span>
-                          </button>
-                        </span>
-                      </td>
-                      <td>
-                        <input
-                          type="number"
-                          value={product.unit_price}
-                          step="0.01"
-                          onChange={(e) =>
-                            changeProductHandler("unit_price", index, e)
-                          }
-                        />
-                      </td>
-                      <td>
-                        <p>
-                          RM{" "}
-                          {(product.unit_price * product.quantity).toFixed(2)}
-                        </p>
-                      </td>
-                      <td>
-                        <span
-                          className="material-symbols-outlined deleteRowIcon"
-                          onChange={(e) =>
-                            changeProductHandler("delete", index, e)
-                          }>
-                          delete
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <ProductListTable
+                productList={productLists.productList}
+                changeProductHandler={changeProductHandler}
+                changeQuantityHandler={changeQuantityHandler}
+                disable={disable}
+              />
             ) : (
               <div style={{ height: "100px" }} className="center">
                 No product added
@@ -271,27 +212,31 @@ const RoomMaterialInput = ({ datas }) => {
             )}
             <div
               className="addProduct"
-              onClick={() => setIsProductListModalOpen(true)}>
+              onClick={() => disable && setIsProductListModalOpen(true)}>
               add material
             </div>
           </div>
         </div>
       </div>
 
-      <ConfirmModal
-        title={"Confirmation"}
-        descriptions={[
-          "Are you sure you want to delete this room?",
-          "Deletion is permenantly, cannot be undo!",
-        ]}
-        open={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onConfirm={deleteConfirm}
-      />
-      <ProductListModal
-        open={isProductListModalOpen}
-        closeFunc={() => setIsProductListModalOpen(false)}
-      />
+      {!disable && (
+        <>
+          <ConfirmModal
+            title={"Confirmation"}
+            descriptions={[
+              "Are you sure you want to delete this room?",
+              "Deletion is permenantly, cannot be undo!",
+            ]}
+            open={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            onConfirm={deleteConfirm}
+          />
+          <ProductListModal
+            open={isProductListModalOpen}
+            closeFunc={() => setIsProductListModalOpen(false)}
+          />
+        </>
+      )}
     </>
   );
 };

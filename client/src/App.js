@@ -10,6 +10,7 @@ import Quotation from "./scenes/Quotation";
 import Notification from "./scenes/Notification";
 import Navbar from "./components/NavBar/Navbar";
 import NewQuote from "./scenes/Quotation/NewQuote";
+import ProjectInfo from "./scenes/Project/ProjectInfo";
 function App() {
   return (
     <div className="App">
@@ -26,8 +27,16 @@ function App() {
 
           <Route path="/user" element={<User />} />
           <Route path="/project" element={<Project />} />
+          <Route path="/project/:project_id" element={<ProjectInfo />} />
           <Route path="/quotation" element={<Quotation />} />
-          <Route path="/quotation/new-quote" element={<NewQuote />} />
+          <Route
+            path="/quotation/new-quote"
+            element={
+              <NewQuote
+                datas={{ endPoint: null, isNew: true, isQuote: true }}
+              />
+            }
+          />
           <Route path="/notification" element={<Notification />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>

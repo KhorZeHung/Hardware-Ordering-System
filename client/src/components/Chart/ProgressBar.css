@@ -5,35 +5,31 @@
   position: relative;
   padding: 10px;
   background-color: transparent;
-}
+  min-width: 100px;
 
-.large {
-  width: 200px !important;
-}
+  span {
+    position: absolute;
+    background-color: transparent;
+    user-select: none;
+  }
 
-.small {
-  max-width: 100px;
-}
+  .percentage {
+    font-size: 1.3rem;
+    top: 36%;
+  }
 
-.progressBarWrapper span {
-  position: absolute;
-  background-color: transparent;
-  user-select: none;
-}
+  .title {
+    font-weight: 200;
+    word-wrap: break-word;
+    max-width: 100px;
+    font-size: 0.7rem;
+    bottom: 15%;
+  }
+  &.large {
+    width: 150px !important;
+  }
 
-.percentage {
-  font-size: 40px;
-  top: 30%;
-}
-
-.percentageSml {
-  font-size: 0.7rem;
-  font-weight: 600;
-}
-
-.title {
-  font-weight: 200;
-  word-wrap: break-word;
-  max-width: 100px;
-  bottom: 20%;
+  &.small {
+    max-width: 100px;
+  }
 }

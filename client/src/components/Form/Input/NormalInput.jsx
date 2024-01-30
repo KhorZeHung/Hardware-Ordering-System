@@ -11,10 +11,11 @@ const NormalInput = ({ datas, formHandler }) => {
     defaultValue = null,
     min = null,
     max = null,
+    disable = false,
   } = datas;
 
   return (
-    <div className="normalInput">
+    <div className={disable ? "normalInput disable" : "normalInput"}>
       <label htmlFor="name">
         {label}
         {required && <span>*</span>}
@@ -29,6 +30,7 @@ const NormalInput = ({ datas, formHandler }) => {
         id={name}
         min={min}
         max={max}
+        disabled={disable}
       />
     </div>
   );

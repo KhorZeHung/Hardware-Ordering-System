@@ -2,11 +2,11 @@ import React from "react";
 import "./ProgressBar.css";
 import { Circle } from "rc-progress";
 
-const RoundProgressBar = ({ percent, title }) => {
+const RoundProgressBar = ({ percent, title, large = true }) => {
   const scale = Math.round(percent / 20) + 1;
   return (
     <>
-      <div className="progressBarWrapper center large">
+      <div className={`progressBarWrapper center ${large ? "large" : "small"}`}>
         <Circle
           percent={percent}
           strokeWidth={10}

@@ -126,7 +126,9 @@ button {
 button:hover,
 button:active,
 input[type="submit"]:hover,
-input[type="submit"]:active {
+input[type="submit"]:active,
+input[type="reset"]:hover,
+input[type="reset"]:active {
   background-color: var(--primary-color-6);
   transition: background-color 0.2s ease-in;
 }

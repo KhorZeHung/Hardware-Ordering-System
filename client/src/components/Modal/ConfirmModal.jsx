@@ -24,10 +24,14 @@ const ConfirmModal = ({
         ))}
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="primary">
+        <Button onClick={onClose} color="primary" style={{ boxShadow: "none" }}>
           Cancel
         </Button>
-        <Button onClick={onConfirm} color="primary" autoFocus>
+        <Button
+          onClick={onConfirm}
+          color="primary"
+          variant="contained"
+          autoFocus>
           Confirm
         </Button>
       </DialogActions>

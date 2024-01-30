@@ -8,6 +8,7 @@ const InputMultipleTxt = ({ datas, formHandler }) => {
     required = true,
     descriptions = [],
     placeholder,
+    disable = false,
   } = datas;
 
   const [inputLists, setInputLists] = useState(descriptions);
@@ -57,6 +58,7 @@ const InputMultipleTxt = ({ datas, formHandler }) => {
                     onClick={() => removeDescriptionHanlder({ index })}
                     value="&#x2716;"
                     className="fileList"
+                    disabled={disable}
                   />
                 </li>
               );
