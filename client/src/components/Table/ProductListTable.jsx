@@ -46,6 +46,7 @@ const ProductListTable = ({
                   onChange={(e) =>
                     !disable && changeProductHandler("quantity", index, e)
                   }
+                  min={0}
                 />
                 <button>
                   <span

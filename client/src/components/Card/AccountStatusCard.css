@@ -1,0 +1,48 @@
+@import "../index.css";
+
+.accountStatusSec {
+  overflow: auto;
+  width: 100%;
+  padding: 1rem;
+  box-sizing: border-box;
+
+  table {
+    width: 100%;
+    table-layout: auto;
+    min-width: 600px;
+    text-align: center;
+    border-collapse: collapse;
+    text-overflow: ellipsis;
+    overflow: none;
+    text-wrap: nowrap;
+    box-shadow: var(--box-shadow-1);
+
+    thead {
+      th {
+        background-color: var(--primary-color-5);
+        color: var(--bckgrd-3);
+      }
+    }
+    tbody {
+      tr {
+        border-bottom: 2px solid rgba(128, 128, 128, 0.45);
+
+        &:hover:not(:last-child) {
+          background-color: var(--bckgrd-3);
+        }
+      }
+      td {
+        &:nth-child(3) {
+          text-align: left;
+          padding-left: 10px;
+        }
+      }
+    }
+
+    td,
+    th {
+      height: 40px;
+      padding: 0 0.5rem;
+    }
+  }
+}

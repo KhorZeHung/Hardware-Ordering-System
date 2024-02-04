@@ -54,10 +54,3 @@
     background-color: var(--primary-color-5);
   }
 }
-
-.spaceEven {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-evenly;
-  align-items: center;
-}

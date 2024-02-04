@@ -30,8 +30,10 @@ const InputMultipleTxt = ({ datas, formHandler }) => {
 
   return (
     <div className="checkBoxList">
-      <div className="normalInput" style={{ position: "relative" }}>
-        <label htmlFor="name">
+      <div
+        className={disable ? "normalInput disable" : "normalInput"}
+        style={{ position: "relative" }}>
+        <label htmlFor={name}>
           {label}
           {required && <span>*</span>}
         </label>

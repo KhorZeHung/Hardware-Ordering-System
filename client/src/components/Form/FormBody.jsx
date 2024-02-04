@@ -8,7 +8,13 @@ import TextArea from "./Input/TextArea";
 import "./FormBody.css";
 
 const FormBody = (props) => {
-  const { title = null, inputLists = null, submitValue = "submit" } = props;
+  const {
+    title = null,
+    inputLists = null,
+    submitValue = "submit",
+    reset = true,
+    grid = true,
+  } = props;
   const [formInputValue, setFormInputValue] = useState({});
 
   const formHandler = (e, customValue, inputName) => {
@@ -20,11 +26,11 @@ const FormBody = (props) => {
   return (
     <form method="post" className="formBody">
       {title && <p className="title">{title}</p>}
-      <div className="formInputLists">
+      <div className={grid ? "formInputLists" : ""}>
         {inputLists && constructInput(inputLists, formHandler)}
       </div>
       <div className="formAction">
-        <input type="reset" value="reset" />
+        {reset && <input type="reset" value="reset" />}
         <input type="submit" value={submitValue} />
       </div>
     </form>

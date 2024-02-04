@@ -5,7 +5,7 @@ const InputOption = ({ datas, formHandler }) => {
   const { label, name, required = true, options = [], disable = false } = datas;
 
   return (
-    <div className="normalInput">
+    <div className={disable ? "normalInput disable" : "normalInput"}>
       <label htmlFor={name}>
         {label} {required && <span>*</span>}
       </label>

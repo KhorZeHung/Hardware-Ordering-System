@@ -1,0 +1,61 @@
+@import "../index.css";
+
+.projectActionSec {
+  position: fixed;
+  bottom: 30px;
+  right: 5%;
+
+  .main-fab {
+    background-color: var(--primary-color-6);
+    color: var(--bckgrd-1);
+    transition: all 0.2s ease-in;
+
+    &:hover {
+      background-color: var(--primary-color-8);
+    }
+  }
+
+  .expanded {
+    transform: rotate(45deg);
+  }
+
+  .expanded-fabs {
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    bottom: 80px;
+    right: 5%;
+    height: 0;
+    overflow: hidden;
+    z-index: 1;
+    transition: height 0.3s ease;
+
+    &.open {
+      height: 150px;
+
+      .fab {
+        opacity: 1;
+        transform: translateY(0);
+        transition: opacity 0.2s ease, transform 0.2s ease;
+      }
+    }
+
+    .fab {
+      background-color: var(--primary-color-3);
+      color: white;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+
+      &:hover {
+        background-color: var(--primary-color-5);
+      }
+    }
+
+    .open .fab {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}

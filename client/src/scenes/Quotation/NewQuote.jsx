@@ -45,30 +45,29 @@ const NewQuote = ({ datas }) => {
     index = null,
     changeSubTotalValue = 0
   ) => {
-    const inputValue = value || e.target.value;
+    const inputValue = value || parseFloat(e.target.value);
 
     setFormInputValue((prev) => {
-      if (Array.isArray(prev[name]) && index !== null) {
-        return {
-          ...prev,
-          [name]: prev[name].map((item, i) =>
-            i === index ? { ...item, ...inputValue } : item
-          ),
-          quote_sub_total: prev["quote_sub_total"] - changeSubTotalValue,
-        };
-      }
+      const { quote_sub_total, quote_grand_total, ...rest } = prev;
+
       return {
-        ...prev,
-        [name]: inputValue,
-        quote_sub_total: prev["quote_sub_total"] - changeSubTotalValue,
+        ...rest,
+        [name]:
+          Array.isArray(prev[name]) && index !== null
+            ? prev[name].map((item, i) =>
+                i === index ? { ...item, ...inputValue } : item
+              )
+            : inputValue,
+        quote_sub_total: quote_sub_total + changeSubTotalValue,
+        quote_grand_total: quote_grand_total + changeSubTotalValue,
       };
     });
   };
 
   const addRoomHandler = (e, defaultValue = []) => {
     e.preventDefault();
-    var numOfRooms = totalNumRoom + 1;
-    var changeValue = calculateSubTotal(defaultValue);
+    const numOfRooms = totalNumRoom + 1;
+    const changeValue = calculateSubTotal(defaultValue);
 
     const productListArray = [
       ...formInputValue.quote_product_lists,
@@ -79,60 +78,41 @@ const NewQuote = ({ datas }) => {
     ];
 
     setTotalNumRoom(numOfRooms);
-    setFormInputValue((prev) => {
-      return {
-        ...prev,
-        quote_product_lists: productListArray,
-        quote_sub_total: prev.quote_sub_total + parseFloat(changeValue),
-        quote_grand_total: prev.quote_grand_total + parseFloat(changeValue),
-      };
-    });
+    setFormInputValue((prev) => ({
+      ...prev,
+      quote_product_lists: productListArray,
+      quote_sub_total: prev.quote_sub_total + parseFloat(changeValue),
+      quote_grand_total: prev.quote_grand_total + parseFloat(changeValue),
+    }));
   };
 
   const deleteRoomHandler = (index) => {
+    const changeValue = calculateSubTotal(
+      formInputValue.quote_product_lists[index].productList
+    );
+
     setTotalNumRoom((prev) => prev - 1);
     setFormInputValue((prev) => {
       const newProductList = [...prev.quote_product_lists];
       newProductList.splice(index, 1);
+
       return {
         ...prev,
         quote_product_lists: newProductList,
+        quote_sub_total: prev.quote_sub_total - parseFloat(changeValue),
+        quote_grand_total: prev.quote_grand_total - parseFloat(changeValue),
       };
     });
   };
-  const needCurrentLocation = isQuote && isNew;
 
-  useEffect(() => {
-    if (needCurrentLocation) {
-      navigator.geolocation.getCurrentPosition((position) => {
-        const longitude = position.coords.longitude;
-        const latitude = position.coords.latitude;
-
-        const nominatimApiUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`;
-
-        fetch(nominatimApiUrl)
-          .then((response) => response.json())
-          .then((data) => {
-            if (data.error) {
-              console.error("Error:", data.error);
-            } else {
-              const result = data.display_name;
-              setFormInputLists((prev) => [
-                ...prev,
-                (prev[3]["defaultValue"] = result),
-              ]);
-              formHandler(null, "quote_location", result);
-            }
-          })
-          .catch((error) => {
-            console.error("Error fetching address:", error);
-          })
-          .finally(() => setIsLoading(false));
-      });
-    } else {
-      setIsLoading(false);
-    }
-  }, [needCurrentLocation]);
+  const discountHandler = (e) => {
+    const value = parseFloat(e.target.value) || 0;
+    setFormInputValue((prev) => ({
+      ...prev,
+      quote_discount: value,
+      quote_grand_total: prev.quote_sub_total - value,
+    }));
+  };
 
   const createRoomHandler = () => {
     return formInputValue.quote_product_lists.map((value, index) => {
@@ -151,14 +131,42 @@ const NewQuote = ({ datas }) => {
     });
   };
 
-  const discountHandler = (e) => {
-    const value = parseFloat(e.target.value) || 0;
-    setFormInputValue((prev) => ({
-      ...prev,
-      quote_discount: value,
-      quote_grand_total: prev.quote_sub_total - value,
-    }));
-  };
+  const needCurrentLocation = isQuote && isNew;
+  useEffect(() => {
+    if (needCurrentLocation) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        const longitude = position.coords.longitude;
+        const latitude = position.coords.latitude;
+
+        const nominatimApiUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`;
+
+        fetch(nominatimApiUrl)
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.error) {
+              console.error("Error:", data.error);
+            } else {
+              const result = data.display_name;
+              setFormInputLists((prev) => {
+                return prev.map((item, i) => {
+                  if (item.name === "quote_address") {
+                    return { ...item, defaultValue: result };
+                  }
+                  return { ...item };
+                });
+              });
+              formHandler(null, "quote_location", result);
+            }
+          })
+          .catch((error) => {
+            console.error("Error fetching address:", error);
+          })
+          .finally(() => setIsLoading(false));
+      });
+    } else {
+      setIsLoading(false);
+    }
+  }, [needCurrentLocation]);
 
   return (
     <>
@@ -167,26 +175,6 @@ const NewQuote = ({ datas }) => {
           <p className="title">new quote</p>
           <div className="formInputLists" style={{ marginBottom: "3rem" }}>
             {constructInput(formInputLists, formHandler)}
-            {/* <NormalInput
-              datas={inputLists[0]}
-              formHandler={(e) => formHandler(e, inputLists[0].name)}
-            />
-            <NormalInput
-              datas={inputLists[1]}
-              formHandler={(e) => formHandler(e, inputLists[1].name)}
-            />
-            <NormalInput
-              datas={inputLists[2]}
-              formHandler={(e) => formHandler(e, inputLists[2].name)}
-            />
-            <NormalInput
-              datas={{ ...inputLists[3], defaultValue: isLoading }}
-              formHandler={(e) => formHandler(e, inputLists[3].name)}
-            />
-            <InputOption
-              datas={inputLists[4]}
-              formHandler={(e) => formHandler(e, inputLists[4].name)}
-            /> */}
           </div>
           <div style={{ margin: "1rem 0" }}>{createRoomHandler()}</div>
           <button className="addRoom" onClick={addRoomHandler}>

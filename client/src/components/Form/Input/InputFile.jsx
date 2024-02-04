@@ -41,7 +41,7 @@ const InputFile = ({ datas, formHandler }) => {
           disabled={disable}
         />
         <input type="button" onClick={uploadFileHandler} value={"+ add file"} />
-        <div className="filesName">
+        <div className={disable ? "filesName disable" : "filesName"}>
           <ul>
             {files.length > 0 &&
               files.map((files, index) => {

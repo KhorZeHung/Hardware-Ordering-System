@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "../FormBody.css";
 
 const TableCheckBox = ({ datas, formHandler }) => {
-  const { name, label, required = true, options = [] } = datas;
+  const { name, label, required = true, options = [], disable = false } = datas;
   const [checkedBox, setCheckedBox] = useState([]);
 
   const checkBoxHandler = (e) => {
@@ -17,7 +17,7 @@ const TableCheckBox = ({ datas, formHandler }) => {
   };
 
   return (
-    <div className="checkBoxList">
+    <div className={disable ? "checkBoxList disable" : "checkBoxList"}>
       <label htmlFor={name}>
         {label} {required && <span>*</span>}
       </label>
@@ -26,7 +26,12 @@ const TableCheckBox = ({ datas, formHandler }) => {
           options.map((option, index) => {
             return (
               <div key={index} onChange={checkBoxHandler}>
-                <input type="checkbox" value={option} name={name} />
+                <input
+                  type="checkbox"
+                  value={option}
+                  name={name}
+                  disabled={disable}
+                />
                 <p>{option}</p>
               </div>
             );

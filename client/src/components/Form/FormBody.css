@@ -3,7 +3,7 @@
 .formBody {
   background-color: var(--bckgrd-2);
   min-width: 300px;
-  width: 70vw;
+  width: 70%;
   margin: 0 auto;
   padding: 1rem;
   box-sizing: border-box;
@@ -110,7 +110,7 @@
   background-color: inherit;
   border-radius: 5px;
   width: 100%;
-  min-width: 280px;
+  min-width: 200px;
   box-sizing: border-box;
   resize: none;
 }
@@ -120,7 +120,6 @@
 }
 
 .formBody label {
-  background-color: inherit;
   color: var(--primary-color-5);
   font-size: 0.9rem;
   user-select: none;
@@ -128,6 +127,7 @@
   display: block;
   text-transform: capitalize;
   background-color: var(--bckgrd-2);
+  z-index: 3;
 }
 
 .formBody .normalInput > label {

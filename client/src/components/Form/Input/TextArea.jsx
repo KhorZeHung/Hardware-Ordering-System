@@ -7,9 +7,10 @@ const textArea = ({ datas, formHandler }) => {
     label,
     required = true,
     placeholder = "Any other thing you want to mention?",
+    disable = false,
   } = datas;
   return (
-    <div className="normalInput">
+    <div className={disable ? "normalInput disable" : "normalInput"}>
       <label htmlFor="name">
         {label} {required && <span>*</span>}
       </label>

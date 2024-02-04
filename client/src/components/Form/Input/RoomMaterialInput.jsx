@@ -89,19 +89,27 @@ const RoomMaterialInput = ({ datas }) => {
     const product = productLists.productList[index];
     const currentProductTotal =
       parseFloat(product.unit_price) * parseInt(product.quantity);
-    var changeValue = 0;
+    let changeValue = 0;
 
     if (key === "delete") {
       newProductListsArray.productList.splice(index, 1);
+      changeValue = -currentProductTotal;
     } else {
-      newProductListsArray.productList[index][key] = e.target.value;
+      const newValue = parseFloat(e.target.value) || 0;
+
       if (key === "quantity") {
-        changeValue = parseFloat(product.unit_price) * e.target.value;
+        const unitPrice = parseFloat(product.unit_price) || 0;
+        const quantity = newValue < 0 ? 0 : newValue;
+        changeValue = unitPrice * quantity - currentProductTotal;
+        newProductListsArray.productList[index][key] = quantity;
       } else if (key === "unit_price") {
-        changeValue = parseInt(product.quantity) * e.target.value;
+        const quantity = parseInt(product.quantity) || 0;
+        const unitPrice = newValue < 0 ? 0 : newValue;
+        changeValue = quantity * unitPrice - currentProductTotal;
+        newProductListsArray.productList[index][key] = unitPrice;
       }
     }
-    changeValue -= currentProductTotal;
+
     setSubTotal((prev) => prev + changeValue);
     setProductLists(newProductListsArray);
     formHandler(
@@ -122,9 +130,9 @@ const RoomMaterialInput = ({ datas }) => {
     let newSubTotal = subTotal;
     if (add) {
       newProductListsArray.productList[index].quantity++;
-      unit_price = -unit_price;
     } else {
       newProductListsArray.productList[index].quantity--;
+      unit_price = -unit_price;
     }
     newSubTotal -= unit_price;
     setSubTotal(newSubTotal);
@@ -212,31 +220,26 @@ const RoomMaterialInput = ({ datas }) => {
             )}
             <div
               className="addProduct"
-              onClick={() => disable && setIsProductListModalOpen(true)}>
+              onClick={() => !disable && setIsProductListModalOpen(true)}>
               add material
             </div>
           </div>
         </div>
       </div>
-
-      {!disable && (
-        <>
-          <ConfirmModal
-            title={"Confirmation"}
-            descriptions={[
-              "Are you sure you want to delete this room?",
-              "Deletion is permenantly, cannot be undo!",
-            ]}
-            open={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
-            onConfirm={deleteConfirm}
-          />
-          <ProductListModal
-            open={isProductListModalOpen}
-            closeFunc={() => setIsProductListModalOpen(false)}
-          />
-        </>
-      )}
+      <ConfirmModal
+        title={"Confirmation"}
+        descriptions={[
+          "Are you sure you want to delete this room?",
+          "Deletion is permenantly, cannot be undo!",
+        ]}
+        open={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={deleteConfirm}
+      />
+      <ProductListModal
+        open={isProductListModalOpen}
+        closeFunc={() => setIsProductListModalOpen(false)}
+      />
     </>
   );
 };

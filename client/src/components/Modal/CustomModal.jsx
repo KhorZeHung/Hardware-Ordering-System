@@ -1,14 +1,18 @@
 import React from "react";
 import "./Modal.css";
 import FormBody from "../Form/FormBody";
+import Dialog from "@mui/material/Dialog";
+import "../index.css";
 
 const CustomModal = (props) => {
   const { open, closeFunc, formStructure = null } = props;
   return (
-    <div className={open ? "modal open" : "modal"}>
-      <span onClick={closeFunc} className="closeModal">
-        &#x2716;
-      </span>
+    <Dialog
+      open={open}
+      onClose={closeFunc}
+      scroll="body"
+      maxWidth="md"
+      fullWidth={true}>
       {formStructure && (
         <FormBody
           title={formStructure.title}
@@ -16,7 +20,7 @@ const CustomModal = (props) => {
           submitValue={formStructure.submitValue}
         />
       )}
-    </div>
+    </Dialog>
   );
 };
 

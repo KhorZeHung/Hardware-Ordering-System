@@ -384,3 +384,53 @@ export const newQuoteData = [
     options: ["condo", "shoplot", "retail shop", "shopping mall", "terrace"],
   },
 ];
+export const projData = [
+  {
+    type: "text",
+    name: "quote_name",
+    label: "quote name",
+    disable: true,
+  },
+  {
+    type: "text",
+    name: "quote_client_name",
+    label: "Client name",
+    disable: true,
+  },
+  {
+    type: "tel",
+    name: "quote_client_contact",
+    label: "Client contact number",
+    disable: true,
+  },
+  {
+    type: "text",
+    name: "quote_address",
+    label: "address",
+    disable: true,
+  },
+  {
+    type: "option",
+    name: "quote_prop_type",
+    label: "Type",
+    options: ["condo", "shoplot", "retail shop", "shopping mall", "terrace"],
+    disable: true,
+  },
+];
+
+export const loginData = [
+  {
+    type: "text",
+    name: "login_user_email",
+    label: "Email",
+    placeholder: "example@mail.com",
+  },
+  {
+    type: "password",
+    name: "login_user_password",
+    label: "Password",
+    placeholder: "keep it secret",
+  },
+];
+
+export const APIGateway = "http://localhost:8080/";
