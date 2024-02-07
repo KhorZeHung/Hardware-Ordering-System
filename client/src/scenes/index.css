@@ -54,3 +54,33 @@
     background-color: var(--primary-color-5);
   }
 }
+
+.centerFormContainer {
+  height: 100vh;
+  width: 100vw;
+  background-color: var(--primary-color-3);
+
+  .pageLink {
+    font-size: 0.7rem;
+    cursor: pointer;
+
+    &.onPages {
+      color: var(--primary-color-8);
+      font-weight: bold;
+    }
+  }
+
+  .formBody {
+    max-width: 400px;
+    max-height: 600px;
+    box-shadow: var(--box-shadow-1);
+    border-radius: 10px;
+  }
+
+  a {
+    margin: 10px;
+    color: navy;
+    font-size: 0.7rem;
+    display: block;
+  }
+}

@@ -1,44 +1,64 @@
-import React from "react";
+import React, { useState, useContext } from "react";
 import { constructInput } from "../../components/Form/FormBody";
 import { loginData } from "../../data";
 import { Link } from "react-router-dom";
+import { APIGateway } from "../../data";
+import { setCookie } from "../../utils/cookie";
+import axios from "axios";
+import LoadableBtn from "../../components/Form/Button/LoadableBtn";
+import "../index.css";
+import { SnackbarContext } from "../../components/Snackbar/SnackBarProvidor";
 
 const Login = () => {
-  const containerStyle = {
-    height: "100vh",
-    width: "100vw",
-    backgroundColor: "var(--primary-color-6)",
-  };
+  const { setSnackbar } = useContext(SnackbarContext);
 
-  const loginFormStyle = {
-    maxWidth: "400px",
-    maxHeight: "600px",
-    boxShadow: "var(--box-shadow-1)",
-    borderRadius: "10px",
-  };
+  const [isLoading, setIsLoading] = useState(false);
+  const submitHandler = async (e) => {
+    e.preventDefault();
+    const formData = new URLSearchParams(new FormData(e.target));
 
-  const linkStyle = {
-    margin: "10px",
-    color: "blue",
-    fontSize: "0.7rem",
-    display: "block",
+    setIsLoading(true);
+    await axios
+      .post(APIGateway + "/user/login", formData)
+      .then((res) => {
+        const token = res.data.token;
+        const message = res.data.message;
+        setCookie("token", token, 12);
+        setSnackbar((prev) => ({
+          severity: "success",
+          message: message,
+          open: true,
+        }));
+        setTimeout(() => {
+          window.location = "../";
+        }, 2000);
+      })
+      .catch((err) => {
+        const message = err.response.data || err.message;
+        setSnackbar({ open: true, message: message, severity: "error" });
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   return (
-    <div className="center" style={containerStyle}>
-      <div className="formBody" style={loginFormStyle}>
-        <form method="post" name="loginForm">
-          <p className="title">login</p>
-          {constructInput(loginData)}
-          <Link to="./forgot-password" target="_self" style={linkStyle}>
-            forgot password?
-          </Link>
-          <div className="formAction">
-            <input type="submit" value="login" />
-          </div>
-        </form>
+    <>
+      <div className="center centerFormContainer">
+        <div className="formBody">
+          <form method="post" name="loginForm" onSubmit={submitHandler}>
+            <p className="title">login</p>
+            {constructInput(loginData, null)}
+            <Link to="../forgot-password" target="_self">
+              forgot password?
+            </Link>
+            <div className="formAction">
+              <LoadableBtn isLoading={isLoading} txt="Login" />
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

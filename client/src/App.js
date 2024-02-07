@@ -1,5 +1,7 @@
 import React from "react";
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
+
+//import scence
 import Login from "./scenes/Login";
 import Dashboard from "./scenes/Dashboard";
 import Order from "./scenes/Order";
@@ -8,10 +10,14 @@ import User from "./scenes/User";
 import Project from "./scenes/Project";
 import Quotation from "./scenes/Quotation";
 import Notification from "./scenes/Notification";
-import Navbar from "./components/NavBar/Navbar";
 import NewQuote from "./scenes/Quotation/NewQuote";
+import ForgotPassword from "./scenes/ForgotPassword";
+
+//import component
+import Navbar from "./components/NavBar/Navbar";
 import ProjectInfo from "./scenes/Project/ProjectInfo";
-import PrivateRoute from "./components/Auth/Auth";
+import PrivateRoute from "./components/Auth/PrivateRoute";
+import LoginRoute from "./components/Auth/LoginRoute";
 
 function App() {
   return (
@@ -19,11 +25,26 @@ function App() {
       <BrowserRouter>
         <Navbar />
         <Routes>
-          <Route path="/login" element={<Login />} />
+          <Route
+            path="/login"
+            element={
+              <LoginRoute>
+                <Login />
+              </LoginRoute>
+            }
+          />
+          <Route
+            path="/forgot-password"
+            element={
+              <LoginRoute>
+                <ForgotPassword />
+              </LoginRoute>
+            }
+          />
           <Route
             path="/"
             element={
-              <PrivateRoute>
+              <PrivateRoute path="dashboard">
                 <Dashboard />
               </PrivateRoute>
             }
@@ -31,7 +52,7 @@ function App() {
           <Route
             path="/order"
             element={
-              <PrivateRoute>
+              <PrivateRoute path="order">
                 <Order />
               </PrivateRoute>
             }
@@ -39,16 +60,15 @@ function App() {
           <Route
             path="/contact"
             element={
-              <PrivateRoute>
+              <PrivateRoute path="contact">
                 <Contact />
               </PrivateRoute>
             }
           />
-          {/* sub pages ofr contact, new contact, new product */}
           <Route
             path="/contact/supplier/:supplier_id"
             element={
-              <PrivateRoute>
+              <PrivateRoute path="contact">
                 <Contact />
               </PrivateRoute>
             }
@@ -56,7 +76,7 @@ function App() {
           <Route
             path="/contact/product/:product_id"
             element={
-              <PrivateRoute>
+              <PrivateRoute path="contact">
                 <Contact />
               </PrivateRoute>
             }
@@ -65,7 +85,7 @@ function App() {
           <Route
             path="/user"
             element={
-              <PrivateRoute>
+              <PrivateRoute path="user">
                 <User />
               </PrivateRoute>
             }
@@ -73,7 +93,7 @@ function App() {
           <Route
             path="/project"
             element={
-              <PrivateRoute>
+              <PrivateRoute path="project">
                 <Project />
               </PrivateRoute>
             }
@@ -81,7 +101,7 @@ function App() {
           <Route
             path="/project/:project_id"
             element={
-              <PrivateRoute>
+              <PrivateRoute path="project">
                 <ProjectInfo />
               </PrivateRoute>
             }
@@ -89,7 +109,7 @@ function App() {
           <Route
             path="/quotation"
             element={
-              <PrivateRoute>
+              <PrivateRoute path="quotation">
                 <Quotation />
               </PrivateRoute>
             }
@@ -97,7 +117,7 @@ function App() {
           <Route
             path="/quotation/new-quote"
             element={
-              <PrivateRoute>
+              <PrivateRoute path="quotation">
                 <NewQuote
                   datas={{ endPoint: null, isNew: true, isQuote: true }}
                 />
@@ -107,7 +127,7 @@ function App() {
           <Route
             path="/notification"
             element={
-              <PrivateRoute>
+              <PrivateRoute path="notification">
                 <Notification />
               </PrivateRoute>
             }
@@ -115,7 +135,7 @@ function App() {
           <Route
             path="*"
             element={
-              <PrivateRoute>
+              <PrivateRoute path="dashboard">
                 <Navigate to="/" />
               </PrivateRoute>
             }

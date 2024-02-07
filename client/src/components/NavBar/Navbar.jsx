@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Outlet, Link, NavLink } from "react-router-dom";
 import "./Navbar.css";
-import { getCookie } from "../../utils/cookie";
+import { getCookie, deleteCookie } from "../../utils/cookie";
+import { allowAccessLink } from "../../utils/allowAccessLink";
 
 const Navbar = () => {
   const [openNavBar, setOpenNavBar] = useState(false);
@@ -9,10 +10,19 @@ const Navbar = () => {
   const navBarHandler = () => setOpenNavBar((prev) => !prev);
   const closeNavBarHandler = () => setOpenNavBar(false);
 
-  const isLoggedIn = getCookie("token");
+  const isTokenExist = () => {
+    const token = getCookie("token");
+    return !!token;
+  };
+
+  const logOutHandler = () => {
+    deleteCookie("token");
+    closeNavBarHandler();
+    window.location.reload();
+  };
 
   return (
-    isLoggedIn && (
+    isTokenExist() && (
       <>
         <div className="spaceBetween navBar">
           <div>
@@ -36,24 +46,15 @@ const Navbar = () => {
                   Dashboard
                 </NavLink>
               </li>
-              {[
-                "contact",
-                "notification",
-                "order",
-                "quotation",
-                "project",
-                "user",
-              ].map((section) => (
+              {allowAccessLink().map((section) => (
                 <li onClick={closeNavBarHandler} key={section}>
                   <NavLink id={section} to={"/" + section}>
                     {section}
                   </NavLink>
                 </li>
               ))}
-              <li onClick={closeNavBarHandler}>
-                <NavLink to="/login" id="logout">
-                  Log out
-                </NavLink>
+              <li onClick={logOutHandler} id="logout">
+                Log out
               </li>
             </ul>
           </div>

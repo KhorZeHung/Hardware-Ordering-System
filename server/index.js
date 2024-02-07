@@ -15,8 +15,13 @@ app.use(cors({ origin: env.ORIGINURL || "*" }));
 
 const user = require("./util/router/user");
 
-
 app.use("/user", user);
+app.get("/", async (req, res) => {
+  const bcrypt = require("bcrypt");
+  console.log(await bcrypt.hash("123", env.BCRYPT_HASH_SALT));
+
+  res.status(200).send(await bcrypt.hash("123", env.BCRYPT_HASH_SALT));
+});
 
 app.all("*", (req, res) => {
   res.status(404).send("Page not found");

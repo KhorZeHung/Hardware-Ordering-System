@@ -421,16 +421,53 @@ export const projData = [
 export const loginData = [
   {
     type: "text",
-    name: "login_user_email",
+    name: "user_email",
     label: "Email",
     placeholder: "example@mail.com",
   },
   {
     type: "password",
-    name: "login_user_password",
+    name: "user_password",
     label: "Password",
     placeholder: "keep it secret",
   },
 ];
 
-export const APIGateway = "http://localhost:8080/";
+export const forgotPasswordData = [
+  [
+    {
+      type: "text",
+      name: "user_email",
+      label: "Email",
+      placeholder: "example@gmail.com",
+      defaultValue: "",
+    },
+  ],
+  [
+    {
+      type: "text",
+      name: "user_password",
+      label: "Temporary password",
+      placeholder: "has send to provided email",
+      defaultValue: "",
+    },
+  ],
+  [
+    {
+      type: "password",
+      name: "user_password",
+      label: "New password",
+      placeholder: "atleast 8 character long",
+      defaultValue: "",
+    },
+    {
+      type: "password",
+      name: "user_repeat_password",
+      label: "Repeat password",
+      placeholder: "same as new password",
+      defaultValue: "",
+    },
+  ],
+];
+
+export const APIGateway = "http://localhost:8080";

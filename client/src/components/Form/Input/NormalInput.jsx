@@ -16,7 +16,7 @@ const NormalInput = ({ datas, formHandler }) => {
 
   return (
     <div className={disable ? "normalInput disable" : "normalInput"}>
-      <label htmlFor="name">
+      <label htmlFor={name}>
         {label}
         {required && <span>*</span>}
       </label>
