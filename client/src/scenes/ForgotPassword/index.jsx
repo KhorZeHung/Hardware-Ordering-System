@@ -30,6 +30,7 @@ const ForgotPassword = () => {
     await axios
       .post(APIGateway + "/user/forgot-password/" + onPages, formData)
       .then((res) => {
+        console.log(res);
         const message = res.data;
         setSnackbar({ open: true, message: message, severity: "success" });
 
@@ -43,6 +44,7 @@ const ForgotPassword = () => {
       })
       .catch((err) => {
         const message = err.response.data || err.message;
+        console.log(err);
         setSnackbar({ open: true, message: message, severity: "error" });
       })
       .finally(() => {

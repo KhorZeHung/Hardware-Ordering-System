@@ -9,11 +9,16 @@ const InputOption = ({ datas, formHandler }) => {
       <label htmlFor={name}>
         {label} {required && <span>*</span>}
       </label>
-      <select name={name} id={name} onChange={formHandler} disabled={disable}>
+      <select
+        name={name}
+        id={name}
+        onChange={formHandler}
+        // value={options[0].value}
+        disabled={disable}>
         {options.length > 0 &&
           options.map((option, index) => (
-            <option key={index} value={option} name={name}>
-              {option}
+            <option key={index} value={option.value} name={name}>
+              {option.name}
             </option>
           ))}
       </select>

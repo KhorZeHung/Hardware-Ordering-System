@@ -58,7 +58,7 @@
 .centerFormContainer {
   height: 100vh;
   width: 100vw;
-  background-color: var(--primary-color-3);
+  background-color: var(--bckgrd-3);
 
   .pageLink {
     font-size: 0.7rem;

@@ -6,8 +6,8 @@ import { APIGateway } from "../../data";
 import { setCookie } from "../../utils/cookie";
 import axios from "axios";
 import LoadableBtn from "../../components/Form/Button/LoadableBtn";
-import "../index.css";
 import { SnackbarContext } from "../../components/Snackbar/SnackBarProvidor";
+import "../index.css";
 
 const Login = () => {
   const { setSnackbar } = useContext(SnackbarContext);

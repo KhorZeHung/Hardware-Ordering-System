@@ -6,13 +6,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 
-const ConfirmModal = ({
-  title,
-  descriptions,
-  open = true,
-  onClose,
-  onConfirm,
-}) => {
+const ConfirmModal = ({ title, descriptions, open, onClose, onConfirm }) => {
   return (
     <Dialog open={open} onClose={onClose}>
       <DialogTitle style={{ fontSize: "1.4rem" }}>{title}</DialogTitle>
@@ -27,11 +21,7 @@ const ConfirmModal = ({
         <Button onClick={onClose} color="primary" style={{ boxShadow: "none" }}>
           Cancel
         </Button>
-        <Button
-          onClick={onConfirm}
-          color="primary"
-          variant="contained"
-          autoFocus>
+        <Button onClick={onConfirm} color="primary" variant="contained">
           Confirm
         </Button>
       </DialogActions>

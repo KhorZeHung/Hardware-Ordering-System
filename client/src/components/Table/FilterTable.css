@@ -38,10 +38,14 @@
 .filterOpt {
   padding-right: 5px;
   max-width: 30%;
+  font-size: 0.7rem;
+  color: var(--primary-color-5);
+  cursor: pointer;
 }
 
 .tableSec {
   max-height: 90vh;
+  min-height: 300px;
   margin: 10px 0;
   overflow: auto;
 }
@@ -89,8 +93,19 @@
   border-right: 1px solid black;
 }
 
-.deleteRowIcon {
-  color: rgb(217, 13, 13);
+.tableAction,
+.filterOpt {
+  color: blue;
+  font-size: 0.7rem !important;
   cursor: pointer;
+  word-wrap: unset;
   user-select: none;
+
+  span:not(:last-child) {
+    padding-right: 10px;
+  }
+
+  span.delete {
+    color: rgb(217, 13, 13);
+  }
 }

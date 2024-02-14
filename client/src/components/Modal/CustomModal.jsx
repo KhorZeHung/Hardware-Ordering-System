@@ -18,6 +18,7 @@ const CustomModal = (props) => {
           title={formStructure.title}
           inputLists={formStructure.inputLists}
           submitValue={formStructure.submitValue}
+          endPoint={formStructure.endPoint}
         />
       )}
     </Dialog>

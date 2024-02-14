@@ -99,6 +99,16 @@
   position: relative;
   background-color: inherit;
   margin-top: 20px;
+
+  .inputRequirement {
+    font-size: 0.7rem;
+    color: red;
+    margin-left: 0.3rem;
+
+    &.success {
+      color: green;
+    }
+  }
 }
 
 .formBody .normalInput input,

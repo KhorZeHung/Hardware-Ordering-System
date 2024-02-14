@@ -1,6 +1,6 @@
 export const dashBoardData = {
   marketing: {
-    tableData: {},
+    // tableData: {},
     donutChartData: {
       title: "sales and quote comparison",
       label: [1991, 1992, 1993],
@@ -35,7 +35,7 @@ export const dashBoardData = {
     ],
   },
   sales: {
-    tableData: {},
+    // tableData: {},
     cardData: [
       {
         value: "RM 635432.30",
@@ -60,7 +60,7 @@ export const dashBoardData = {
     ],
   },
   project: {
-    tableData: {},
+    // tableData: {},
     cardData: [
       {
         value: "15",
@@ -85,7 +85,7 @@ export const dashBoardData = {
     ],
   },
   account: {
-    tableData: {},
+    // tableData: {},
     cardData: [
       {
         value: "RM 314432.30",
@@ -319,10 +319,27 @@ export const projectData = {
   ],
 };
 export const userData = {
-  tableData: { checkBox: true },
+  tableData: {
+    checkBox: {
+      addCheckBox: true,
+      handlerArray: [
+        {
+          name: "edit",
+          onClickHandler: () => {},
+        },
+        {
+          name: "delete",
+          onClickHandler: () => {},
+        },
+      ],
+      endPoint: "/user",
+      filter: { options: ["superuser", "admin", "manager"] },
+    },
+  },
   newModalForm: {
     title: "new user",
     submitValue: "add user",
+    endPoint: "/user/register",
     inputLists: [
       {
         type: "text",
@@ -334,7 +351,11 @@ export const userData = {
         type: "option",
         name: "user_authority",
         label: "Autority",
-        options: ["super user", "manager", "admin"],
+        options: [
+          { name: "superuser", value: 1 },
+          { name: "admin", value: 2 },
+          { name: "manager", value: 3 },
+        ],
       },
       {
         type: "email",
@@ -457,8 +478,9 @@ export const forgotPasswordData = [
       type: "password",
       name: "user_password",
       label: "New password",
-      placeholder: "atleast 8 character long",
+      placeholder: "be creative",
       defaultValue: "",
+      onKeyUpCheck: true,
     },
     {
       type: "password",

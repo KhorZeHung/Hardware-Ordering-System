@@ -1,61 +1,77 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import "./FilterTable.css";
 import CircularProgress from "@mui/material-next/CircularProgress";
 import axios from "axios";
+import { APIGateway } from "../../data";
+import { getCookie } from "../../utils/cookie";
+import { SnackbarContext } from "../../components/Snackbar/SnackBarProvidor";
+import { ConfirmModalContext } from "../../components/Modal/ConfirmModalProvider";
 
 const FilterTable = (props) => {
   const {
-    checkBox = false,
-    endPoint = "https://dummyjson.com/products",
-    filter = null,
+    checkBox = {
+      addCheckBox: false,
+      handlerArray: [],
+    },
+    endPoint = "/user",
+    filter = { options: ["superuser", "admin", "manager"] },
   } = props.datas;
 
-  const [column, setColumn] = useState(null);
-  const [asc, setAsc] = useState(false);
   const [tableData, setTableData] = useState(null);
-  const [oriData, setOriData] = useState(null);
   const [checkedBox, setCheckedBox] = useState([]);
-  const [tableIsLoading, setTableIsLoading] = useState(false);
-  const [filterValue, setFilterValue] = useState("all");
-  const [searchTerm, setSearchTerm] = useState("");
-  const searchTermRef = useRef(null);
+  const [tableIsLoading, setTableIsLoading] = useState(true);
+  const [filterValue, setFilterValue] = useState({
+    searchTerm: null,
+    filterOption: null,
+  });
+  const searchTermRef = useRef();
+  const { setSnackbar } = useContext(SnackbarContext);
 
   useEffect(() => {
+    setTableIsLoading(true);
     const fetchData = async () => {
       try {
-        const response = await axios.get(endPoint);
-        const datas = response.data;
-        setTableData(datas.products);
-        setOriData(datas.products);
-        setTableIsLoading(true);
+        var APIEndpoint = `${APIGateway}${endPoint}?`;
 
-        //need to change after back-end fully develop
-        setColumn(Object.keys(datas.products[0]).slice(0, 5));
+        const { searchTerm, filterOption } = filterValue;
+
+        if (searchTerm !== null && searchTerm.length > 1) {
+          APIEndpoint += `searchterm=${encodeURIComponent(searchTerm)}`;
+        }
+
+        if (filterOption !== null) {
+          if (searchTerm !== null && searchTerm.length > 1) {
+            APIEndpoint += "&";
+          }
+          APIEndpoint += `filteroption=${encodeURIComponent(filterOption)}`;
+        }
+        const token = getCookie("token");
+        const response = await axios.get(APIEndpoint, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const datas = response.data;
+
+        setTableData(datas);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        const message =
+          error.response.data.message ||
+          error.message ||
+          "Something went wrong, please try later";
+        setSnackbar({ open: true, message: message, severity: "error" });
+      } finally {
+        setTableIsLoading(false);
       }
     };
 
     fetchData();
-  }, [endPoint]);
-
-  const sortTable = (columnName) => {
-    const sortedData = [...tableData].sort((a, b) => {
-      if (a[columnName] < b[columnName]) {
-        return asc ? 1 : -1;
-      }
-      if (a[columnName] > b[columnName]) {
-        return asc ? -1 : 1;
-      }
-      return 0;
-    });
-    setAsc((prev) => !prev);
-    setTableData(sortedData);
-  };
+  }, [filterValue, setSnackbar, endPoint]);
 
   const clearSearch = () => {
     searchTermRef.current.value = "";
-    setTableData(filter ? filterData(filterValue, oriData) : oriData);
+    setFilterValue((prev) => ({ ...prev, searchTerm: null }));
   };
 
   const checkBoxHandler = (event) => {
@@ -90,42 +106,33 @@ const FilterTable = (props) => {
 
   const searchHandler = (e) => {
     const checkValue = String(e.target.value).toLowerCase();
-    setSearchTerm(checkValue);
-
-    var newTableArray =
-      filterValue === "all" ? oriData : filterData(filterValue, oriData);
-    setTableData(searchData(checkValue, newTableArray));
+    setFilterValue((prev) => ({ ...prev, searchTerm: checkValue }));
   };
 
-  const searchData = (searchTerm, referArray) => {
-    if (searchTerm.length > 1) {
-      return referArray.filter((item) =>
-        Object.values(item).some((value) =>
-          String(value).toLowerCase().includes(searchTerm)
-        )
-      );
-    }
-    return referArray;
+  const filterHander = (e) => {
+    const value = String(e.target.value).toLowerCase();
+    var selectedValue;
+    if (value === "all") selectedValue = null;
+    else selectedValue = value;
+
+    setFilterValue((prev) => ({ ...prev, filterOption: selectedValue }));
   };
 
-  const filterOptionHandler = (e) => {
-    e.preventDefault();
-    const checkValue = String(e.target.value).toLowerCase();
-    setFilterValue(checkValue);
-    var newTableValue =
-      searchTerm.length > 1 ? searchData(searchTerm, oriData) : oriData;
+  const { openModal } = useContext(ConfirmModalContext);
 
-    setTableData(filterData(checkValue, newTableValue));
+  const handleConfirmAction = () => {
+    console.log("done");
   };
 
-  const filterData = (category, referArray) => {
-    if (category === "all") {
-      return referArray;
-    }
-    return referArray.filter((value) => {
-      const rowValue = String(value[filter.column]).toLowerCase();
-      return rowValue.includes(String(category).toLowerCase());
-    });
+  const handleOpenModal = () => {
+    openModal(
+      "Confirmation",
+      [
+        "Are you sure you want to delete this user?",
+        "Delete is permenant and cannot be undo",
+      ],
+      handleConfirmAction
+    );
   };
 
   return (
@@ -144,31 +151,25 @@ const FilterTable = (props) => {
           </div>
         </div>
         <div className="filterOpt center">
-          {checkBox && checkedBox.length > 0 && (
-            <>
-              <p style={{ paddingRight: "1rem" }}>
-                {checkedBox.length} SELECTED
-              </p>
-              {/* need to add onClick endpoint to delete selected rows */}
-              <span className="material-symbols-outlined deleteRowIcon">
-                delete
-              </span>
-            </>
-          )}
-          {filter && checkedBox.length === 0 && (
+          {filter && (
             <>
               <select
                 name="tableFilter"
                 style={{ minWidth: "50px" }}
-                onChange={filterOptionHandler}>
-                <option value="all" defaultChecked>
-                  all
-                </option>
-                {filter.options.map((value) => (
-                  <option key={value} value={value}>
-                    {value}
-                  </option>
-                ))}
+                onChange={filterHander}>
+                <option value="all">all</option>
+                {filter.options.map((value) => {
+                  return (
+                    <option
+                      key={`option-${value}`}
+                      value={value}
+                      selected={
+                        filterValue.filterOption === value ? true : undefined
+                      }>
+                      {value}
+                    </option>
+                  );
+                })}
               </select>
             </>
           )}
@@ -176,17 +177,17 @@ const FilterTable = (props) => {
       </div>
       <hr />
       <div className="tableSec">
-        {!tableIsLoading ? (
+        {tableIsLoading ? (
           <div className="center" style={{ height: "400px", width: "100%" }}>
             <CircularProgress />
           </div>
         ) : (
           <>
-            {tableData.length > 0 ? (
+            {tableData && tableData.tbody.length > 0 ? (
               <table>
                 <thead>
                   <tr>
-                    {checkBox && column.length && (
+                    {checkBox && (
                       <th>
                         <input
                           type="checkbox"
@@ -195,35 +196,43 @@ const FilterTable = (props) => {
                         />
                       </th>
                     )}
-                    {column &&
-                      column.map((value, index) => (
-                        <th key={index} onClick={() => sortTable(value)}>
-                          {value}
-                        </th>
-                      ))}
+                    {tableData.thead.map((value, index) => (
+                      <th key={`thead-${value}`}>{value}</th>
+                    ))}
+                    {checkBox.addCheckBox && <th>Action</th>}
                   </tr>
                 </thead>
                 <tbody>
-                  {tableData.map(
-                    ({ id, title, description, price, discountPercentage }) => (
-                      <tr key={id}>
-                        {checkBox && (
-                          <th>
-                            <input
-                              type="checkbox"
-                              value={id}
-                              onClick={editCheckedBox}
-                            />
-                          </th>
-                        )}
-                        <td>{id}</td>
-                        <td>{title}</td>
-                        <td>{description}</td>
-                        <td>{price}</td>
-                        <td>{discountPercentage}</td>
-                      </tr>
-                    )
-                  )}
+                  {tableData.tbody.map((rowData, rowIndex) => (
+                    <tr key={`row-${rowIndex}`}>
+                      {checkBox && (
+                        <td>
+                          <input
+                            type="checkbox"
+                            value={rowData.id}
+                            onClick={editCheckedBox}
+                          />
+                        </td>
+                      )}
+                      {Object.values(rowData).map((cellData, cellIndex) => (
+                        <td key={`cell-${cellIndex}`}>{cellData}</td>
+                      ))}
+                      {checkBox.addCheckBox && (
+                        <td className="tableAction">
+                          {checkBox.handlerArray.map((value, index) => {
+                            return (
+                              <span
+                                key={index}
+                                onClick={handleOpenModal}
+                                className={`${value.name || ""}`}>
+                                {value.name}
+                              </span>
+                            );
+                          })}
+                        </td>
+                      )}
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             ) : (
