@@ -16,7 +16,6 @@ const Login = () => {
   const submitHandler = async (e) => {
     e.preventDefault();
     const formData = new URLSearchParams(new FormData(e.target));
-
     setIsLoading(true);
     await axios
       .post(APIGateway + "/user/login", formData)

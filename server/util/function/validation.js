@@ -8,7 +8,7 @@ function getUserInfo(req, res, next) {
   const { user_email } = req.body;
   const query = `SELECT * FROM \`user\` WHERE user_email = ?`;
   db.query(query, [user_email], (err, result) => {
-    if (err) return res.status(500).json("Something went wrong here");
+    if (err) return res.status(500).json("Something went wrong " + err);
     req.mysqlRes = result;
     next();
   });
@@ -33,7 +33,7 @@ function generateJWT(req, res, next) {
 
   const tokenBody = {
     user_id: result.user_id,
-    user_position: result.user_position,
+    user_authority: result.user_authority,
     user_name: result.user_name,
     user_email: result.user_email,
   };
@@ -49,7 +49,7 @@ function generateJWT(req, res, next) {
 // validate user through token
 const validateJWT = (req, res, next) => {
   if (!req.headers["authorization"])
-    return res.status(401).send("Please sign up");
+    return res.status(401).json({ message: "Please sign up" });
 
   const authHeader = req.headers["authorization"];
   if (authHeader && authHeader.startsWith("Bearer ")) {
@@ -70,7 +70,7 @@ const validateJWT = (req, res, next) => {
 
 // check uniqueness of email submit
 function uniqueEmail(req, res, next) {
-  const { user_email, update_profile } = req.body;
+  const { user_email, update } = req.body;
 
   if (!user_email)
     return res
@@ -81,7 +81,7 @@ function uniqueEmail(req, res, next) {
   let checkUniqueUserQuery = "SELECT * FROM `user` WHERE user_email = ?";
   let queryParams = [user_email];
 
-  if (update_profile) {
+  if (update) {
     checkUniqueUserQuery += " AND user_id != ?;";
     queryParams.push(req.body.user_id || req.user.user_id);
   }
@@ -89,10 +89,9 @@ function uniqueEmail(req, res, next) {
   db.query(checkUniqueUserQuery, queryParams, (err, result) => {
     if (err) {
       return res.status(500).json({ message: "Something went wrong" + err });
-    } else if (result.length) {
+    } else if (result.length > 0) {
       return res.status(409).json({ message: "Email already registered" });
     } else {
-      // Call next() only when the query is successful and there are no conflicts
       next();
     }
   });
@@ -126,7 +125,7 @@ function generateUserPK(req, res, next) {
   }
 
   const lastUserIdQuery =
-    "SELECT * FROM `user` WHERE user_position = ? ORDER BY user_created_at DESC LIMIT 1;";
+    "SELECT * FROM `user` WHERE user_authority = ? ORDER BY user_created_at DESC LIMIT 1;";
 
   db.query(lastUserIdQuery, [user_authority], (err, result) => {
     if (err)

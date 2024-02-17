@@ -18,13 +18,13 @@ CREATE TABLE `user` (
 	user_id VARCHAR(255) NOT NULL, 
     user_email VARCHAR(255) NOT NULL UNIQUE, 
     user_password LONGTEXT NOT NULL, 
-    user_phone VARCHAR(14) NOT NULL UNIQUE, 
+    user_contact VARCHAR(14) NOT NULL UNIQUE, 
     user_name VARCHAR(255) NOT NULL, 
-    user_position INT NOT NULL, 
+    user_authority INT NOT NULL, 
     user_created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     user_last_edit TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, 
     PRIMARY KEY (user_id), 
-    FOREIGN KEY (user_position) REFERENCES `position`(pos_id)
+    FOREIGN KEY (user_authority) REFERENCES `position`(pos_id)
 );
 
 CREATE TABLE password_reset_token(
@@ -45,7 +45,7 @@ CREATE TABLE supplier (
 	supplier_id INT AUTO_INCREMENT NOT NULL,
     supplier_cmp_name VARCHAR(255) NOT NULL,
     supplier_pic VARCHAR(255) NOT NULL,
-    supplier_phone VARCHAR(14) NOT NULL,
+    supplier_contact VARCHAR(14) NOT NULL,
     supplier_category VARCHAR(255) NOT NULL,
     supplier_address VARCHAR(255),
     createdAt TIMESTAMP DEFAULT current_timestamp,
@@ -68,7 +68,7 @@ CREATE TABLE quotation (
     quote_name VARCHAR(255) NOT NULL,      
     create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,     
     client_name VARCHAR(255) NOT NULL,      
-    client_phone  VARCHAR(14) NOT NULL,   
+    client_contact  VARCHAR(14) NOT NULL,   
     budget DECIMAL(20, 2) NOT NULL DEFAULT 0,   
     location VARCHAR(255) NOT NULL,      
     pic_id VARCHAR(10), 
@@ -84,7 +84,7 @@ CREATE TABLE project (
     manager_in_charge_id VARCHAR(10), 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
     client_name VARCHAR(255) NOT NULL,
-    client_phone VARCHAR(14) NOT NULL, 
+    client_contact VARCHAR(14) NOT NULL, 
     budget DECIMAL(20, 2) NOT NULL DEFAULT 0,   
     location VARCHAR(255) NOT NULL,      
     `due-date` DATE DEFAULT NULL,

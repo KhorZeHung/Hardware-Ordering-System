@@ -10,11 +10,7 @@ const {
   uniqueEmail,
   generateUserPK,
 } = require("../function/validation.js");
-const {
-  isAdmin,
-  isSuperuser,
-  isManager,
-} = require("../function/authorization.js");
+const { isAdmin } = require("../function/authorization.js");
 const { randomPassword } = require("../function/randomPassword");
 const db = require("../function/conn.js");
 const moment = require("moment-timezone");
@@ -24,13 +20,13 @@ router.get("", validateJWT, isAdmin, (req, res) => {
   const searchTerm = req.query.searchterm || "";
   const filterOption = req.query.filteroption || "";
 
-  let selectQuery = `SELECT u.user_id AS 'id', u.user_email AS 'emil', u.user_phone AS 'contact number', u.user_name AS 'name',p.pos_name AS 'position' FROM \`user\`AS u INNER JOIN position AS p ON u.user_position = p.pos_id`;
+  let selectQuery = `SELECT u.user_id AS 'id', u.user_email AS 'emil', u.user_contact AS 'contact number', u.user_name AS 'name',p.pos_name AS 'position' FROM \`user\`AS u INNER JOIN position AS p ON u.user_authority = p.pos_id`;
   let queryParams = [];
 
   if (searchTerm) {
     selectQuery += ` WHERE (u.user_name LIKE ?
       OR u.user_email LIKE ?
-      OR u.user_phone LIKE ?
+      OR u.user_contact LIKE ?
       OR u.user_id LIKE ?)`;
     queryParams.push(
       `%${searchTerm}%`,
@@ -60,13 +56,35 @@ router.get("", validateJWT, isAdmin, (req, res) => {
     };
 
     // Send the JSON response
-    res.status(200).json(responseBody);
+    res.status(200).json({ data: responseBody });
+  });
+});
+
+//get specific user info
+router.get("/:user_id", validateJWT, isAdmin, (req, res) => {
+  const { user_id } = req.params;
+  if (!user_id) {
+    res.status(400).json({ message: "Please select a user" });
+  }
+
+  const selectQuery =
+    "SELECT user_id, user_authority, user_name, user_contact, user_email FROM `user` WHERE user_id = ?;";
+
+  db.query(selectQuery, user_id, (err, result) => {
+    if (err)
+      return res.status(500).json({ message: "Something went wrong " + err });
+
+    if (result.length !== 1)
+      return res.status(400).json({ message: "No such user" });
+
+    return res.status(200).json({ data: result[0] });
   });
 });
 
 //authenticate the user
 router.post("/login", getUserInfo, correctUser, generateJWT, (req, res) => {
-  if (!req.signedToken) return res.sendStatus(500);
+  if (!req.signedToken)
+    return res.status(500).json({ message: "Something went wrong " + err });
   res.status(200).send({ token: req.signedToken, message: "login successful" });
 });
 
@@ -92,7 +110,7 @@ router.post(
     );
 
     const insertQuery =
-      "INSERT INTO `user` (user_id, user_email, user_phone, user_position, user_name, user_password) VALUES (?,?,?,?,?,?);";
+      "INSERT INTO `user` (user_id, user_email, user_contact, user_authority, user_name, user_password) VALUES (?,?,?,?,?,?);";
     db.query(
       insertQuery,
       [
@@ -274,7 +292,7 @@ router.post(
     db.query(updateQuery, [hashed_new_user_password, user_id], (err) => {
       if (err)
         return res.status(500).json({ message: "something went wrong" + err });
-      return res.status(200).json({ messsage: "Password reset successfully" });
+      return res.status(200).json({ message: "Password reset successfully" });
     });
   }
 );
@@ -282,18 +300,18 @@ router.post(
 //allow user to edit profile
 router.post("/edit-profile", validateJWT, uniqueEmail, (req, res) => {
   const user_id = req.body.user_id || req.user.user_id;
-  const { user_email, user_contact, user_position, user_name } = req.body;
+  const { user_email, user_contact, user_authority, user_name } = req.body;
 
   let updateQuery =
-    "UPDATE `user` SET user_email = ?, user_phone = ?, user_position = ?, user_name = ?";
-  let queryParams = [user_email, user_contact, user_position, user_name];
+    "UPDATE `user` SET user_email = ?, user_contact = ?, user_authority = ?, user_name = ?";
+  let queryParams = [user_email, user_contact, user_authority, user_name];
 
-  if (user_position) {
-    if (req.user.user_position > 2)
+  if (user_authority) {
+    if (req.user.user_authority > 2)
       return res.status(400).json({ message: "Cannot update position" });
 
-    updateQuery += ", user_position = ? ";
-    queryParams.push(user_position);
+    updateQuery += ", user_authority = ? ";
+    queryParams.push(user_authority);
   }
 
   updateQuery += "WHERE user_id = ?;";
@@ -302,13 +320,13 @@ router.post("/edit-profile", validateJWT, uniqueEmail, (req, res) => {
   db.query(updateQuery, queryParams, (err) => {
     if (err)
       return res.status(500).json({ message: "Something went wrong" + err });
-    return res.status(200).json({ messsage: "Profile update successfully" });
+    return res.status(200).json({ message: "Profile update successfully" });
   });
 });
 
 // delete user account
-router.delete("/delete-user", validateJWT, isAdmin, async (req, res, next) => {
-  const { user_id } = req.body;
+router.delete("/delete/:user_id", validateJWT, isAdmin, async (req, res) => {
+  const { user_id } = req.params;
   if (!user_id)
     return res.status(400).json({ message: "Please provide required info. " });
 

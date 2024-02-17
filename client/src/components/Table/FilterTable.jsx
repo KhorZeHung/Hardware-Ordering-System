@@ -5,7 +5,6 @@ import axios from "axios";
 import { APIGateway } from "../../data";
 import { getCookie } from "../../utils/cookie";
 import { SnackbarContext } from "../../components/Snackbar/SnackBarProvidor";
-import { ConfirmModalContext } from "../../components/Modal/ConfirmModalProvider";
 
 const FilterTable = (props) => {
   const {
@@ -13,8 +12,8 @@ const FilterTable = (props) => {
       addCheckBox: false,
       handlerArray: [],
     },
-    endPoint = "/user",
-    filter = { options: ["superuser", "admin", "manager"] },
+    endPoint,
+    filter = null,
   } = props.datas;
 
   const [tableData, setTableData] = useState(null);
@@ -31,17 +30,19 @@ const FilterTable = (props) => {
     setTableIsLoading(true);
     const fetchData = async () => {
       try {
-        var APIEndpoint = `${APIGateway}${endPoint}?`;
+        var APIEndpoint = `${APIGateway}${endPoint}`;
 
         const { searchTerm, filterOption } = filterValue;
 
         if (searchTerm !== null && searchTerm.length > 1) {
-          APIEndpoint += `searchterm=${encodeURIComponent(searchTerm)}`;
+          APIEndpoint += `?searchterm=${encodeURIComponent(searchTerm)}`;
         }
 
         if (filterOption !== null) {
           if (searchTerm !== null && searchTerm.length > 1) {
             APIEndpoint += "&";
+          } else {
+            APIEndpoint += "?";
           }
           APIEndpoint += `filteroption=${encodeURIComponent(filterOption)}`;
         }
@@ -52,8 +53,7 @@ const FilterTable = (props) => {
           },
         });
 
-        const datas = response.data;
-
+        const datas = response.data.data;
         setTableData(datas);
       } catch (error) {
         const message =
@@ -116,23 +116,6 @@ const FilterTable = (props) => {
     else selectedValue = value;
 
     setFilterValue((prev) => ({ ...prev, filterOption: selectedValue }));
-  };
-
-  const { openModal } = useContext(ConfirmModalContext);
-
-  const handleConfirmAction = () => {
-    console.log("done");
-  };
-
-  const handleOpenModal = () => {
-    openModal(
-      "Confirmation",
-      [
-        "Are you sure you want to delete this user?",
-        "Delete is permenant and cannot be undo",
-      ],
-      handleConfirmAction
-    );
   };
 
   return (
@@ -203,36 +186,40 @@ const FilterTable = (props) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {tableData.tbody.map((rowData, rowIndex) => (
-                    <tr key={`row-${rowIndex}`}>
-                      {checkBox && (
-                        <td>
-                          <input
-                            type="checkbox"
-                            value={rowData.id}
-                            onClick={editCheckedBox}
-                          />
-                        </td>
-                      )}
-                      {Object.values(rowData).map((cellData, cellIndex) => (
-                        <td key={`cell-${cellIndex}`}>{cellData}</td>
-                      ))}
-                      {checkBox.addCheckBox && (
-                        <td className="tableAction">
-                          {checkBox.handlerArray.map((value, index) => {
-                            return (
-                              <span
-                                key={index}
-                                onClick={handleOpenModal}
-                                className={`${value.name || ""}`}>
-                                {value.name}
-                              </span>
-                            );
-                          })}
-                        </td>
-                      )}
-                    </tr>
-                  ))}
+                  {tableData.tbody.map((rowData, rowIndex) => {
+                    return (
+                      <tr key={`row-${rowIndex}`}>
+                        {checkBox && (
+                          <td>
+                            <input
+                              type="checkbox"
+                              value={rowData.id}
+                              onClick={editCheckedBox}
+                            />
+                          </td>
+                        )}
+                        {Object.values(rowData).map((cellData, cellIndex) => (
+                          <td key={`cell-${cellIndex}`}>{cellData}</td>
+                        ))}
+                        {checkBox.addCheckBox && (
+                          <td className="tableAction">
+                            {checkBox.handlerArray.map((value, index) => {
+                              return (
+                                <span
+                                  key={index}
+                                  onClick={() =>
+                                    value.onClickHandler(rowData.id)
+                                  }
+                                  className={`${value.name || ""}`}>
+                                  {value.name}
+                                </span>
+                              );
+                            })}
+                          </td>
+                        )}
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             ) : (

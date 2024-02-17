@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "../FormBody.css";
 
 const InputMultipleTxt = ({ datas, formHandler }) => {
@@ -6,12 +6,18 @@ const InputMultipleTxt = ({ datas, formHandler }) => {
     name,
     label,
     required = true,
-    descriptions = [],
     placeholder,
     disable = false,
+    defaultValue = null,
   } = datas;
 
-  const [inputLists, setInputLists] = useState(descriptions);
+  const [inputLists, setInputLists] = useState(defaultValue || []);
+
+  useEffect(() => {
+    if (defaultValue) {
+      formHandler(null, defaultValue, name);
+    }
+  }, []);
 
   const updateDescriptions = (e) => {
     const inputEle = document.getElementById(name);
@@ -40,7 +46,6 @@ const InputMultipleTxt = ({ datas, formHandler }) => {
         <input
           name={name}
           id={name}
-          required={required}
           placeholder={placeholder}
           style={{ paddingRight: "1.7rem" }}
         />

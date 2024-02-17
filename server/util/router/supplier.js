@@ -1,19 +1,21 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../function/conn");
+const { selectCategory, replaceIds } = require("../function/stringFormat");
 const {
   validateJWT,
   validateCategory,
   validateSupplier,
 } = require("../function/validation");
 const { isAdmin } = require("../function/authorization");
+const { catIdToName } = require("../function/stringFormat");
 
 // register for new supplier
 router.post("/register", validateJWT, isAdmin, async (req, res) => {
   const {
     supplier_cmp_name,
     supplier_pic,
-    supplier_phone,
+    supplier_contact,
     supplier_category,
     supplier_address,
   } = req.body;
@@ -21,7 +23,7 @@ router.post("/register", validateJWT, isAdmin, async (req, res) => {
   // Check if all required fields are provided
   if (
     !supplier_cmp_name ||
-    !supplier_phone ||
+    !supplier_contact ||
     !supplier_category ||
     !supplier_pic ||
     !Array.isArray(supplier_category) ||
@@ -42,13 +44,13 @@ router.post("/register", validateJWT, isAdmin, async (req, res) => {
   const json_supplier_category = JSON.stringify(uniqueCategory);
 
   const insertQuery =
-    "INSERT INTO supplier (supplier_cmp_name, supplier_pic, supplier_phone, supplier_category, supplier_address) VALUES (?, ?, ?, ?, ?)";
+    "INSERT INTO supplier (supplier_cmp_name, supplier_pic, supplier_contact, supplier_category, supplier_address) VALUES (?, ?, ?, ?, ?)";
   db.query(
     insertQuery,
     [
       supplier_cmp_name,
       supplier_pic,
-      supplier_phone,
+      supplier_contact,
       json_supplier_category,
       supplier_address,
     ],
@@ -64,22 +66,85 @@ router.post("/register", validateJWT, isAdmin, async (req, res) => {
   );
 });
 
-router.get("/:supplier_id", validateJWT, (req, res) => {
+//get all supplier data info
+router.get(
+  "",
+  validateJWT,
+  (req, res, next) => {
+    const searchTerm = req.query.searchterm || "";
+    const filterOption = req.query.filteroption || "";
+
+    let selectQuery = `SELECT supplier_id AS 'id', supplier_cmp_name AS 'company name', supplier_pic AS 'person in charge', supplier_contact AS contact, supplier_category AS category, supplier_address AS address FROM supplier`;
+    let queryParams = [];
+
+    if (searchTerm) {
+      selectQuery += ` WHERE (supplier_cmp_name LIKE ?
+      OR supplier_pic LIKE ?
+      OR supplier_contact LIKE ?
+      OR supplier_address LIKE ?)`;
+      queryParams.push(
+        `%${searchTerm}%`,
+        `%${searchTerm}%`,
+        `%${searchTerm}%`,
+        `%${searchTerm}%`
+      );
+    }
+
+    if (filterOption) {
+      if (searchTerm) selectQuery += " AND";
+      else selectQuery += " WHERE";
+
+      selectQuery += " supplier_category LIKE ";
+      queryParams.push(`%${filterOption}%`);
+    }
+
+    db.query(selectQuery, queryParams, (err, results) => {
+      if (err)
+        return res.status(500).json({ message: "Something went wrong" + err });
+
+      const thead = results.length > 0 ? Object.keys(results[0]) : [];
+      const responseBody = {
+        thead: thead,
+        tbody: results,
+      };
+      req.responseBody = responseBody;
+      next();
+    });
+  },
+  selectCategory,
+  (req, res) => {
+    req.responseBody.tbody.forEach((obj) => {
+      const categoryArray = JSON.parse(obj.category);
+      obj.category = replaceIds(categoryArray, req.categoryArray).join(", ");
+    });
+
+    return res.status(200).json({ data: req.responseBody });
+  }
+);
+
+//get specific supplier data
+router.get("/:supplier_id", validateJWT, (req, res, next) => {
   const { supplier_id } = req.params;
 
-  let selectQuery = "SELECT * FROM supplier";
-  let queryParams = [];
-  if (supplier_id !== "*") {
-    selectQuery += " WHERE supplier_id = ?;";
-    queryParams.push(supplier_id);
-  }
-  db.query(selectQuery, queryParams, (err, result) => {
+  const selectQuery = "SELECT * FROM supplier WHERE supplier_id = ?;";
+
+  db.query(selectQuery, [supplier_id], (err, result) => {
     if (err)
       return res.status(500).json({ message: "Something went wrong." + err });
-    if (!result.length)
+    if (result.length !== 1)
       return res.status(400).json({ message: "Supplier not found" });
 
-    return res.status(200).json({ data: result });
+    const returnObj = result[0];
+
+    if (returnObj.supplier_category) {
+      returnObj.supplier_category = JSON.parse(returnObj.supplier_category);
+      if (Array.isArray(returnObj.supplier_category)) {
+        returnObj.supplier_category = returnObj.supplier_category.map(
+          (category) => parseInt(category)
+        );
+      }
+    }
+    return res.status(200).json({ data: returnObj });
   });
 });
 
@@ -93,18 +158,18 @@ router.post(
     const {
       supplier_cmp_name,
       supplier_pic,
-      supplier_phone,
+      supplier_contact,
       supplier_category,
       supplier_id,
-      supplier_address,
+      supplier_address = null,
     } = req.body;
+
     if (
       !supplier_cmp_name ||
-      !supplier_phone ||
+      !supplier_contact ||
       !supplier_category ||
       !supplier_pic ||
       !supplier_id ||
-      !supplier_address ||
       !Array.isArray(supplier_category) ||
       supplier_category.length === 0
     ) {
@@ -123,16 +188,16 @@ router.post(
 
     const json_supplier_category = JSON.stringify(uniqueCategory);
 
-    const udpateQuery =
-      "UPDATE supplier SET supplier_cmp_name = ?, supplier_pic = ?, supplier_phone = ? , supplier_category = ?, supplier_address = ? WHERE supplier_id = ?";
+    const updateQuery =
+      "UPDATE supplier SET supplier_cmp_name = ?, supplier_pic = ?, supplier_contact = ? , supplier_category = ?, supplier_address = ? WHERE supplier_id = ?";
     db.query(
-      udpateQuery,
+      updateQuery,
       [
         supplier_cmp_name,
         supplier_pic,
-        supplier_phone,
+        supplier_contact,
         json_supplier_category,
-        supplier_id,
+        supplier_address,
         supplier_id,
       ],
       (err) => {
@@ -149,8 +214,8 @@ router.post(
 );
 
 //delete supplier
-router.delete("/delete", validateJWT, isAdmin, validateSupplier, (req, res) => {
-  const { supplier_id } = req.body;
+router.delete("/delete/:supplier_id", validateJWT, isAdmin, (req, res) => {
+  const { supplier_id } = req.params;
 
   if (!supplier_id)
     return res.status(400).json({ message: "Please provide required info" });
@@ -161,7 +226,6 @@ router.delete("/delete", validateJWT, isAdmin, validateSupplier, (req, res) => {
   ];
 
   for (const query of arrayOfQuery) {
-    console.log(query);
     db.query(query, [supplier_id], (err) => {
       if (err)
         return res
@@ -170,7 +234,7 @@ router.delete("/delete", validateJWT, isAdmin, validateSupplier, (req, res) => {
     });
   }
 
-  return res.status(200).json({ messsage: "Supplier delete successfully" });
+  return res.status(200).json({ message: "Supplier delete successfully" });
 });
 
 module.exports = router;

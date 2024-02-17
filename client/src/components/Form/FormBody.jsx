@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import InputFile from "./Input/InputFile";
 import InputOption from "./Input/InputOption";
 import NormalInput from "./Input/NormalInput";
@@ -17,11 +17,23 @@ const FormBody = (props) => {
     title = null,
     inputLists = null,
     submitValue = "submit",
-    reset = true,
     grid = true,
     endPoint,
   } = props;
   const [formInputValue, setFormInputValue] = useState({});
+
+  useEffect(() => {
+    inputLists.map((fileds) => {
+      if (fileds.hasOwnProperty("defaultValue")) {
+        setFormInputValue((prev) => ({
+          ...prev,
+          [fileds.name]: fileds.defaultValue,
+          update: true,
+        }));
+      }
+      return null;
+    });
+  }, [inputLists]);
 
   const formHandler = (e, customValue, inputName) => {
     const id = inputName || e.target.name;
@@ -37,7 +49,6 @@ const FormBody = (props) => {
 
   const submitHandler = async (e) => {
     e.preventDefault();
-    console.log(formInputValue);
     const formData = formInputValue;
     setIsLoading(true);
 
@@ -49,7 +60,6 @@ const FormBody = (props) => {
       })
       .then((res) => {
         const message = res.data.message;
-        console.log(res.data);
         setSnackbar((prev) => ({
           severity: "success",
           message: message,
@@ -75,7 +85,6 @@ const FormBody = (props) => {
         {inputLists && constructInput(inputLists, formHandler)}
       </div>
       <div className="formAction">
-        {reset && <input type="reset" value="reset" />}
         <LoadableBtn isLoading={isLoading} txt={submitValue} />
       </div>
     </form>
@@ -92,7 +101,7 @@ export const constructInput = (inputLists, formHandler = null) => {
       case "tel":
         return (
           <NormalInput
-            key={index}
+            key={`input-${index}`}
             datas={inputList}
             formHandler={formHandler}
           />
@@ -100,18 +109,26 @@ export const constructInput = (inputLists, formHandler = null) => {
 
       case "file":
         return (
-          <InputFile key={index} datas={inputList} formHandler={formHandler} />
+          <InputFile
+            key={`input-${index}`}
+            datas={inputList}
+            formHandler={formHandler}
+          />
         );
 
       case "textarea":
         return (
-          <TextArea key={index} datas={inputList} formHandler={formHandler} />
+          <TextArea
+            key={`input-${index}`}
+            datas={inputList}
+            formHandler={formHandler}
+          />
         );
 
       case "checkbox":
         return (
           <TableCheckBox
-            key={index}
+            key={`input-${index}`}
             datas={inputList}
             formHandler={formHandler}
           />
@@ -119,7 +136,7 @@ export const constructInput = (inputLists, formHandler = null) => {
       case "option":
         return (
           <InputOption
-            key={index}
+            key={`input-${index}`}
             datas={inputList}
             formHandler={formHandler}
           />
@@ -127,15 +144,25 @@ export const constructInput = (inputLists, formHandler = null) => {
       case "multipletext":
         return (
           <InputMultipleTxt
-            key={index}
+            key={`input-${index}`}
             datas={inputList}
             formHandler={formHandler}
           />
         );
+      case "hidden":
+        return (
+          <input
+            type="hidden"
+            value={inputList.value}
+            name={inputList.name}
+            key={`input-${index}`}
+          />
+        );
+
       default:
         return (
           <NormalInput
-            key={index}
+            key={`input-${index}`}
             datas={inputList}
             formHandler={formHandler}
           />

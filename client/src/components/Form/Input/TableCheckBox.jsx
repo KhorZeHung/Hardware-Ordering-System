@@ -2,15 +2,25 @@ import React, { useState } from "react";
 import "../FormBody.css";
 
 const TableCheckBox = ({ datas, formHandler }) => {
-  const { name, label, required = true, options = [], disable = false } = datas;
-  const [checkedBox, setCheckedBox] = useState([]);
+  const {
+    name,
+    label,
+    required = true,
+    options = [],
+    disable = false,
+    defaultValue = [],
+  } = datas;
+  const [checkedBox, setCheckedBox] = useState(defaultValue);
 
   const checkBoxHandler = (e) => {
-    const newCheckedBoxArray = [...checkedBox];
+    let newCheckedBoxArray = [...checkedBox];
+    const value = parseInt(e.target.value);
     if (e.target.checked) {
-      newCheckedBoxArray.push(e.target.value);
+      newCheckedBoxArray.push(value);
     } else {
-      newCheckedBoxArray.filter((checkedBox) => checkedBox !== e.target.value);
+      newCheckedBoxArray = newCheckedBoxArray.filter(
+        (checkedBox) => checkedBox !== value
+      );
     }
     setCheckedBox(newCheckedBoxArray);
     formHandler(e, newCheckedBoxArray, name);
@@ -23,16 +33,18 @@ const TableCheckBox = ({ datas, formHandler }) => {
       </label>
       <div className="scrollable">
         {options.length > 0 &&
-          options.map((option, index) => {
+          options.map((option) => {
             return (
-              <div key={index} onChange={checkBoxHandler}>
+              <div key={"Option_" + option.value}>
                 <input
                   type="checkbox"
-                  value={option}
+                  value={parseInt(option.value)}
                   name={name}
                   disabled={disable}
+                  checked={checkedBox.includes(parseInt(option.value))}
+                  onChange={checkBoxHandler}
                 />
-                <p>{option}</p>
+                <p>{option.name}</p>
               </div>
             );
           })}

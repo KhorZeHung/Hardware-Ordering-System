@@ -4,7 +4,7 @@ import { getCookie } from "./cookie";
 export const allowAccessLink = () => {
   if (!getCookie("token")) return;
 
-  const position = decode(getCookie("token")).user_position;
+  const position = decode(getCookie("token")).user_authority;
   switch (position) {
     case 1:
       return [

@@ -1,9 +1,23 @@
-import React from "react";
+import React, { useState } from "react";
 import "../FormBody.css";
 
 const InputOption = ({ datas, formHandler }) => {
-  const { label, name, required = true, options = [], disable = false } = datas;
+  const {
+    label,
+    name,
+    required = true,
+    options = [],
+    disable = false,
+    defaultValue = null,
+  } = datas;
 
+  const [selected, setSelected] = useState(defaultValue);
+
+  const selectChangeHandler = (event) => {
+    const { value } = event.target;
+    setSelected(value);
+    formHandler(event);
+  };
   return (
     <div className={disable ? "normalInput disable" : "normalInput"}>
       <label htmlFor={name}>
@@ -12,15 +26,23 @@ const InputOption = ({ datas, formHandler }) => {
       <select
         name={name}
         id={name}
-        onChange={formHandler}
-        // value={options[0].value}
+        onChange={selectChangeHandler}
+        value={selected || ""}
         disabled={disable}>
-        {options.length > 0 &&
-          options.map((option, index) => (
-            <option key={index} value={option.value} name={name}>
-              {option.name}
-            </option>
-          ))}
+        {options.length > 0 && (
+          <>
+            {!defaultValue && (
+              <option value="" disabled>
+                Select an option
+              </option>
+            )}
+            {options.map((option, index) => (
+              <option key={index} value={option.value} name={name}>
+                {option.name}
+              </option>
+            ))}
+          </>
+        )}
       </select>
     </div>
   );

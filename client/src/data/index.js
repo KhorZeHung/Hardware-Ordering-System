@@ -108,7 +108,23 @@ export const dashBoardData = {
 
 export const contactData = {
   supplier: {
-    tableData: { checkBox: true },
+    tableData: {
+      checkBox: {
+        addCheckBox: true,
+        handlerArray: [
+          {
+            name: "edit",
+            endPoint: "/edit",
+          },
+          {
+            name: "delete",
+            endPoint: "/delete",
+          },
+        ],
+      },
+      endPoint: "/supplier",
+      // filter: { options: ["superuser", "admin", "manager"] },
+    },
     cardData: [
       {
         value: "15",
@@ -118,53 +134,75 @@ export const contactData = {
     newModalForm: {
       title: "new supplier",
       submitValue: "add supplier",
+      getDefaultValueEndPoint: "/supplier/",
+      endPoint: "/supplier/register",
       inputLists: [
         {
           type: "text",
-          name: "splr_company",
+          name: "supplier_cmp_name",
           label: "supplier company name",
           placeholder: "Example sdn bhd",
         },
         {
           type: "checkbox",
-          name: "splr_cat",
+          name: "supplier_category",
           label: "Supplier category",
           options: [
-            "furniture",
-            "carpentry",
-            "curtain",
-            "decoration",
-            "general hardware",
-            "electrical hardware",
-            "plumbing hardware",
-            "electrical service",
-            "plumbing service",
-          ].sort(),
+            { name: "Interior Design", value: 1 },
+            { name: "Kitchen Renovation", value: 2 },
+            { name: "Bathroom Remodeling", value: 3 },
+            { name: "Flooring", value: 4 },
+            { name: "Painting", value: 5 },
+            { name: "Roofing", value: 6 },
+            { name: "Electrical Work", value: 7 },
+            { name: "Plumbing", value: 8 },
+            { name: "Landscaping", value: 9 },
+          ],
         },
         {
           type: "text",
-          name: "personInCharge",
+          name: "supplier_pic",
           label: "Person In-charge",
           placeholder: "Full name with title",
         },
         {
-          type: "email",
-          name: "splr_email",
-          label: "Company E-mail",
-          placeholder: "example@gmail.com",
+          type: "text",
+          name: "supplier_address",
+          label: "Address",
+          placeholder: "full address without post code",
           required: false,
         },
         {
           type: "tel",
-          name: "splr_contact",
+          name: "supplier_contact",
           label: "Contact number",
           placeholder: "03-XXXX XXXX",
+        },
+        {
+          type: "hidden",
+          name: "supplier_id",
         },
       ],
     },
   },
   product: {
-    tableData: { checkBox: true },
+    tableData: {
+      checkBox: {
+        addCheckBox: true,
+        handlerArray: [
+          {
+            name: "edit",
+            endPoint: "/edit",
+          },
+          {
+            name: "delete",
+            endPoint: "/delete",
+          },
+        ],
+      },
+      endPoint: "/product",
+      // filter: { options: ["superuser", "admin", "manager"] },
+    },
     cardData: [
       {
         value: "112",
@@ -174,6 +212,8 @@ export const contactData = {
     newModalForm: {
       title: "new product / service",
       submitValue: "add product",
+      getDefaultValueEndPoint: "/product/",
+      endPoint: "/product/register",
       inputLists: [
         {
           type: "text",
@@ -183,68 +223,53 @@ export const contactData = {
         },
         {
           type: "text",
-          name: "product_cost",
+          name: "product_unit_cost",
           label: "Cost (RM)",
           placeholder: "XXX.XX",
         },
         {
           type: "text",
-          name: "product_price",
+          name: "product_unit_price",
           label: "Charging Price (RM)",
           placeholder: "+15% to cost as default",
         },
+        // {
+        //   type: "text",
+        //   name: "product_brand",
+        //   label: "Product Brand ",
+        //   required: false,
+        //   default: 1,
+        // },
         {
-          type: "text",
-          name: "product_brand",
-          label: "Product Brand ",
-          required: false,
-          default: 1,
-        },
-        {
-          type: "checkbox",
-          name: "product_cat",
+          type: "option",
+          name: "supplier_id",
           label: "Supplier",
-          options: [
-            "supplier 1",
-            "supplier 2",
-            "supplier 3",
-            "supplier 4",
-            "supplier 5",
-            "supplier 6",
-            "supplier 7",
-            "supplier 8",
-            "supplier 9",
-            "supplier 10",
-          ].sort(),
         },
         {
           type: "checkbox",
-          name: "splr_cat",
+          name: "product_category",
           label: "Product category",
           options: [
-            "furniture",
-            "carpentry",
-            "curtain",
-            "decoration",
-            "general hardware",
-            "electrical hardware",
-            "plumbing hardware",
-            "electrical service",
-            "plumbing service",
-          ].sort(),
-        },
-        {
-          type: "textarea",
-          name: "product_detail",
-          label: "product detail",
-          required: false,
-          placeholder: "Record anything for internal use.",
+            { name: "Interior Design", value: 1 },
+            { name: "Kitchen Renovation", value: 2 },
+            { name: "Bathroom Remodeling", value: 3 },
+            { name: "Flooring", value: 4 },
+            { name: "Painting", value: 5 },
+            { name: "Roofing", value: 6 },
+            { name: "Electrical Work", value: 7 },
+            { name: "Plumbing", value: 8 },
+            { name: "Landscaping", value: 9 },
+          ],
         },
         {
           type: "multipletext",
           name: "product_description",
           label: "product description",
           placeholder: "Description for Quotation, hit enter to record",
+        },
+        {
+          type: "hidden",
+          name: "product_id",
         },
       ],
     },
@@ -325,21 +350,22 @@ export const userData = {
       handlerArray: [
         {
           name: "edit",
-          onClickHandler: () => {},
+          endPoint: "/edit-profile",
         },
         {
           name: "delete",
-          onClickHandler: () => {},
+          endPoint: "/delete",
         },
       ],
-      endPoint: "/user",
-      filter: { options: ["superuser", "admin", "manager"] },
     },
+    endPoint: "/user",
+    filter: { options: ["superuser", "admin", "manager"] },
   },
   newModalForm: {
     title: "new user",
     submitValue: "add user",
     endPoint: "/user/register",
+    getDefaultValueEndPoint: "/user/",
     inputLists: [
       {
         type: "text",
@@ -461,7 +487,6 @@ export const forgotPasswordData = [
       name: "user_email",
       label: "Email",
       placeholder: "example@gmail.com",
-      defaultValue: "",
     },
   ],
   [
@@ -470,7 +495,6 @@ export const forgotPasswordData = [
       name: "user_password",
       label: "Temporary password",
       placeholder: "has send to provided email",
-      defaultValue: "",
     },
   ],
   [
@@ -479,7 +503,6 @@ export const forgotPasswordData = [
       name: "user_password",
       label: "New password",
       placeholder: "be creative",
-      defaultValue: "",
       onKeyUpCheck: true,
     },
     {
@@ -487,7 +510,6 @@ export const forgotPasswordData = [
       name: "user_repeat_password",
       label: "Repeat password",
       placeholder: "same as new password",
-      defaultValue: "",
     },
   ],
 ];
