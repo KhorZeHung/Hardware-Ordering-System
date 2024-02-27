@@ -65,8 +65,7 @@
   grid-row: span 2;
 }
 
-.formBody textarea,
-.formBody .checkBoxList {
+.formBody textarea {
   grid-row: span 3;
   font: inherit;
   font-size: 13px;
@@ -111,7 +110,7 @@
   }
 }
 
-.formBody .normalInput input,
+.formBody .normalInput input:not([type="checkbox"]),
 .formBody textarea,
 .formBody select {
   outline: none;
@@ -164,23 +163,47 @@
   user-select: none;
 }
 
+.formBody .displayOption {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: var(--primary-color-6);
+  cursor: pointer;
+  user-select: none;
+}
+
 .formBody .checkBoxList .scrollable {
+  position: absolute;
+  display: none;
+  width: 100%;
+  z-index: 10;
+  overflow-y: auto;
+  background-color: var(--bckgrd-2);
+  box-shadow: var(--box-shadow-1);
+
+  &.show {
+    display: flex !important;
+    flex-direction: column;
+  }
+}
+
+.formBody .multiTxt .scrollable {
   height: 160px;
   overflow-y: auto;
   background-color: var(--bckgrd-2);
 }
-.formBody .checkBoxList .scrollable > div {
+.formBody .scrollable > div {
   display: flex;
   height: 30px;
   padding: 0.5rem;
 }
 
-.formBody .checkBoxList .scrollable > div > input {
+.formBody .scrollable > div > input {
   margin-right: 10px;
   cursor: pointer;
 }
 
-.formBody .checkBoxList .scrollable > div > p {
+.formBody .scrollable > div > p {
   line-height: 30px;
   font-size: 0.8rem;
   white-space: nowrap;

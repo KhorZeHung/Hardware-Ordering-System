@@ -17,7 +17,7 @@ const InputMultipleTxt = ({ datas, formHandler }) => {
     if (defaultValue) {
       formHandler(null, defaultValue, name);
     }
-  }, []);
+  }, [defaultValue, formHandler, name]);
 
   const updateDescriptions = (e) => {
     const inputEle = document.getElementById(name);
@@ -35,7 +35,7 @@ const InputMultipleTxt = ({ datas, formHandler }) => {
   };
 
   return (
-    <div className="checkBoxList">
+    <div className="multiTxt">
       <div
         className={disable ? "normalInput disable" : "normalInput"}
         style={{ position: "relative" }}>

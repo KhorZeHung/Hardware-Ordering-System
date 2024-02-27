@@ -20,20 +20,25 @@ const Login = () => {
     await axios
       .post(APIGateway + "/user/login", formData)
       .then((res) => {
-        const token = res.data.token;
-        const message = res.data.message;
+        const { token, message, options } = res.data;
+        options.forEach((option) => {
+          const key = Object.keys(option)[0];
+          const value = JSON.stringify(option[key]);
+          localStorage.setItem(key, value);
+        });
         setCookie("token", token, 12);
-        setSnackbar((prev) => ({
+        setSnackbar({
           severity: "success",
           message: message,
           open: true,
-        }));
+        });
         setTimeout(() => {
           window.location = "../";
         }, 2000);
       })
       .catch((err) => {
-        const message = err.response.data || err.message;
+        const message =
+          err.response.data || err.message || "Something went wrong";
         setSnackbar({ open: true, message: message, severity: "error" });
       })
       .finally(() => {

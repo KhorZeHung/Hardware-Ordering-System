@@ -146,19 +146,27 @@ function generateUserPK(req, res, next) {
 
 // validate supplier id
 function validateSupplier(req, res, next) {
-  const { supplier_id } = req.body;
+  const { supplier_id, supplier_cmp_name } = req.body;
 
-  if (!supplier_id)
+  if (!supplier_id && !supplier_cmp_name)
     return res.status(400).json({ message: "Please provide required info" });
 
-  const selectQuery = "SELECT * FROM supplier WHERE supplier_id = ?";
-  db.query(selectQuery, [supplier_id], (err, result) => {
+  let selectQuery = "SELECT * FROM supplier WHERE supplier_cmp_name = ?";
+  let queryParams = [supplier_cmp_name];
+
+  if (supplier_id) {
+    selectQuery += " AND supplier_id = ?;";
+    queryParams.push(supplier_id);
+  }
+
+  db.query(selectQuery, queryParams, (err, result) => {
     if (err)
       return res.status(500).json({ message: "Something went wrong " + err });
 
-    if (result.length !== 1)
+    if (result.length > 1)
       return res.status(400).json({ message: "Bad request" });
 
+    req.supplier = result;
     next();
   });
 }
@@ -199,18 +207,31 @@ async function validateCategory(arraysOfCategory) {
 
 // validate product id individually
 function validateProduct(req, res, next) {
-  const { product_id } = req.body;
+  const { product_name, supplier_id } = req.body;
+  const { product_id } = req.params;
 
-  if (!product_id)
+  if (!product_id && (!product_name || !supplier_id))
     return res.status(400).json({ message: "Please provide required info" });
 
-  const selectQuery = "SELECT * FROM product WHERE product_id = ?";
-  db.query(selectQuery, [product_id], (err, result) => {
+  let selectQuery = "SELECT * FROM product ";
+  let queryParams = [];
+
+  if (product_id) {
+    selectQuery += "WHERE product_id = ?;";
+    queryParams.push(product_id);
+  } else {
+    selectQuery += "WHERE product_name = ? AND supplier_id = ?;";
+    queryParams.push(product_name, supplier_id);
+  }
+
+  db.query(selectQuery, queryParams, (err, result) => {
     if (err)
       return res.status(500).json({ message: "Something went wrong " + err });
 
-    if (result.length !== 1)
+    if (result.length > 1)
       return res.status(400).json({ message: "Bad request" });
+
+    req.product = result;
     next();
   });
 }

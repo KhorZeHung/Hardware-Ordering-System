@@ -17,6 +17,7 @@ const Navbar = () => {
 
   const logOutHandler = () => {
     deleteCookie("token");
+    localStorage.clear();
     closeNavBarHandler();
     window.location.reload();
   };

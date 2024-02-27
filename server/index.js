@@ -15,7 +15,6 @@ app.use(cors({ origin: env.ORIGINURL || "*" }));
 
 const user = require("./util/router/user");
 const account = require("./util/router/account");
-const notification = require("./util/router/notification");
 const order = require("./util/router/order");
 const product = require("./util/router/product");
 const project = require("./util/router/project");
@@ -24,12 +23,12 @@ const supplier = require("./util/router/supplier");
 
 app.use("/user", user);
 app.use("/account", account);
-app.use("/notification", notification);
 app.use("/order", order);
 app.use("/product", product);
 app.use("/project", project);
 app.use("/quote", quote);
 app.use("/supplier", supplier);
+app.get("/category", )
 
 app.all("*", (req, res) => {
   res.status(404).send("Page not found");

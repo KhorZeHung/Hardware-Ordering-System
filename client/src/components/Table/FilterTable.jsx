@@ -25,7 +25,6 @@ const FilterTable = (props) => {
   });
   const searchTermRef = useRef();
   const { setSnackbar } = useContext(SnackbarContext);
-
   useEffect(() => {
     setTableIsLoading(true);
     const fetchData = async () => {
@@ -67,6 +66,8 @@ const FilterTable = (props) => {
     };
 
     fetchData();
+
+    return () => {};
   }, [filterValue, setSnackbar, endPoint]);
 
   const clearSearch = () => {
@@ -170,7 +171,7 @@ const FilterTable = (props) => {
               <table>
                 <thead>
                   <tr>
-                    {checkBox && (
+                    {checkBox.addCheckBox && (
                       <th>
                         <input
                           type="checkbox"
@@ -182,14 +183,14 @@ const FilterTable = (props) => {
                     {tableData.thead.map((value, index) => (
                       <th key={`thead-${value}`}>{value}</th>
                     ))}
-                    {checkBox.addCheckBox && <th>Action</th>}
+                    {checkBox.handlerArray && <th>Action</th>}
                   </tr>
                 </thead>
                 <tbody>
                   {tableData.tbody.map((rowData, rowIndex) => {
                     return (
                       <tr key={`row-${rowIndex}`}>
-                        {checkBox && (
+                        {checkBox.addCheckBox && (
                           <td>
                             <input
                               type="checkbox"
@@ -201,7 +202,7 @@ const FilterTable = (props) => {
                         {Object.values(rowData).map((cellData, cellIndex) => (
                           <td key={`cell-${cellIndex}`}>{cellData}</td>
                         ))}
-                        {checkBox.addCheckBox && (
+                        {checkBox.handlerArray && (
                           <td className="tableAction">
                             {checkBox.handlerArray.map((value, index) => {
                               return (
@@ -226,7 +227,7 @@ const FilterTable = (props) => {
               <div
                 className="center"
                 style={{
-                  height: "400px",
+                  height: "200px",
                   width: "100%",
                   backgroundColor: "transparent",
                 }}>

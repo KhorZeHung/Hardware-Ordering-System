@@ -10,7 +10,7 @@ import User from "./scenes/User";
 import Project from "./scenes/Project";
 import Quotation from "./scenes/Quotation";
 import Notification from "./scenes/Notification";
-import NewQuote from "./scenes/Quotation/NewQuote";
+import QuoteForm from "./scenes/Quotation/QuoteForm";
 import ForgotPassword from "./scenes/ForgotPassword";
 
 //import component
@@ -118,9 +118,15 @@ function App() {
             path="/quotation/new-quote"
             element={
               <PrivateRoute path="quotation">
-                <NewQuote
-                  datas={{ endPoint: null, isNew: true, isQuote: true }}
-                />
+                <QuoteForm datas={{ isNew: true, isQuote: true }} />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/quotation/:quote_id"
+            element={
+              <PrivateRoute path="quotation">
+                <QuoteForm datas={{ isNew: false, isQuote: true }} />
               </PrivateRoute>
             }
           />

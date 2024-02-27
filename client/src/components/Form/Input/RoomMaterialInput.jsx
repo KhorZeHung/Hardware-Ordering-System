@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
-import ConfirmModal from "../../Modal/ConfirmModal";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import ProductListModal from "../../Modal/ProductListModal";
 import ProductListTable from "../../Table/ProductListTable";
+import { ConfirmModalContext } from "../../Modal/ConfirmModalProvider";
 import "../FormBody.css";
 
 export const calculateSubTotal = (productLists) => {
@@ -10,7 +10,8 @@ export const calculateSubTotal = (productLists) => {
   }
   return productLists.reduce(
     (total, item) =>
-      total + parseInt(item.quantity) * parseFloat(item.unit_price),
+      total +
+      parseInt(item.product_quantity) * parseFloat(item.product_unit_price),
     0
   );
 };
@@ -22,22 +23,19 @@ const RoomMaterialInput = ({ datas }) => {
     formHandler = null,
     addRoomHandler = null,
     deleteRoomHandler = null,
-    disable = false,
   } = datas;
 
   const numOfRoom = index + 1;
   const indexOfArray = index;
-
   const [open, setOpen] = useState(false);
   const [productLists, setProductLists] = useState(defaultProductList);
   const [subTotal, setSubTotal] = useState(
     calculateSubTotal(defaultProductList.productList) || 0
   );
   const [isActionMenuOpen, setIsActionMenuOpen] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isProductListModalOpen, setIsProductListModalOpen] = useState(false);
   const mainBarActionRef = useRef(null);
-
+  const { openModal } = useContext(ConfirmModalContext);
   useEffect(() => {
     setProductLists(defaultProductList);
     setSubTotal(calculateSubTotal(defaultProductList.productList) || 0);
@@ -67,28 +65,27 @@ const RoomMaterialInput = ({ datas }) => {
     };
   }, [open, numOfRoom]);
 
-  useEffect(() => {
-    const handleOutsideClick = (event) => {
-      if (
-        mainBarActionRef.current &&
-        !mainBarActionRef.current.contains(event.target)
-      ) {
-        setIsActionMenuOpen(false);
-      }
-    };
-
-    document.addEventListener("click", handleOutsideClick);
-
-    return () => {
-      document.removeEventListener("click", handleOutsideClick);
-    };
-  }, [isActionMenuOpen]);
+  const productDescriptionHandler = (newArray, index) => {
+    setProductLists((prev) => ({
+      ...prev,
+      productList: prev.productList.map((item, idx) => {
+        if (idx === index) {
+          return {
+            ...item,
+            product_description: newArray,
+          };
+        }
+        return item;
+      }),
+    }));
+  };
 
   const changeProductHandler = (key, index, e) => {
     const newProductListsArray = { ...productLists };
     const product = productLists.productList[index];
     const currentProductTotal =
-      parseFloat(product.unit_price) * parseInt(product.quantity);
+      parseFloat(product.product_unit_price) *
+      parseInt(product.product_quantity);
     let changeValue = 0;
 
     if (key === "delete") {
@@ -97,13 +94,13 @@ const RoomMaterialInput = ({ datas }) => {
     } else {
       const newValue = parseFloat(e.target.value) || 0;
 
-      if (key === "quantity") {
-        const unitPrice = parseFloat(product.unit_price) || 0;
+      if (key === "product_quantity") {
+        const unitPrice = parseFloat(product.product_unit_price) || 0;
         const quantity = newValue < 0 ? 0 : newValue;
         changeValue = unitPrice * quantity - currentProductTotal;
         newProductListsArray.productList[index][key] = quantity;
-      } else if (key === "unit_price") {
-        const quantity = parseInt(product.quantity) || 0;
+      } else if (key === "product_unit_price") {
+        const quantity = parseInt(product.product_quantity) || 0;
         const unitPrice = newValue < 0 ? 0 : newValue;
         changeValue = quantity * unitPrice - currentProductTotal;
         newProductListsArray.productList[index][key] = unitPrice;
@@ -125,13 +122,13 @@ const RoomMaterialInput = ({ datas }) => {
     e.preventDefault();
     const newProductListsArray = { ...productLists };
     var unit_price = parseFloat(
-      newProductListsArray.productList[index].unit_price
+      newProductListsArray.productList[index].product_unit_price
     );
     let newSubTotal = subTotal;
     if (add) {
-      newProductListsArray.productList[index].quantity++;
+      newProductListsArray.productList[index].product_quantity++;
     } else {
-      newProductListsArray.productList[index].quantity--;
+      newProductListsArray.productList[index].product_quantity--;
       unit_price = -unit_price;
     }
     newSubTotal -= unit_price;
@@ -154,9 +151,33 @@ const RoomMaterialInput = ({ datas }) => {
     formHandler(e, "quote_product_lists", newProductListsArray, indexOfArray);
   };
 
+  const addProductHandler = (e, arraysOfProduct, newSubTotal) => {
+    const newProductListsArray = {
+      ...productLists,
+      productList: arraysOfProduct,
+    };
+
+    setProductLists(newProductListsArray);
+    const netPlus = newSubTotal - subTotal;
+    setSubTotal((prev) => prev + newSubTotal);
+    formHandler(
+      e,
+      "quote_product_lists",
+      newProductListsArray,
+      indexOfArray,
+      netPlus
+    );
+  };
+
   const deleteConfirm = () => {
-    setIsModalOpen(false);
-    deleteRoomHandler(indexOfArray);
+    openModal(
+      "Confirmation",
+      [
+        "Are you sure you want to delete this room?",
+        "Deletion is permenantly, cannot be undo!",
+      ],
+      () => deleteRoomHandler(indexOfArray)
+    );
   };
 
   return (
@@ -169,13 +190,12 @@ const RoomMaterialInput = ({ datas }) => {
             id="room1"
             value={productLists.roomName}
             style={{ padding: "5px" }}
-            onChange={(e) => changeRoomNameHandler(e)}
-            disabled={disable}
+            onChange={changeRoomNameHandler}
           />
           <span
             ref={mainBarActionRef}
             className="material-symbols-outlined mainBarAction"
-            onClick={() => !disable && setIsActionMenuOpen(!isActionMenuOpen)}>
+            onClick={() => setIsActionMenuOpen(!isActionMenuOpen)}>
             more_vert
           </span>
           <span
@@ -185,12 +205,12 @@ const RoomMaterialInput = ({ datas }) => {
             }>
             <div
               onClick={(e) => {
-                !disable && addRoomHandler(e, productLists.productList);
+                addRoomHandler(e, productLists.productList);
               }}>
               <span className="material-symbols-outlined">content_copy</span>
               <p>make a copy</p>
             </div>
-            <div onClick={() => !disable && setIsModalOpen(true)}>
+            <div onClick={() => deleteConfirm()}>
               <span className="material-symbols-outlined">delete</span>
               <p>delete room</p>
             </div>
@@ -211,7 +231,7 @@ const RoomMaterialInput = ({ datas }) => {
                 productList={productLists.productList}
                 changeProductHandler={changeProductHandler}
                 changeQuantityHandler={changeQuantityHandler}
-                disable={disable}
+                productDescriptionHandler={productDescriptionHandler}
               />
             ) : (
               <div style={{ height: "100px" }} className="center">
@@ -220,25 +240,19 @@ const RoomMaterialInput = ({ datas }) => {
             )}
             <div
               className="addProduct"
-              onClick={() => !disable && setIsProductListModalOpen(true)}>
+              onClick={() => setIsProductListModalOpen(true)}>
               add material
             </div>
           </div>
         </div>
       </div>
-      <ConfirmModal
-        title={"Confirmation"}
-        descriptions={[
-          "Are you sure you want to delete this room?",
-          "Deletion is permenantly, cannot be undo!",
-        ]}
-        open={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onConfirm={deleteConfirm}
-      />
       <ProductListModal
         open={isProductListModalOpen}
         closeFunc={() => setIsProductListModalOpen(false)}
+        addProductHandler={addProductHandler}
+        defaultValue={productLists.productList.map((product) =>
+          String(product.product_id)
+        )}
       />
     </>
   );

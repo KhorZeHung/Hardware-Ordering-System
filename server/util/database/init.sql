@@ -56,6 +56,7 @@ CREATE TABLE product(
 	product_id INT AUTO_INCREMENT NOT NULL, 
     product_name VARCHAR(255) NOT NULL, 
     product_category VARCHAR(255),
+    product_unit_cost DECIMAL(10,2) NOT NULL, 
     product_unit_price DECIMAL(10,2) NOT NULL, 
     product_description LONGTEXT NOT NULL, 
     supplier_id INT DEFAULT NULL, 
@@ -67,32 +68,37 @@ CREATE TABLE quotation (
     quote_id VARCHAR(255) NOT NULL,      
     quote_name VARCHAR(255) NOT NULL,      
     create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,     
-    client_name VARCHAR(255) NOT NULL,      
-    client_contact  VARCHAR(14) NOT NULL,   
-    budget DECIMAL(20, 2) NOT NULL DEFAULT 0,   
-    location VARCHAR(255) NOT NULL,      
+    quote_client_name VARCHAR(255) NOT NULL,      
+    quote_client_contact  VARCHAR(14) NOT NULL,   
+    quote_address VARCHAR(255) NOT NULL,      
     pic_id VARCHAR(10), 
-    quote_list LONGTEXT DEFAULT NULL,      
-    PRIMARY KEY (quote_id),      
-    FOREIGN KEY (pic_id) 
+    quote_product_lists LONGTEXT DEFAULT NULL,          
+    quote_sub_total DECIMAL(15,2) NOT NULL, 
+    quote_prop_type VARCHAR(10) NOT NULL, 
+    quote_discount DECIMAL(15, 2) NOT NULL, 
+    last_edit_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, 
+    PRIMARY KEY (quote_id),
+    FOREIGN KEY (pic_id)
     REFERENCES `user`(user_id)  
 );
 
 CREATE TABLE project (
-    proj_id VARCHAR(20) NOT NULL, 
-    proj_name VARCHAR(255) DEFAULT NULL, 
+    project_id VARCHAR(20) NOT NULL, 
+    project_name VARCHAR(255) DEFAULT NULL, 
     manager_in_charge_id VARCHAR(10), 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
-    client_name VARCHAR(255) NOT NULL,
-    client_contact VARCHAR(14) NOT NULL, 
-    budget DECIMAL(20, 2) NOT NULL DEFAULT 0,   
-    location VARCHAR(255) NOT NULL,      
-    `due-date` DATE DEFAULT NULL,
-    total_charges DECIMAL(20, 2) NOT NULL,
+    project_client_name VARCHAR(255) NOT NULL,
+    project_client_contact VARCHAR(14) NOT NULL, 
+    project_address VARCHAR(255) NOT NULL,      
+    project_grand_total DECIMAL(20, 2) NOT NULL,
+    project_sub_total DECIMAL(20, 2) NOT NULL,
+    project_discount DECIMAL(20, 2) NOT NULL,
+    project_prop_type VARCHAR(10) NOT NULL, 
     last_edit_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     last_edit_pic VARCHAR(255),
     admin_in_charge_id VARCHAR(10),
-    material_list LONGTEXT NOT NULL,
+    project_product_lists LONGTEXT NOT NULL,
+    PRIMARY KEY (project_id),
     FOREIGN KEY (manager_in_charge_id) REFERENCES `user`(user_id),
     FOREIGN KEY (admin_in_charge_id) REFERENCES `user`(user_id),
     FOREIGN KEY (last_edit_pic) REFERENCES `user`(user_id),
@@ -100,30 +106,19 @@ CREATE TABLE project (
     CONSTRAINT CHECK (admin_in_charge_id LIKE 'ADM%' OR manager_in_charge_id LIKE 'SPU%')
 );
 
-CREATE TABLE `order` (
-	order_id INT AUTO_INCREMENT NOT NULL, 
-    order_status INT DEFAULT 1, 
-    order_total_price DECIMAL(20, 2) NOT NULL DEFAULT 0,
-    order_send_datetime TIMESTAMP DEFAULT NULL, 
-    proj_id VARCHAR(20) NOT NULL, 
-    PRIMARY KEY (order_id),
-    CONSTRAINT order_status CHECK (order_status >= 0 AND order_status <= 4)
-);
-
-CREATE TABLE order_list (
-	olist_id INT AUTO_INCREMENT NOT NULL, 
-    olist_unit_price DECIMAL(10, 2) NOT NULL, 
-    olist_quantity INT NOT NULL, 
-    olist_product_id INT DEFAULT NULL, 
-    doc_refer LONGTEXT DEFAULT NULL,
-    received_date DATE DEFAULT NULL,
-    order_id INT NOT NULL, 
-    PRIMARY KEY (olist_id),
-    FOREIGN KEY (order_id) REFERENCES `order`(order_id),
-    FOREIGN KEY (olist_product_id) REFERENCES product(product_id), 
-    CONSTRAINT product_id_and_doc_refer_check 
-        CHECK (
-            (olist_product_id IS NULL AND doc_refer IS NOT NULL) OR 
-            (olist_product_id IS NOT NULL AND doc_refer IS NULL)
-        )
+CREATE TABLE project_order (
+    project_order_id INT AUTO_INCREMENT NOT NULL, 
+    supplier_id INT NOT NULL, 
+    project_id VARCHAR(20) NOT NULL, 
+    project_order_subtotal DECIMAL(15,2) NOT NULL, 
+    project_order_total_paid DECIMAL(15,2) NOT NULL DEFAULT 0,
+    project_order_product_lists LONGTEXT NOT NULL, 
+    project_order_status VARCHAR(255) DEFAULT 'under process',
+    project_order_doc_refer VARCHAR(255) DEFAULT NULL, 
+    pic_id VARCHAR(255) NOT NULL,
+    PRIMARY KEY(project_order_id), 
+    FOREIGN KEY (supplier_id) REFERENCES supplier(supplier_id),
+    FOREIGN KEY (project_id) REFERENCES project(project_id),
+    FOREIGN KEY (pic_id) REFERENCES `user`(user_id), 
+    CONSTRAINT pic_id_check CHECK (pic_id LIKE 'SPU%' OR pic_id LIKE 'AMD%')
 );

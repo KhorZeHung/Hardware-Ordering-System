@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../function/conn");
-const { selectCategory, replaceIds } = require("../function/stringFormat");
+const { replaceIds } = require("../function/stringFormat");
+const { getCategoryInfo, getSupplierInfo } = require("../function/getInfo");
 const {
   validateJWT,
   validateCategory,
@@ -11,65 +12,76 @@ const { isAdmin } = require("../function/authorization");
 const { catIdToName } = require("../function/stringFormat");
 
 // register for new supplier
-router.post("/register", validateJWT, isAdmin, async (req, res) => {
-  const {
-    supplier_cmp_name,
-    supplier_pic,
-    supplier_contact,
-    supplier_category,
-    supplier_address,
-  } = req.body;
-
-  // Check if all required fields are provided
-  if (
-    !supplier_cmp_name ||
-    !supplier_contact ||
-    !supplier_category ||
-    !supplier_pic ||
-    !Array.isArray(supplier_category) ||
-    supplier_category.length === 0
-  ) {
-    return res
-      .status(400)
-      .json({ message: "Please provide all required information." });
-  }
-  const uniqueCategory = [...new Set(supplier_category)];
-
-  try {
-    const categoryCheck = await validateCategory(uniqueCategory);
-  } catch (error) {
-    return res.status(error.status).json(error.message);
-  }
-
-  const json_supplier_category = JSON.stringify(uniqueCategory);
-
-  const insertQuery =
-    "INSERT INTO supplier (supplier_cmp_name, supplier_pic, supplier_contact, supplier_category, supplier_address) VALUES (?, ?, ?, ?, ?)";
-  db.query(
-    insertQuery,
-    [
+router.post(
+  "/register",
+  validateJWT,
+  isAdmin,
+  validateSupplier,
+  async (req, res) => {
+    const {
       supplier_cmp_name,
       supplier_pic,
       supplier_contact,
-      json_supplier_category,
+      supplier_category,
       supplier_address,
-    ],
-    (err) => {
-      if (err) {
-        console.error("Error creating supplier:", err);
-        return res.status(500).json({ message: "Something went wrong." });
-      }
+    } = req.body;
+
+    // Check if all required fields are provided
+    if (
+      !supplier_cmp_name ||
+      !supplier_contact ||
+      !supplier_category ||
+      !supplier_pic ||
+      !Array.isArray(supplier_category) ||
+      supplier_category.length === 0
+    ) {
       return res
-        .status(201)
-        .json({ message: "Supplier created successfully." });
+        .status(400)
+        .json({ message: "Please provide all required information." });
     }
-  );
-});
+
+    if (req.supplier.length > 0) {
+      return res.status(400).json({ message: "Supplier exists" });
+    }
+
+    const uniqueCategory = [...new Set(supplier_category)];
+    try {
+      const categoryCheck = await validateCategory(uniqueCategory);
+    } catch (error) {
+      return res.status(error.status).json(error.message);
+    }
+
+    const json_supplier_category = JSON.stringify(uniqueCategory);
+
+    const insertQuery =
+      "INSERT INTO supplier (supplier_cmp_name, supplier_pic, supplier_contact, supplier_category, supplier_address) VALUES (?, ?, ?, ?, ?)";
+    db.query(
+      insertQuery,
+      [
+        supplier_cmp_name,
+        supplier_pic,
+        supplier_contact,
+        json_supplier_category,
+        supplier_address,
+      ],
+      (err) => {
+        if (err) {
+          console.error("Error creating supplier:", err);
+          return res.status(500).json({ message: "Something went wrong." });
+        }
+        return res
+          .status(201)
+          .json({ message: "Supplier created successfully." });
+      }
+    );
+  }
+);
 
 //get all supplier data info
 router.get(
   "",
   validateJWT,
+  getCategoryInfo,
   (req, res, next) => {
     const searchTerm = req.query.searchterm || "";
     const filterOption = req.query.filteroption || "";
@@ -111,7 +123,6 @@ router.get(
       next();
     });
   },
-  selectCategory,
   (req, res) => {
     req.responseBody.tbody.forEach((obj) => {
       const categoryArray = JSON.parse(obj.category);
@@ -121,6 +132,15 @@ router.get(
     return res.status(200).json({ data: req.responseBody });
   }
 );
+
+//get all supplier's id and name only
+router.get("/options", validateJWT, getSupplierInfo, (req, res) => {
+  if (req.supplierArray) {
+    res.status(200).json({ option: req.supplierArray });
+  } else {
+    res.status(500).json({ message: "something went wrong" });
+  }
+});
 
 //get specific supplier data
 router.get("/:supplier_id", validateJWT, (req, res, next) => {
@@ -176,6 +196,10 @@ router.post(
       return res
         .status(400)
         .json({ message: "Please provide all required information." });
+    }
+
+    if (req.supplier.length !== 1) {
+      return res.status(400).json({ message: "Supplier not found" });
     }
 
     const uniqueCategory = [...new Set(supplier_category)];

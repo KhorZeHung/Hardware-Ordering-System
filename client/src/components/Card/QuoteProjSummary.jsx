@@ -19,6 +19,7 @@ const QuoteProjSummary = ({ formInputValue, discountHandler }) => {
                 name="discount"
                 defaultValue={parseFloat(quote_discount).toFixed(2)}
                 step={0.01}
+                max={quote_sub_total}
                 onChange={discountHandler}
               />
             </td>

@@ -10,7 +10,6 @@ const InputOption = ({ datas, formHandler }) => {
     disable = false,
     defaultValue = null,
   } = datas;
-
   const [selected, setSelected] = useState(defaultValue);
 
   const selectChangeHandler = (event) => {

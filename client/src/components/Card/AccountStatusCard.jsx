@@ -5,7 +5,9 @@ import "./AccountStatusCard.css";
 const AccountStatusCard = () => {
   return (
     <>
-      <div className="accountStatusSec">
+      <div
+        className="accountStatusSec"
+        style={{ width: "80vw", margin: "0 auto" }}>
         <table>
           <thead>
             <tr>

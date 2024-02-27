@@ -7,19 +7,22 @@ const {
   validateCategory,
   validateProduct,
 } = require("../function/validation");
-const { isAdmin } = require("../function/authorization");
+const { isAdmin, isManager } = require("../function/authorization");
+const { getProductInfo } = require("../function/getInfo");
 
 // add new product
 router.post(
-  "/add",
+  "/register",
   validateJWT,
   isAdmin,
   validateSupplier,
+  validateProduct,
   async (req, res) => {
     const {
       product_name,
       product_category,
       product_unit_price,
+      product_unit_cost,
       product_description,
       supplier_id,
     } = req.body;
@@ -29,13 +32,20 @@ router.post(
       !product_name ||
       !product_unit_price ||
       isNaN(product_unit_price) ||
-      parseFloat(product_unit_price).toFixed(2) !== product_unit_price ||
+      !product_unit_cost ||
+      isNaN(product_unit_cost) ||
       !Array.isArray(product_description) ||
       product_description.length === 0 ||
       !Array.isArray(product_category) ||
       product_category.length === 0
     ) {
       return res.status(400).json({ message: "Please provide required info" });
+    }
+
+    if (req.product.length > 1 || req.supplier.length > 0) {
+      return res
+        .status(400)
+        .json({ message: "Please provide valid information" });
     }
 
     const uniqueCategory = [...new Set(product_category)];
@@ -48,15 +58,18 @@ router.post(
 
     const json_product_category = JSON.stringify(uniqueCategory);
     const json_product_description = JSON.stringify(product_description);
+    const float_product_unit_cost = parseFloat(product_unit_cost).toFixed(2);
+    const float_product_unit_price = parseFloat(product_unit_price).toFixed(2);
 
     const insertQuery =
-      "INSERT INTO product (product_name, product_category, product_unit_price, product_description, supplier_id) VALUES (?, ?, ?, ?, ?);";
+      "INSERT INTO product (product_name, product_category, product_unit_price, product_unit_cost, product_description, supplier_id) VALUES (?, ?, ?,?,?, ?);";
     db.query(
       insertQuery,
       [
         product_name,
         json_product_category,
-        product_unit_price,
+        float_product_unit_price,
+        float_product_unit_cost,
         json_product_description,
         supplier_id,
       ],
@@ -140,6 +153,14 @@ router.get(
   }
 );
 
+//get all product as option
+router.get("/options", validateJWT, getProductInfo, (req, res) => {
+  if (!req.productArray) {
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+  return res.status(200).json({ option: req.productArray });
+});
+
 //get specific product data
 router.get(
   "/:product_id",
@@ -163,10 +184,11 @@ router.get(
 
     const selectQuery = `SELECT * FROM product WHERE product_id = ?;`;
     db.query(selectQuery, [product_id], (err, result) => {
-      if (err) res.status(500).json({ message: "Something went wrong " + err });
+      if (err)
+        return res.status(500).json({ message: "Something went wrong " + err });
 
       if (result.length !== 1)
-        res.status(400).json({ message: "Product/service not found" });
+        return res.status(400).json({ message: "Product/service not found" });
 
       const returnObj = result[0];
 
@@ -283,7 +305,7 @@ router.delete(
         return res
           .status(500)
           .json({ message: "Something went wrong : " + err });
-      res.status(200).json({ messsage: "Product delete successfully" });
+      res.status(200).json({ message: "Product delete successfully" });
     });
   }
 );

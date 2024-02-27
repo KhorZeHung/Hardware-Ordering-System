@@ -201,7 +201,6 @@ export const contactData = {
         ],
       },
       endPoint: "/product",
-      // filter: { options: ["superuser", "admin", "manager"] },
     },
     cardData: [
       {
@@ -299,7 +298,22 @@ export const orderData = {
 };
 
 export const quoteData = {
-  tableData: { checkBox: true },
+  tableData: {
+    endPoint: "/quote",
+    checkBox: {
+      addCheckBox: false,
+      handlerArray: [
+        {
+          name: "edit",
+          endPoint: "/edit",
+        },
+        {
+          name: "delete",
+          endPoint: "/delete",
+        },
+      ],
+    },
+  },
   cardData: [
     {
       value: "13",
@@ -319,7 +333,19 @@ export const quoteData = {
   ],
 };
 export const projectData = {
-  tableData: { checkBox: true, filterOption: ["all", "active", "terminated"] },
+  endPoint: "/project",
+  tableData: {
+    endPoint: "/project",
+    checkBox: {
+      addCheckBox: false,
+      handlerArray: [
+        {
+          name: "edit",
+          endPoint: "/edit",
+        },
+      ],
+    },
+  },
   cardData: [
     {
       value: "5",
@@ -340,6 +366,46 @@ export const projectData = {
       value: "RM 22,942.21",
       title: "avg cost / proj",
       description: "last month",
+    },
+  ],
+  inputLists: [
+    {
+      type: "text",
+      name: "project_name",
+      label: "project name",
+      disable: true,
+    },
+    {
+      type: "text",
+      name: "project_client_name",
+      label: "Client name",
+      disable: true,
+    },
+    {
+      type: "tel",
+      name: "project_client_contact",
+      label: "Client contact number",
+      disable: true,
+    },
+    {
+      type: "text",
+      name: "project_address",
+      label: "address",
+      disable: true,
+    },
+    {
+      type: "option",
+      name: "project_prop_type",
+      label: "Type",
+      options: [
+        { name: "condo", value: "condo" },
+        { name: "shoplot", value: "shoplot" },
+        { name: "mall", value: "mall" },
+        { name: "terrace", value: "terrace" },
+        { name: "banglow", value: "banglow" },
+        { name: "semi-banglow", value: "semi-banglow" },
+      ],
+      disable: true,
     },
   ],
 };
@@ -399,71 +465,49 @@ export const userData = {
   },
 };
 
-export const newQuoteData = [
-  {
-    type: "text",
-    name: "quote_name",
-    label: "quote name",
-    placeholder: "Describe location or version",
-  },
-  {
-    type: "text",
-    name: "quote_client_name",
-    label: "Client name",
-    placeholder: "Full name with title",
-  },
-  {
-    type: "tel",
-    name: "quote_client_contact",
-    label: "Client contact number",
-    placeholder: "01X-XXX XXXX",
-  },
-  {
-    type: "text",
-    name: "quote_address",
-    label: "address",
-    placeholder: "full address with unit",
-  },
-  {
-    type: "option",
-    name: "quote_prop_type",
-    label: "Type",
-    options: ["condo", "shoplot", "retail shop", "shopping mall", "terrace"],
-  },
-];
-export const projData = [
-  {
-    type: "text",
-    name: "quote_name",
-    label: "quote name",
-    disable: true,
-  },
-  {
-    type: "text",
-    name: "quote_client_name",
-    label: "Client name",
-    disable: true,
-  },
-  {
-    type: "tel",
-    name: "quote_client_contact",
-    label: "Client contact number",
-    disable: true,
-  },
-  {
-    type: "text",
-    name: "quote_address",
-    label: "address",
-    disable: true,
-  },
-  {
-    type: "option",
-    name: "quote_prop_type",
-    label: "Type",
-    options: ["condo", "shoplot", "retail shop", "shopping mall", "terrace"],
-    disable: true,
-  },
-];
+export const newQuoteData = {
+  endPoint: "/quote/add",
+  title: "new quote",
+  inputLists: [
+    {
+      type: "text",
+      name: "quote_name",
+      label: "quote name",
+      placeholder: "Describe location or version",
+    },
+    {
+      type: "text",
+      name: "quote_client_name",
+      label: "Client name",
+      placeholder: "Full name with title",
+    },
+    {
+      type: "tel",
+      name: "quote_client_contact",
+      label: "Client contact number",
+      placeholder: "01X-XXX XXXX",
+    },
+    {
+      type: "text",
+      name: "quote_address",
+      label: "address",
+      placeholder: "full address with unit",
+    },
+    {
+      type: "option",
+      name: "quote_prop_type",
+      label: "Type",
+      options: [
+        { name: "condo", value: "condo" },
+        { name: "shoplot", value: "shoplot" },
+        { name: "mall", value: "mall" },
+        { name: "terrace", value: "terrace" },
+        { name: "banglow", value: "banglow" },
+        { name: "semi-banglow", value: "semi-banglow" },
+      ],
+    },
+  ],
+};
 
 export const loginData = [
   {

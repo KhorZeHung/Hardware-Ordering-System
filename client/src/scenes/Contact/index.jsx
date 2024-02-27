@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import "../index.css";
 import TableWithSmlCard from "../../components/Table/TableWithSmlCard";
 import { contactData, APIGateway } from "../../data";
@@ -105,6 +105,37 @@ const Contact = () => {
         setSnackbar({ open: true, message: message, severity: "error" });
       });
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!localStorage.getItem("supplierInfo")) {
+        try {
+          const response = await axios.get(APIGateway + "/supplier/options", {
+            headers: {
+              Authorization: `Bearer ${getCookie("token")}`,
+            },
+          });
+          const supplierInfo = JSON.stringify(response.data.option);
+          localStorage.setItem("supplierInfo", supplierInfo);
+        } catch (error) {
+          console.error("Error fetching supplier info:", error);
+        }
+      }
+      const storedSupplierInfo = localStorage.getItem("supplierInfo");
+      if (storedSupplierInfo) {
+        const supplierInfo = JSON.parse(storedSupplierInfo);
+        contactData.product.newModalForm.inputLists.forEach((input) => {
+          if (input.name === "supplier_id") {
+            input.options = supplierInfo;
+          }
+        });
+      }
+    };
+
+    fetchData();
+
+    return () => {};
+  }, []);
 
   contactData[
     isSupplierPage

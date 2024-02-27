@@ -14,6 +14,7 @@ const { isAdmin } = require("../function/authorization.js");
 const { randomPassword } = require("../function/randomPassword");
 const db = require("../function/conn.js");
 const moment = require("moment-timezone");
+const { getCategoryInfo } = require("../function/getInfo.js");
 
 //get user info
 router.get("", validateJWT, isAdmin, (req, res) => {
@@ -82,11 +83,26 @@ router.get("/:user_id", validateJWT, isAdmin, (req, res) => {
 });
 
 //authenticate the user
-router.post("/login", getUserInfo, correctUser, generateJWT, (req, res) => {
-  if (!req.signedToken)
-    return res.status(500).json({ message: "Something went wrong " + err });
-  res.status(200).send({ token: req.signedToken, message: "login successful" });
-});
+router.post(
+  "/login",
+  getUserInfo,
+  correctUser,
+  generateJWT,
+  getCategoryInfo,
+  (req, res) => {
+    if (!req.signedToken || !req.categoryArray)
+      return res.status(500).json({ message: "Something went wrong " + err });
+    const categoryArray = req.categoryArray.map((category) => ({
+      value: category.id,
+      name: category.name,
+    }));
+    res.status(200).send({
+      token: req.signedToken,
+      message: "login successful",
+      options: [{ categoryInfo: req.categoryArray }],
+    });
+  }
+);
 
 //admin or superuser register a new user
 router.post(
