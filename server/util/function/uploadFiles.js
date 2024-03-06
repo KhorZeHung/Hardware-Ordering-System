@@ -4,7 +4,7 @@ require("dotenv").config();
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, env.process.IMGSAVEPATH);
+    cb(null, process.env.IMGSAVEPATH);
   },
   filename: function (req, file, cb) {
     // Generate a unique file name
@@ -37,12 +37,15 @@ const uploadFiles = (req, res, next) => {
     if (err instanceof multer.MulterError) {
       return res.status(400).json({ message: err.message });
     } else if (err) {
-      return res.status(500).json({ message: "Something went wrong" });
+      return res.status(500).json({ message: "Something went wrong" + err });
     }
-
-    const fileNames = req.files.map((file) => file.filename);
-    req.fileNames = JSON.stringify(fileNames);
-    next();
+    if (req.files) {
+      const fileNames = req.files.map((file) => file.filename);
+      req.fileNames = fileNames;
+      next();
+    } else {
+      next();
+    }
   });
 };
 

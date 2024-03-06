@@ -54,6 +54,9 @@ const Navbar = () => {
                   </NavLink>
                 </li>
               ))}
+              <li onClick={closeNavBarHandler}>
+                <NavLink to={"/profile"}>profile</NavLink>
+              </li>
               <li onClick={logOutHandler} id="logout">
                 Log out
               </li>

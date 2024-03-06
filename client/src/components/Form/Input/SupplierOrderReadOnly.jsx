@@ -1,17 +1,20 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
-import { ConfirmModalContext } from "../../Modal/ConfirmModalProvider";
 import useProductInfo from "../../../utils/useProductInfo";
+import axios from "axios";
+import { APIGateway } from "../../../data";
+import { getCookie } from "../../../utils/cookie";
+import { SnackbarContext } from "../../Snackbar/SnackBarProvidor";
 import "../FormBody.css";
 
 const RoomMaterialReadOnly = ({ datas }) => {
-  const { defaultOrderList, index, action = [], id = null } = datas;
-
+  const { defaultOrderList, index } = datas;
   const numOfRoom = index + 1;
   const [open, setOpen] = useState(false);
   const [orderLists, setOrderLists] = useState(defaultOrderList || null);
   const [isActionMenuOpen, setIsActionMenuOpen] = useState(false);
   const mainBarActionRef = useRef(null);
   const { productInfo } = useProductInfo();
+  const { setSnackbar } = useContext(SnackbarContext);
 
   useEffect(() => {
     if (defaultOrderList && productInfo) {
@@ -61,6 +64,33 @@ const RoomMaterialReadOnly = ({ datas }) => {
     };
   }, [open, numOfRoom]);
 
+  const updateOrderHandler = (id) => {
+    const url = APIGateway + "/order/edit";
+    const formData = {
+      project_order_status: "Proceed to order",
+      project_order_id: id,
+    };
+
+    axios
+      .post(url, formData, {
+        headers: {
+          Authorization: `Bearer ${getCookie("token")}`,
+        },
+      })
+      .then((res) => {
+        const { message } = res.data;
+        console.log(message);
+        setSnackbar({ open: true, message: message, severity: "success" });
+      })
+      .catch((err) => {
+        const message = err.response.data.message || "Something went wrong";
+        setSnackbar({ open: true, message: message, severity: "error" });
+      })
+      .finally(() => {
+        setIsActionMenuOpen(false);
+      });
+  };
+
   return (
     <>
       <div style={{ width: "100%", padding: "1rem 0" }}>
@@ -73,7 +103,7 @@ const RoomMaterialReadOnly = ({ datas }) => {
             style={{ padding: "5px" }}
             readOnly
           />
-          {action.length > 0 && (
+          {defaultOrderList.status === "under process" && (
             <>
               <span
                 ref={mainBarActionRef}
@@ -86,20 +116,19 @@ const RoomMaterialReadOnly = ({ datas }) => {
                 style={
                   isActionMenuOpen ? { display: "block" } : { display: "none" }
                 }>
-                {action.map((option) => {
-                  return (
-                    <div
-                      onClick={(e) => {
-                        option.onClickHandler(id);
-                      }}>
-                      <p>{option.name}</p>
-                    </div>
-                  );
-                })}
+                <div
+                  onClick={() => {
+                    updateOrderHandler(defaultOrderList.id);
+                  }}
+                  style={{ color: "black" }}>
+                  <p>proceed to order</p>
+                </div>
               </span>
             </>
           )}
           <p className="subTotal">
+            <span className="orderStatus">{defaultOrderList.status}</span>
+
             {"RM " + parseFloat(orderLists.subtotal).toFixed(2)}
           </p>
           <span

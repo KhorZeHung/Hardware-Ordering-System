@@ -7,17 +7,10 @@ export const allowAccessLink = () => {
   const position = decode(getCookie("token")).user_authority;
   switch (position) {
     case 1:
-      return [
-        "contact",
-        "notification",
-        "order",
-        "quotation",
-        "project",
-        "user",
-      ];
+      return ["contact", "order", "quotation", "project", "user"];
 
     case 2:
-      return ["contact", "notification", "order", "project", "user"];
+      return ["contact", "order", "project", "user"];
     case 3:
       return ["contact", "order", "quotation", "project"];
     default:

@@ -16,6 +16,10 @@
     margin: 0;
   }
 
+  button:hover {
+    background-color: var(--primary-color-6);
+  }
+
   .addRoom {
     display: block;
     margin: 0 auto;
@@ -55,16 +59,15 @@
 
 .formInputLists {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
   grid-template-rows: auto;
-  gap: 2rem;
+  gap: 1rem;
 }
 
-.formBody input[type="files"],
 .formBody input[type="select"] {
   grid-row: span 2;
 }
 
+.formBody input[type="files"],
 .formBody textarea {
   grid-row: span 3;
   font: inherit;
@@ -234,18 +237,24 @@
   list-style: none;
   white-space: nowrap;
   height: 50px;
-}
 
-.filesName > ul > li {
-  display: inline-block;
-  position: relative;
-  margin: 0.5rem;
-  padding-right: 10px;
-  max-width: 200px !important;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  overflow-wrap: unset;
+  ul {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+    li {
+      display: inline-block;
+      position: relative;
+      margin: 0.5rem;
+      padding-right: 10px;
+      width: 90%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      overflow-wrap: unset;
+    }
+  }
 }
 
 .descriptionList > li {
@@ -341,7 +350,7 @@
 
       div {
         height: 36px;
-        padding: 0 5px;
+        padding: 0 10px;
         display: flex;
         justify-content: center;
         color: rgb(43, 45, 46);
@@ -527,5 +536,20 @@
   &.open .addProduct {
     display: block;
     bottom: 0px;
+  }
+}
+
+.orderStatus {
+  font-size: 9px;
+  color: rgb(255, 115, 0);
+  padding-right: 10px;
+  text-transform: capitalize;
+
+  &.success {
+    color: green;
+  }
+
+  &.failed {
+    color: red;
   }
 }

@@ -5,13 +5,14 @@ import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import Login from "./scenes/Login";
 import Dashboard from "./scenes/Dashboard";
 import Order from "./scenes/Order";
+import OrderInfo from "./scenes/Order/OrderInfo";
 import Contact from "./scenes/Contact";
 import User from "./scenes/User";
 import Project from "./scenes/Project";
 import Quotation from "./scenes/Quotation";
-import Notification from "./scenes/Notification";
 import QuoteForm from "./scenes/Quotation/QuoteForm";
 import ForgotPassword from "./scenes/ForgotPassword";
+import Profile from "./scenes/Profile";
 
 //import component
 import Navbar from "./components/NavBar/Navbar";
@@ -54,6 +55,14 @@ function App() {
             element={
               <PrivateRoute path="order">
                 <Order />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/order/:order_id"
+            element={
+              <PrivateRoute path="order">
+                <OrderInfo />
               </PrivateRoute>
             }
           />
@@ -131,13 +140,14 @@ function App() {
             }
           />
           <Route
-            path="/notification"
+            path="/profile"
             element={
-              <PrivateRoute path="notification">
-                <Notification />
+              <PrivateRoute path="profile">
+                <Profile />
               </PrivateRoute>
             }
           />
+
           <Route
             path="*"
             element={

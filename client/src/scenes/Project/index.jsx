@@ -1,4 +1,4 @@
-import React, { useState, useContext, useRef } from "react";
+import React, { useState, useContext } from "react";
 import { APIGateway, projectData } from "../../data";
 import { ConfirmModalContext } from "../../components/Modal/ConfirmModalProvider";
 import { SnackbarContext } from "../../components/Snackbar/SnackBarProvidor";
@@ -64,7 +64,6 @@ const Project = () => {
   const editProjectHandler = (id) => {
     navigate(`./${id}`);
   };
-
 
   projectData.tableData.checkBox.handlerArray[0].onClickHandler =
     editProjectHandler;

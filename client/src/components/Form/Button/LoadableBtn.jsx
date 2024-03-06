@@ -1,5 +1,6 @@
 import React from "react";
 import CircularProgress from "@mui/material-next/CircularProgress";
+import "../FormBody.css";
 
 const LoadableBtn = ({ isLoading, txt }) => {
   return (

@@ -71,7 +71,6 @@ const validateJWT = (req, res, next) => {
 // check uniqueness of email submit
 function uniqueEmail(req, res, next) {
   const { user_email, update } = req.body;
-
   if (!user_email)
     return res
       .status(400)

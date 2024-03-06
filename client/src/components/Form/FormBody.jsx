@@ -46,17 +46,41 @@ const FormBody = (props) => {
   const { setSnackbar } = useContext(SnackbarContext);
 
   const [isLoading, setIsLoading] = useState(false);
+  const [filesCenter, setFilesCenter] = useState([]);
 
   const submitHandler = async (e) => {
     e.preventDefault();
-    const formData = formInputValue;
     setIsLoading(true);
+    let formData;
+    let headerConfig;
+
+    if (filesCenter.length > 0) {
+      formData = new FormData();
+
+      for (const key in formInputValue) {
+        formData.append(key, formInputValue[key]);
+      }
+
+      filesCenter.forEach((file) => {
+        formData.append(`files`, file);
+      });
+
+      headerConfig = {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      };
+    } else {
+      formData = formInputValue;
+      headerConfig = {
+        Authorization: `Bearer ${token}`,
+      };
+    }
+
+    const url = APIGateway + endPoint;
 
     await axios
-      .post(APIGateway + endPoint, formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      .post(url, formData, {
+        headers: headerConfig,
       })
       .then((res) => {
         const message = res.data.message;
@@ -72,6 +96,7 @@ const FormBody = (props) => {
       .catch((err) => {
         const message = err.response.data.message || err.message;
         setSnackbar({ open: true, message: message, severity: "error" });
+        console.log(message);
       })
       .finally(() => {
         setIsLoading(false);
@@ -82,7 +107,7 @@ const FormBody = (props) => {
     <form method="post" className="formBody" onSubmit={submitHandler}>
       {title && <p className="title">{title}</p>}
       <div className={grid ? "formInputLists" : ""}>
-        {inputLists && constructInput(inputLists, formHandler)}
+        {inputLists && constructInput(inputLists, formHandler, setFilesCenter)}
       </div>
       <div className="formAction">
         <LoadableBtn isLoading={isLoading} txt={submitValue} />
@@ -91,7 +116,11 @@ const FormBody = (props) => {
   );
 };
 
-export const constructInput = (inputLists, formHandler = null) => {
+export const constructInput = (
+  inputLists,
+  formHandler = null,
+  setFilesCenter
+) => {
   return inputLists.map((inputList, index) => {
     switch (inputList.type) {
       case "text":
@@ -112,7 +141,7 @@ export const constructInput = (inputLists, formHandler = null) => {
           <InputFile
             key={`input-${index}`}
             datas={inputList}
-            formHandler={formHandler}
+            formHandler={setFilesCenter}
           />
         );
 

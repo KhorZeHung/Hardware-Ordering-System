@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useRef, useContext } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import ProductListTable from "../../Table/ProductListTable";
-import { ConfirmModalContext } from "../../Modal/ConfirmModalProvider";
 import { calculateSubTotal } from "./RoomMaterialInput";
 import "../FormBody.css";
 
@@ -15,7 +14,6 @@ const RoomMaterialReadOnly = ({ datas }) => {
   );
   const [isActionMenuOpen, setIsActionMenuOpen] = useState(false);
   const mainBarActionRef = useRef(null);
-  const { openModal } = useContext(ConfirmModalContext);
   useEffect(() => {
     setProductLists(defaultProductList);
     setSubTotal(calculateSubTotal(defaultProductList.productList) || 0);

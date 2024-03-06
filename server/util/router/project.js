@@ -50,7 +50,7 @@ router.post(
     } = req.quotation;
 
     const insertQuery =
-      "INSERT INTO project (project_id, project_name, manager_in_charge_id, project_client_name, project_client_contact, project_address, project_grand_total, project_sub_total, project_discount, project_prop_type, last_edit_pic, project_product_lists) VALUES (?,?,?,?,?,?,?,?,?,?,?,?);";
+      "INSERT INTO project (project_id, project_name, manager_in_charge_id, project_client_name, project_client_contact, project_address, project_grand_total, project_sub_total, project_discount, project_prop_type, last_edit_pic, project_product_lists, project_outstanding) VALUES (?,?,?,?,?,?,?,?,?,?,?,?, ?);";
     db.query(
       insertQuery,
       [
@@ -66,6 +66,7 @@ router.post(
         quote_prop_type,
         pic_id,
         quote_product_lists,
+        (quote_sub_total = quote_discount),
       ],
       (err) => {
         if (err)
@@ -91,8 +92,6 @@ router.post(
       return map;
     }, {});
 
-    console.log(productToSupplier);
-
     // Summarize product list
     const productListSummary = JSON.parse(quote_product_lists)
       .flatMap((product_lists) => product_lists.productList)
@@ -112,7 +111,7 @@ router.post(
 
         if (productExist && indexInSummary !== -1) {
           // Update existing product's total quantity
-          summary[supplier_id].productList[productExist].total_quantity +=
+          summary[supplier_id].productList[indexInSummary].total_quantity +=
             parseInt(product_quantity);
 
           summary[supplier_id].subTotal += subTotal;
@@ -211,25 +210,82 @@ router.get("", validateJWT, (req, res) => {
 });
 
 //get specific quotation info
-router.get("/:project_id", validateJWT, (req, res) => {
-  const { project_id } = req.params;
+router.get(
+  "/:project_id",
+  validateJWT,
+  (req, res, next) => {
+    const { project_id } = req.params;
 
-  if (!project_id)
-    res.status(400).json({ message: "Project identification is not provided" });
+    if (!project_id)
+      res
+        .status(400)
+        .json({ message: "Project identification is not provided" });
 
-  const selectQuery = "SELECT * FROM project WHERE project_id = ?;";
-  db.query(selectQuery, [project_id], (err, result) => {
-    if (err)
-      return res.status(500).json({ message: "Something went wrong " + err });
-    if (result.length !== 1)
-      return res.status(400).json({ message: "Project not found" });
+    const selectQuery = "SELECT * FROM project WHERE project_id = ?;";
+    db.query(selectQuery, [project_id], (err, result) => {
+      if (err)
+        return res.status(500).json({ message: "Something went wrong " + err });
+      if (result.length !== 1)
+        return res.status(400).json({ message: "Project not found" });
 
-    let returnObj = result[0];
-    returnObj.project_product_lists = JSON.parse(
-      returnObj.project_product_lists
-    );
-    return res.status(200).json({ data: returnObj });
-  });
-});
+      let returnObj = result[0];
+      returnObj.project_product_lists = JSON.parse(
+        returnObj.project_product_lists
+      );
+
+      req.projectData = returnObj;
+      next();
+    });
+  },
+  (req, res, next) => {
+    const { project_id } = req.params;
+    if (!project_id)
+      return res
+        .status(400)
+        .json({ message: "Project identification is not provided" });
+
+    const selectQuery = `SELECT o.project_order_id AS id,
+                          s.supplier_cmp_name AS name,
+                          o.project_order_subtotal AS subtotal,
+                          o.project_order_total_paid AS "total paid",
+                          o.project_order_product_lists,
+                          o.project_order_status AS "status"
+                        FROM project_order AS o
+                        INNER JOIN supplier AS s ON o.supplier_id = s.supplier_id
+                        WHERE o.project_id = ?;`;
+    db.query(selectQuery, [project_id], (err, result) => {
+      if (err)
+        return res.status(500).json({ message: "Something went wrong " + err });
+      result = result.map((order) => {
+        order.project_order_product_lists = JSON.parse(
+          order.project_order_product_lists
+        );
+        return order;
+      });
+
+      req.orderData = result;
+      next();
+    });
+  },
+  (req, res) => {
+    const { project_id } = req.params;
+    if (!project_id)
+      return res
+        .status(400)
+        .json({ message: "Project identification is not provided" });
+
+    const selectQuery = `SELECT account_status_description AS "description", amount, isDebit, DATE(created_at) AS 'date', account_status_id AS "id" FROM account_status WHERE project_id = ?;`;
+    db.query(selectQuery, [project_id], (err, result) => {
+      if (err)
+        return res.status(500).json({ message: "Something went wrong " + err });
+
+      return res.status(200).json({
+        projectInfo: req.projectData,
+        orderInfo: req.orderData,
+        accountInfo: result,
+      });
+    });
+  }
+);
 
 module.exports = router;

@@ -108,3 +108,60 @@
     }
   }
 }
+
+.materialSummary {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  height: 60px;
+  margin: 10px;
+
+  table {
+    tr {
+      text-align: right;
+      color: var(--primary-color-6);
+      font-size: 12px;
+
+      td:last-child {
+        padding: 5px 0 5px 20px;
+      }
+    }
+  }
+}
+
+.orderInfo {
+  .orderTable,
+  .supplierTable {
+    border-collapse: collapse;
+    text-align: center;
+    margin: 40px auto 20px;
+    width: 80%;
+    box-shadow: var(--box-shadow-1);
+
+    td,
+    th {
+      padding: 10px;
+    }
+
+    th {
+      background-color: var(--primary-color-6);
+      color: white;
+      width: 30%;
+    }
+
+    td:hover {
+      background-color: var(--bckgrd-3);
+    }
+  }
+
+  .summaryTable {
+    font-size: 12px;
+    width: 80%;
+    padding-left: 60%;
+    margin: 0 auto;
+
+    tr {
+      height: 24px;
+    }
+  }
+}

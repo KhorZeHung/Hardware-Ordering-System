@@ -1,6 +1,5 @@
 export const dashBoardData = {
   marketing: {
-    // tableData: {},
     donutChartData: {
       title: "sales and quote comparison",
       label: [1991, 1992, 1993],
@@ -110,7 +109,6 @@ export const contactData = {
   supplier: {
     tableData: {
       checkBox: {
-        addCheckBox: true,
         handlerArray: [
           {
             name: "edit",
@@ -123,7 +121,19 @@ export const contactData = {
         ],
       },
       endPoint: "/supplier",
-      // filter: { options: ["superuser", "admin", "manager"] },
+      filter: {
+        options: [
+          { name: "Interior Design", value: 1 },
+          { name: "Kitchen Renovation", value: 2 },
+          { name: "Bathroom Remodeling", value: 3 },
+          { name: "Flooring", value: 4 },
+          { name: "Painting", value: 5 },
+          { name: "Roofing", value: 6 },
+          { name: "Electrical Work", value: 7 },
+          { name: "Plumbing", value: 8 },
+          { name: "Landscaping", value: 9 },
+        ],
+      },
     },
     cardData: [
       {
@@ -274,11 +284,17 @@ export const contactData = {
     },
   },
 };
-export const notificationData = {
-  tableData: { checkBox: true, filterOption: ["all", "unseen", "seen"] },
-};
 export const orderData = {
-  tableData: { checkBox: true, filterOption: ["all", "uncheck", "checked"] },
+  tableData: {
+    checkBox: {
+      handlerArray: [
+        {
+          name: "view",
+        },
+      ],
+    },
+    endPoint: "/order",
+  },
   cardData: [
     {
       value: "RM 65,000.00",
@@ -295,6 +311,30 @@ export const orderData = {
       title: "uncheck order",
     },
   ],
+  orderRecordForm: {
+    title: "edit order",
+    submitValue: "save",
+    endPoint: "/order/edit",
+    inputLists: [
+      {
+        type: "option",
+        name: "project_order_status",
+        label: "Status",
+        options: [
+          { name: "Ordering", value: "Ordering" },
+          { name: "Order confirm", value: "Order confirm" },
+          { name: "Ready to pick-up", value: "Ready to pick-up" },
+          { name: "Paid", value: "Paid" },
+          { name: "Rejected", value: "Rejected" },
+          { name: "Problematic", value: "Problematic" },
+        ],
+      },
+      {
+        type: "hidden",
+        name: "project_order_id",
+      },
+    ],
+  },
 };
 
 export const quoteData = {
@@ -465,6 +505,50 @@ export const userData = {
   },
 };
 
+export const profileData = {
+  profileForm: {
+    title: "Profile",
+    submitValue: "update profile",
+    endPoint: "/user/edit-profile",
+    getDefaultValueEndPoint: "/user/",
+    inputLists: [
+      {
+        type: "text",
+        name: "user_name",
+        label: "user name",
+        placeholder: "Full name without title",
+      },
+      {
+        type: "option",
+        name: "user_authority",
+        label: "Autority",
+        options: [
+          { name: "superuser", value: 1 },
+          { name: "admin", value: 2 },
+          { name: "manager", value: 3 },
+        ],
+      },
+      {
+        type: "email",
+        name: "user_email",
+        label: "E-mail",
+        placeholder: "example@email.com",
+      },
+      {
+        type: "tel",
+        name: "user_contact",
+        label: "Contact number",
+        placeholder: "01X-XXX XXXX",
+      },
+      {
+        type: "hidden",
+        name: "update",
+        defaultValue: true,
+      },
+    ],
+  },
+};
+
 export const newQuoteData = {
   endPoint: "/quote/add",
   title: "new quote",
@@ -558,4 +642,46 @@ export const forgotPasswordData = [
   ],
 ];
 
+export const accountData = {
+  newAccountForm: {
+    title: "new statement",
+    submitValue: "add statement",
+    endPoint: "/account/add",
+    inputLists: [
+      {
+        type: "option",
+        name: "isDebit",
+        label: "Type of statement",
+        options: [
+          { name: "debit", value: true },
+          { name: "credit", value: false },
+        ],
+      },
+      {
+        type: "file",
+        name: "doc_refer",
+        label: "Doc to refer",
+        limit: 2,
+      },
+      {
+        type: "number",
+        name: "amount",
+        label: "Amount",
+        placeholder: "RM XXX.XX",
+      },
+      {
+        type: "text",
+        name: "account_status_description",
+        label: "Description",
+        placeholder: "characteristic of statement",
+      },
+      {
+        type: "hidden",
+        name: "project_id",
+      },
+    ],
+  },
+};
+
 export const APIGateway = "http://localhost:8080";
+export const ImgPathWay = "/images/";

@@ -2,9 +2,11 @@
 
 .accountStatusSec {
   overflow: auto;
-  width: 100%;
+  width: 80vw;
   padding: 1rem;
   box-sizing: border-box;
+  min-height: 200px;
+  margin: 0 auto;
 
   table {
     width: 100%;
@@ -32,9 +34,21 @@
         }
       }
       td {
+        &.doc_link {
+          cursor: pointer;
+          user-select: none;
+          color: blue;
+        }
+
         &:nth-child(3) {
           text-align: left;
           padding-left: 10px;
+        }
+      }
+
+      tr:not(:last-child) {
+        td:not(:last-child) {
+          border-right: 1px solid black;
         }
       }
     }

@@ -246,7 +246,7 @@ router.post(
 
     const productIds = req.productArray.map((product) => product.id);
     let isValid = true;
-    let quote_sub_total = 0;
+    let quote_sub_total = 0.0;
 
     quote_product_lists.forEach((productLists) => {
       const { roomName, productList } = productLists;
@@ -267,9 +267,8 @@ router.post(
         ) {
           isValid = false;
         } else {
-          quote_sub_total += parseFloat(
-            product_quantity * product_unit_price
-          ).toFixed(2);
+          quote_sub_total +=
+            parseInt(product_quantity) * parseFloat(product_unit_price);
         }
       });
     });
@@ -294,7 +293,7 @@ router.post(
         quote_address,
         quote_prop_type,
         stringify_quote_product_lists,
-        quote_sub_total,
+        quote_sub_total.toFixed(2),
         quote_discount || 0,
         user_id,
         quote_id,
@@ -328,15 +327,69 @@ router.delete("/delete/:quote_id", validateJWT, isManager, (req, res) => {
   });
 });
 
-router.get("/quotation-list/:quote_id", (req, res) => {
-  const stream = res.writeHead(200, {
-    "Content-Type": "application/pdf",
-    "Content-Disposition": `attachment;filename=quotation-list.pdf`,
-  });
-  createQuotation(
-    (chunk) => stream.write(chunk),
-    () => stream.end()
-  );
-});
+router.get(
+  "/quotation-list/:quote_id",
+  validateJWT,
+  isManager,
+  getProductInfo,
+  (req, res, next) => {
+    const { quote_id } = req.params;
+
+    const selectQuery = "SELECT * FROM quotation WHERE quote_id = ?;";
+    db.query(selectQuery, [quote_id], (err, result) => {
+      if (err)
+        return res.status(500).json({ message: "Something went wrong " + err });
+      if (result.length !== 1)
+        return res.status(400).json({ message: "Quotation list not found" });
+
+      const returnObj = result[0];
+      returnObj.quote_product_lists = JSON.parse(returnObj.quote_product_lists);
+      req.quoteData = returnObj;
+      next();
+    });
+  },
+  (req, res, next) => {
+    const { quoteData, productArray } = req;
+    let { quote_id, created_at, pic_id, last_edit_time, ...newQuoteData } =
+      quoteData;
+
+    let formatedProductArray = productArray.reduce((productObj, product) => {
+      const stringProductId = String(product.id);
+      productObj[stringProductId] = product;
+      return productObj;
+    }, {});
+
+    newQuoteData.quote_product_lists = newQuoteData.quote_product_lists.map(
+      (room) => {
+        const newProductList = room.productList.map((product) => {
+          const referProduct = formatedProductArray[String(product.product_id)];
+          const newProductDescription = product.product_description.map(
+            (index) => referProduct.description[index]
+          );
+          return {
+            ...product,
+            product_name: referProduct.name,
+            product_description: newProductDescription,
+          };
+        });
+
+        return { ...room, productList: newProductList };
+      }
+    );
+    req.quoteData = newQuoteData;
+    next();
+  },
+  (req, res) => {
+    const stream = res.writeHead(200, {
+      "Content-Type": "application/pdf",
+      "Content-Disposition": `attachment;filename=quotation-list.pdf`,
+    });
+    createQuotation(
+      req.quoteData,
+      (chunk) => stream.write(chunk),
+      () => stream.end()
+    );
+  }
+);
 
 module.exports = router;

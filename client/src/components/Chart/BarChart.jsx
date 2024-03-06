@@ -1,12 +1,11 @@
 import React from "react";
 import Chart from "react-apexcharts";
 
-const BarChart = () => {
+const BarChart = ({ datas }) => {
+  
   const chartInfo = {
     options: {
-      xaxis: {
-        categories: [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998],
-      },
+      xaxis: datas.xaxis,
       title: {
         text: "Marketing and sales comparison",
         margin: 20,
@@ -26,16 +25,7 @@ const BarChart = () => {
       },
       colors: ["#74c2bb", "#27413e"],
     },
-    series: [
-      {
-        name: "marketing",
-        data: [30, 40, 45, 50, 49, 60, 70, 91],
-      },
-      {
-        name: "sales",
-        data: [70, 66, 88, 100, 99, 80, 100, 121],
-      },
-    ],
+    series: datas.series,
   };
 
   return (

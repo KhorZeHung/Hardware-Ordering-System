@@ -9,7 +9,6 @@ import { SnackbarContext } from "../../components/Snackbar/SnackBarProvidor";
 const FilterTable = (props) => {
   const {
     checkBox = {
-      addCheckBox: false,
       handlerArray: [],
     },
     endPoint,
@@ -17,7 +16,6 @@ const FilterTable = (props) => {
   } = props.datas;
 
   const [tableData, setTableData] = useState(null);
-  const [checkedBox, setCheckedBox] = useState([]);
   const [tableIsLoading, setTableIsLoading] = useState(true);
   const [filterValue, setFilterValue] = useState({
     searchTerm: null,
@@ -75,36 +73,6 @@ const FilterTable = (props) => {
     setFilterValue((prev) => ({ ...prev, searchTerm: null }));
   };
 
-  const checkBoxHandler = (event) => {
-    const checked = event.target.checked;
-    const normalCheckBox = document.querySelectorAll(
-      ".tableSec input[type='checkbox']:not(#mainCheckBox)"
-    );
-
-    let newCheckedBoxArray = [];
-    normalCheckBox.forEach((checkbox) => {
-      checkbox.checked = checked;
-      checked && newCheckedBoxArray.push(checkbox.value);
-    });
-
-    setCheckedBox(newCheckedBoxArray);
-  };
-
-  const editCheckedBox = (event) => {
-    const checked = event.target.checked;
-    const value = event.target.value;
-
-    !checked && (document.querySelector("#mainCheckBox").checked = false);
-
-    setCheckedBox((prev) => {
-      if (checked) {
-        return [...prev, value];
-      } else {
-        return prev.filter((val) => val !== value);
-      }
-    });
-  };
-
   const searchHandler = (e) => {
     const checkValue = String(e.target.value).toLowerCase();
     setFilterValue((prev) => ({ ...prev, searchTerm: checkValue }));
@@ -146,11 +114,13 @@ const FilterTable = (props) => {
                   return (
                     <option
                       key={`option-${value}`}
-                      value={value}
+                      value={value.value}
                       selected={
-                        filterValue.filterOption === value ? true : undefined
+                        filterValue.filterOption === value.value
+                          ? true
+                          : undefined
                       }>
-                      {value}
+                      {value.name}
                     </option>
                   );
                 })}
@@ -171,15 +141,6 @@ const FilterTable = (props) => {
               <table>
                 <thead>
                   <tr>
-                    {checkBox.addCheckBox && (
-                      <th>
-                        <input
-                          type="checkbox"
-                          onChange={checkBoxHandler}
-                          id="mainCheckBox"
-                        />
-                      </th>
-                    )}
                     {tableData.thead.map((value, index) => (
                       <th key={`thead-${value}`}>{value}</th>
                     ))}
@@ -190,15 +151,6 @@ const FilterTable = (props) => {
                   {tableData.tbody.map((rowData, rowIndex) => {
                     return (
                       <tr key={`row-${rowIndex}`}>
-                        {checkBox.addCheckBox && (
-                          <td>
-                            <input
-                              type="checkbox"
-                              value={rowData.id}
-                              onClick={editCheckedBox}
-                            />
-                          </td>
-                        )}
                         {Object.values(rowData).map((cellData, cellIndex) => (
                           <td key={`cell-${cellIndex}`}>{cellData}</td>
                         ))}

@@ -354,15 +354,32 @@ router.delete("/delete/:user_id", validateJWT, isAdmin, async (req, res) => {
     "DELETE FROM `user` WHERE user_id = ?",
   ];
 
-  for (const query of arrayOfQueries) {
-    db.query(query, [user_id], (err) => {
-      if (err)
-        return res
-          .status(500)
-          .json({ messasge: "Something went wrong " + err });
+  const deleteAsyncQueries = async (arrayOfQueries, user_id) => {
+    try {
+      const queryPromises = arrayOfQueries.map((query) => {
+        return new Promise((resolve, reject) => {
+          db.query(query, [user_id], (err) => {
+            if (err) reject(err);
+            resolve();
+          });
+        });
+      });
+      await Promise.all(queryPromises);
+      return { success: true, message: "Delete successful" };
+    } catch (err) {
+      return { success: false, message: "Something went wrong " + err };
+    }
+  };
+
+  deleteAsyncQueries(arrayOfQueries, user_id)
+    .then((result) => {
+      return res
+        .status(result.success ? 200 : 500)
+        .json({ message: result.message });
+    })
+    .catch((error) => {
+      return res.status(500).json({ message: "Internal Server Error" });
     });
-  }
-  return res.status(200).json({ message: "Delete successful" });
 });
 
 module.exports = router;

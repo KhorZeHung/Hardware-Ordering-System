@@ -6,6 +6,7 @@ import "../index.css";
 
 const CustomModal = (props) => {
   const { open, closeFunc, formStructure = null } = props;
+
   return (
     <Dialog
       open={open}

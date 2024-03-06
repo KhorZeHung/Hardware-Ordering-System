@@ -13,20 +13,24 @@ const InputFile = ({ datas, formHandler }) => {
   };
 
   const filesHandler = (e) => {
-    const newFilesArrays = Array.from(e.target.files);
+    const newFilesArrays = [...e.target.files];
     setFiles(newFilesArrays);
-    formHandler(e, newFilesArrays);
+    formHandler(newFilesArrays);
   };
 
-  const removeFileHanlder = (index) => {
+  const removeFileHanlder = (e, index) => {
     const newFilesArray = [...files];
     newFilesArray.splice(index, 1);
     setFiles(newFilesArray);
-    formHandler(newFilesArray, name);
+    formHandler(newFilesArray);
   };
 
   return (
-    <>
+    <div
+      style={{
+        gridRow: "span 2",
+        width: "100%",
+      }}>
       <label htmlFor="file">{label}</label>
       <div style={{ width: "100%" }}>
         <input
@@ -50,7 +54,7 @@ const InputFile = ({ datas, formHandler }) => {
                     {files.name}
                     <input
                       type="button"
-                      onClick={() => removeFileHanlder({ index })}
+                      onClick={(e) => removeFileHanlder(e, index)}
                       value="&#x2716;"
                       className="fileList"
                     />
@@ -60,7 +64,7 @@ const InputFile = ({ datas, formHandler }) => {
           </ul>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

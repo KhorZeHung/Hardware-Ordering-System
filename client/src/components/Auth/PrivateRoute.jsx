@@ -6,7 +6,10 @@ import { allowAccessLink } from "../../utils/allowAccessLink";
 const PrivateRoute = ({ children, path }) => {
   const isLoggedIn = getCookie("token");
   const allowAccess =
-    isLoggedIn && (allowAccessLink().includes(path) || path === "dashboard");
+    isLoggedIn &&
+    (allowAccessLink().includes(path) ||
+      path === "dashboard" ||
+      path === "profile");
 
   return isLoggedIn && allowAccess ? (
     children

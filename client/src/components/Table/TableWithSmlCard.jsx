@@ -15,12 +15,13 @@ const TableWithSmlCard = (props) => {
 
   return (
     <div style={{ width: "100%" }}>
-      {barChartData && <BarChart />}
+      {barChartData && <BarChart datas={barChartData} />}
       <div className="smallCardSec">
         {donutChartData && (
           <ReportSmlDonutChart
             description={donutChartData.description}
             title={donutChartData.title}
+            datas={donutChartData.datas}
           />
         )}
         {cardData &&
