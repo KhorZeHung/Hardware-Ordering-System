@@ -44,10 +44,10 @@ const QuoteForm = ({ datas }) => {
         },
       })
       .then((res) => {
-        const msg = res.data.message || "successful";
-        setSnackbar({ open: true, severity: "success", message: msg });
+        const { message } = res.data;
+        setSnackbar({ open: true, severity: "success", message: message });
         setTimeout(() => {
-          window.location = "./";
+          window.location.reload();
         }, 2000);
       })
       .catch((err) => {
@@ -274,6 +274,7 @@ const QuoteForm = ({ datas }) => {
     }
     return () => {};
   }, [isNew, quote_id, setSnackbar]);
+
   return (
     <>
       {!isLoading ? (
@@ -293,14 +294,16 @@ const QuoteForm = ({ datas }) => {
           <div
             className="formAction"
             style={{ margin: "2rem auto 0", maxWidth: "500px" }}>
-            <button className="center" onClick={getQuoteListHandler}>
-              <span
-                className="material-symbols-outlined"
-                style={{ paddingRight: "0.5rem", fontSize: "1rem" }}>
-                picture_as_pdf
-              </span>
-              create pdf
-            </button>
+            {quote_id && (
+              <button className="center" onClick={getQuoteListHandler}>
+                <span
+                  className="material-symbols-outlined"
+                  style={{ paddingRight: "0.5rem", fontSize: "1rem" }}>
+                  picture_as_pdf
+                </span>
+                create pdf
+              </button>
+            )}
             <button className="center" type="submit" onClick={submitHandler}>
               {isBtnLoading ? (
                 <CircularProgress size={18} color="inherit" />

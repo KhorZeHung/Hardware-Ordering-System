@@ -288,14 +288,14 @@ router.get(
               2
             )}`,
             description: "per month",
-            title: "new payment",
+            title: "new inflow",
           },
           {
             value: `RM ${parseFloat(averageProjectData.average_sales).toFixed(
               2
             )}`,
             description: "per month",
-            title: "avg payment",
+            title: "avg inflow",
           },
           {
             value: `RM ${parseFloat(

@@ -20,6 +20,9 @@ const CustomModal = (props) => {
           inputLists={formStructure.inputLists}
           submitValue={formStructure.submitValue}
           endPoint={formStructure.endPoint}
+          grid={
+            typeof formStructure.grid === "boolean" ? formStructure.grid : true
+          }
         />
       )}
     </Dialog>

@@ -83,33 +83,33 @@ router.get(
   validateJWT,
   getCategoryInfo,
   (req, res, next) => {
-    const searchTerm = req.query.searchterm || "";
-    const filterOption = req.query.filteroption || "";
+    const { searchterm = null, filteroption = null } = req.query;
 
     let selectQuery = `SELECT supplier_id AS 'id', supplier_cmp_name AS 'company name', supplier_pic AS 'person in charge', supplier_contact AS contact, supplier_category AS category, supplier_address AS address FROM supplier`;
     let queryParams = [];
 
-    if (searchTerm) {
+    if (searchterm) {
       selectQuery += ` WHERE (supplier_cmp_name LIKE ?
       OR supplier_pic LIKE ?
       OR supplier_contact LIKE ?
       OR supplier_address LIKE ?)`;
       queryParams.push(
-        `%${searchTerm}%`,
-        `%${searchTerm}%`,
-        `%${searchTerm}%`,
-        `%${searchTerm}%`
+        `%${searchterm}%`,
+        `%${searchterm}%`,
+        `%${searchterm}%`,
+        `%${searchterm}%`
       );
     }
 
-    if (filterOption) {
-      if (searchTerm) selectQuery += " AND";
+    if (filteroption) {
+      if (searchterm) selectQuery += " AND";
       else selectQuery += " WHERE";
 
-      selectQuery += " supplier_category LIKE ";
-      queryParams.push(`%${filterOption}%`);
+      selectQuery += " supplier_category LIKE ?";
+      queryParams.push(`%${filteroption}%`);
     }
 
+    selectQuery += " ORDER BY supplier_id DESC;";
     db.query(selectQuery, queryParams, (err, results) => {
       if (err)
         return res.status(500).json({ message: "Something went wrong" + err });

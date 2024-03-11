@@ -36,6 +36,7 @@ const RoomMaterialInput = ({ datas }) => {
   const [isProductListModalOpen, setIsProductListModalOpen] = useState(false);
   const mainBarActionRef = useRef(null);
   const { openModal } = useContext(ConfirmModalContext);
+
   useEffect(() => {
     setProductLists(defaultProductList);
     setSubTotal(calculateSubTotal(defaultProductList.productList) || 0);
@@ -80,7 +81,7 @@ const RoomMaterialInput = ({ datas }) => {
     }));
   };
 
-  const changeProductHandler = (key, index, e) => {
+  function changeProductHandler(key, index, e) {
     const newProductListsArray = { ...productLists };
     const product = productLists.productList[index];
     const currentProductTotal =
@@ -92,18 +93,33 @@ const RoomMaterialInput = ({ datas }) => {
       newProductListsArray.productList.splice(index, 1);
       changeValue = -currentProductTotal;
     } else {
-      const newValue = parseFloat(e.target.value) || 0;
+      const newValue = e.target.value;
 
       if (key === "product_quantity") {
         const unitPrice = parseFloat(product.product_unit_price) || 0;
-        const quantity = newValue < 0 ? 0 : newValue;
+        const quantity = parseFloat(newValue) < 0 ? 0 : parseFloat(newValue);
         changeValue = unitPrice * quantity - currentProductTotal;
-        newProductListsArray.productList[index][key] = quantity;
+        newProductListsArray.productList[index] = {
+          ...product,
+          [key]: quantity,
+        };
       } else if (key === "product_unit_price") {
         const quantity = parseInt(product.product_quantity) || 0;
-        const unitPrice = newValue < 0 ? 0 : newValue;
+        const unitPrice = parseFloat(newValue) < 0 ? 0 : parseFloat(newValue);
         changeValue = quantity * unitPrice - currentProductTotal;
-        newProductListsArray.productList[index][key] = unitPrice;
+        newProductListsArray.productList[index] = {
+          ...product,
+          [key]: unitPrice,
+        };
+      } else {
+        newProductListsArray.productList[index] = {
+          ...product,
+          [key]: newValue,
+        };
+        changeValue =
+          parseFloat(product.product_unit_price) *
+            parseInt(product.product_quantity) -
+          currentProductTotal;
       }
     }
 
@@ -116,7 +132,8 @@ const RoomMaterialInput = ({ datas }) => {
       indexOfArray,
       changeValue
     );
-  };
+    e.target.focus();
+  }
 
   const changeQuantityHandler = (index, add, e) => {
     e.preventDefault();

@@ -45,6 +45,8 @@ router.get("", validateJWT, isAdmin, (req, res) => {
     queryParams.push(`%${filterOption}%`);
   }
 
+  selectQuery += " ORDER BY user_id DESC;";
+
   db.query(selectQuery, queryParams, (err, results) => {
     if (err)
       return res.status(500).json({ message: "Something went wrong" + err });

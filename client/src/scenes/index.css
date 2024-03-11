@@ -35,7 +35,7 @@
 
 .addNewItem {
   position: fixed;
-  right: 5%;
+  right: 3%;
   font-size: 2rem;
   bottom: 5%;
   background-color: var(--primary-color-4);

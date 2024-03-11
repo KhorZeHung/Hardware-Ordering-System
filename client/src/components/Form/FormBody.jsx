@@ -20,6 +20,7 @@ const FormBody = (props) => {
     grid = true,
     endPoint,
   } = props;
+
   const [formInputValue, setFormInputValue] = useState({});
 
   useEffect(() => {
@@ -106,7 +107,7 @@ const FormBody = (props) => {
   return (
     <form method="post" className="formBody" onSubmit={submitHandler}>
       {title && <p className="title">{title}</p>}
-      <div className={grid ? "formInputLists" : ""}>
+      <div className={`formInputLists ${grid ? "grid" : ""}`}>
         {inputLists && constructInput(inputLists, formHandler, setFilesCenter)}
       </div>
       <div className="formAction">

@@ -15,7 +15,7 @@ import "../index.css";
 const ProjectInfo = () => {
   const { project_id } = useParams();
   const { setSnackbar } = useContext(SnackbarContext);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [inputLists, setInputLists] = useState([]);
   const [orderLists, setOrderLists] = useState([]);
   const [isOrderSummary, setIsOrderSummary] = useState(false);

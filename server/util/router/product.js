@@ -92,25 +92,34 @@ router.get(
   "",
   validateJWT,
   (req, res, next) => {
-    const searchTerm = req.query.searchterm || "";
+    const searchterm = req.query.searchterm || "";
     const filterOption = req.query.filteroption || "";
 
     let selectQuery = `SELECT p.product_id AS 'id', p.product_name AS 'name', p.product_unit_price AS 'unit price (RM)', p.product_category AS category, p.product_description AS 'description', s.supplier_cmp_name as supplier FROM product AS p INNER JOIN supplier AS s ON p.supplier_id = s.supplier_id`;
     let queryParams = [];
 
-    if (searchTerm) {
+    if (searchterm) {
       selectQuery += ` WHERE (p.product_name LIKE ?
-      OR p.product_description LIKE ?)`;
-      queryParams.push(`%${searchTerm}%`, `%${searchTerm}%`);
+      OR p.product_description LIKE ?
+      OR s.supplier_cmp_name LIKE ?)
+      OR s.supplier_pic LIKE ?`;
+      queryParams.push(
+        `%${searchterm}%`,
+        `%${searchterm}%`,
+        `%${searchterm}%`,
+        `%${searchterm}%`
+      );
     }
 
     if (filterOption) {
-      if (searchTerm) selectQuery += " AND";
+      if (searchterm) selectQuery += " AND";
       else selectQuery += " WHERE";
 
-      selectQuery += " supplier_category LIKE ";
+      selectQuery += " product_category LIKE ?";
       queryParams.push(`%${filterOption}%`);
     }
+
+    selectQuery += " ORDER BY product_id DESC;";
 
     db.query(selectQuery, queryParams, (err, results) => {
       if (err)
@@ -158,6 +167,7 @@ router.get("/options", validateJWT, getProductInfo, (req, res) => {
   if (!req.productArray) {
     return res.status(500).json({ message: "Something went wrong" });
   }
+
   return res.status(200).json({ option: req.productArray });
 });
 

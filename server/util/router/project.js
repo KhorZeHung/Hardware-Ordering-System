@@ -66,7 +66,7 @@ router.post(
         quote_prop_type,
         pic_id,
         quote_product_lists,
-        (quote_sub_total = quote_discount),
+        quote_sub_total - quote_discount,
       ],
       (err) => {
         if (err)
@@ -178,24 +178,30 @@ router.post(
 
 //get all project info, with filter function
 router.get("", validateJWT, (req, res) => {
-  const searchTerm = req.query.searchterm || "";
+  const { searchterm, filteroption } = req.query;
 
   let selectQuery = `SELECT project_id AS "id", project_name AS 'project name', project_client_name AS "client name", project_client_contact AS "contact", project_grand_total AS "total charge", project_address AS location FROM project`;
   let queryParams = [];
 
-  if (searchTerm) {
+  if (searchterm) {
     selectQuery += ` WHERE (project_name LIKE ?
       OR project_client_name LIKE ?
       OR project_client_phone LIKE ?
       OR project_address LIKE ?)`;
     queryParams.push(
-      `%${searchTerm}%`,
-      `%${searchTerm}%`,
-      `%${searchTerm}%`,
-      `%${searchTerm}%`
+      `%${searchterm}%`,
+      `%${searchterm}%`,
+      `%${searchterm}%`,
+      `%${searchterm}%`
     );
   }
 
+  if (filteroption) {
+    selectQuery += " AND project_prop_type = ?";
+    queryParams.push(filteroption);
+  }
+
+  selectQuery += " ORDER BY created_at DESC;";
   db.query(selectQuery, queryParams, (err, results) => {
     if (err)
       return res.status(500).json({ message: "Something went wrong" + err });
@@ -274,7 +280,7 @@ router.get(
         .status(400)
         .json({ message: "Project identification is not provided" });
 
-    const selectQuery = `SELECT account_status_description AS "description", amount, isDebit, DATE(created_at) AS 'date', account_status_id AS "id" FROM account_status WHERE project_id = ?;`;
+    const selectQuery = `SELECT account_status_description AS "description", amount, isDebit, DATE_FORMAT(account_status_date, '%d/%m/%Y') AS 'date', account_status_id AS "id" FROM account_status WHERE project_id = ?;`;
     db.query(selectQuery, [project_id], (err, result) => {
       if (err)
         return res.status(500).json({ message: "Something went wrong " + err });

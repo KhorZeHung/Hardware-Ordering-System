@@ -50,9 +50,14 @@ router.post(
         .json({ message: "Server error, cannot perform validation" });
 
     const productIds = productArray.map((product) => product.id);
+    const productObj = productArray.reduce((summary, product) => {
+      summary[product.id] = product;
+      return summary;
+    }, {});
     let quoteSubTotal = 0;
 
     async function validateProducts() {
+      let validatedProductLists = [];
       for (const areaOfRenovation of quote_product_lists) {
         const { roomName, productList } = areaOfRenovation;
 
@@ -62,14 +67,16 @@ router.post(
           !Array.isArray(productList) ||
           productList.length < 1
         ) {
-          return res
-            .status(400)
-            .json({ message: "Information provided is insufficient" });
+          throw new Error("Information provided is insufficient");
         }
 
-        productList.forEach((productListArray) => {
-          const { product_id, product_quantity, product_unit_price } =
-            productListArray;
+        const validatedProductList = productList.reduce((summary, product) => {
+          const {
+            product_id,
+            product_quantity,
+            product_unit_price,
+            product_name,
+          } = product;
           if (
             !product_id ||
             !product_quantity ||
@@ -77,28 +84,47 @@ router.post(
             !product_unit_price ||
             !parseFloat(product_unit_price) ||
             !productIds.includes(product_id)
-          )
+          ) {
             return res
               .status(400)
-              .json({ message: "Information provided is incorrect" });
+              .json({ message: "Information provided is not complete" });
+          }
 
           quoteSubTotal +=
             parseInt(product_quantity) * parseFloat(product_unit_price);
+
+          if (product_name === formatedProductArray[product_id].name) {
+            const { product_name, ...remainingObj } = product;
+            product = remainingObj;
+          }
+
+          summary.push(product);
+          return summary;
+        }, []);
+
+        validatedProductLists.push({
+          roomName,
+          productList: validatedProductList,
         });
       }
 
-      req.body.quote_sub_total = quoteSubTotal;
-      next();
+      return validatedProductLists;
     }
 
-    validateProducts().catch((err) => {
-      res.status(500).json({ message: "An error occurred during validation" });
-    });
+    validateProducts()
+      .then((validatedLists) => {
+        req.body.quote_product_lists = validatedLists;
+        req.body.quote_sub_total = quoteSubTotal;
+        next();
+      })
+      .catch((err) => {
+        res.status(400).json({ message: err.message });
+      });
   },
   (req, res, next) => {
     const { user_id } = req.user;
     const selectQuery =
-      "SELECT quote_id FROM quotation WHERE pic_id = ? ORDER BY create_at DESC LIMIT 1;";
+      "SELECT quote_id FROM quotation WHERE pic_id = ? ORDER BY created_at DESC LIMIT 1;";
 
     db.query(selectQuery, [user_id], (err, result) => {
       if (err)
@@ -153,9 +179,10 @@ router.post(
           return res
             .status(500)
             .json({ message: "Something went wrong " + err });
-        return res
-          .status(200)
-          .json({ message: "Quotation list created successful" });
+        return res.status(200).json({
+          message: "Quotation list created successful",
+          quote_id: newQuoteId,
+        });
       }
     );
   }
@@ -163,24 +190,33 @@ router.post(
 
 //get all quotation info, with filter function
 router.get("", validateJWT, isManager, (req, res) => {
-  const searchTerm = req.query.searchterm || "";
+  const { searchterm, filteroption } = req.query;
   const { user_id } = req.user;
 
   let selectQuery = `SELECT quote_id AS "id", quote_name AS 'quotation name', quote_client_name AS "client name", quote_client_contact AS "contact", quote_sub_total AS "total charge", quote_address AS location FROM quotation WHERE pic_id = ? `;
   let queryParams = [user_id];
 
-  if (searchTerm) {
+  if (searchterm) {
     selectQuery += ` AND (quote_name LIKE ?
       OR quote_client_name LIKE ?
-      OR quote_client_phone LIKE ?
+      OR quote_id LIKE ?
+      OR quote_client_contact LIKE ?
       OR quote_address LIKE ?)`;
     queryParams.push(
-      `%${searchTerm}%`,
-      `%${searchTerm}%`,
-      `%${searchTerm}%`,
-      `%${searchTerm}%`
+      `%${searchterm}%`,
+      `%${searchterm}%`,
+      `%${searchterm}%`,
+      `%${searchterm}%`,
+      `%${searchterm}%`
     );
   }
+
+  if (filteroption) {
+    selectQuery += " AND quote_prop_type = ?";
+    queryParams.push(filteroption);
+  }
+
+  selectQuery += " ORDER BY created_at DESC;";
 
   db.query(selectQuery, queryParams, (err, results) => {
     if (err)
@@ -219,7 +255,7 @@ router.post(
   validateJWT,
   isManager,
   getProductInfo,
-  (req, res) => {
+  (req, res, next) => {
     const {
       quote_name,
       quote_client_name,
@@ -229,8 +265,6 @@ router.post(
       quote_prop_type,
       quote_product_lists,
     } = req.body;
-    const { user_id } = req.user;
-    const { quote_id } = req.params;
     if (
       !quote_name ||
       !quote_client_name ||
@@ -238,48 +272,101 @@ router.post(
       !quote_address ||
       !quote_prop_type ||
       !quote_product_lists ||
+      !quote_discount < 0 ||
       typeof quote_product_lists !== "object"
     )
       return res
         .status(400)
         .json({ message: "Please provide all required information." });
-
-    const productIds = req.productArray.map((product) => product.id);
-    let isValid = true;
+    const { productArray } = req;
+    const productIds = productArray.map((product) => product.id);
+    let formatedProductArray = productArray.reduce((productObj, product) => {
+      const stringProductId = String(product.id);
+      productObj[stringProductId] = product;
+      return productObj;
+    }, {});
     let quote_sub_total = 0.0;
 
-    quote_product_lists.forEach((productLists) => {
-      const { roomName, productList } = productLists;
-      if (!roomName || !productList || !Array.isArray(productList)) {
-        return res
-          .status(400)
-          .json({ message: "Information provided is invalid" });
-      }
-      productList.forEach((material) => {
-        const { product_id, product_unit_price, product_quantity } = material;
+    async function validateProducts() {
+      let validatedProductLists = [];
+      for (const areaOfRenovation of quote_product_lists) {
+        const { roomName, productList } = areaOfRenovation;
+
         if (
-          !product_id ||
-          !product_unit_price ||
-          isNaN(product_quantity) ||
-          isNaN(product_unit_price) ||
-          !product_quantity ||
-          !productIds.includes(product_id)
+          !roomName ||
+          !productList ||
+          !Array.isArray(productList) ||
+          productList.length < 1
         ) {
-          isValid = false;
-        } else {
+          throw new Error("Information provided is insufficient");
+        }
+
+        const validatedProductList = productList.reduce((summary, product) => {
+          const {
+            product_id,
+            product_quantity,
+            product_unit_price,
+            product_name,
+          } = product;
+          if (
+            !product_id ||
+            !product_quantity ||
+            !parseInt(product_quantity) ||
+            !product_unit_price ||
+            !parseFloat(product_unit_price) ||
+            !productIds.includes(product_id)
+          ) {
+            return res
+              .status(400)
+              .json({ message: "Information provided is not complete" });
+          }
+
           quote_sub_total +=
             parseInt(product_quantity) * parseFloat(product_unit_price);
-        }
-      });
-    });
 
-    if (!isValid) {
-      return res
-        .status(400)
-        .json({ message: "Invalid material's information" });
+          if (product_name === formatedProductArray[product_id].name) {
+            const { product_name, ...remainingObj } = product;
+            product = remainingObj;
+          }
+
+          summary.push(product);
+          return summary;
+        }, []);
+
+        validatedProductLists.push({
+          roomName,
+          productList: validatedProductList,
+        });
+      }
+
+      return validatedProductLists;
     }
 
-    const stringify_quote_product_lists = JSON.stringify(quote_product_lists);
+    validateProducts()
+      .then((validatedLists) => {
+        req.formated_quote_product_lists = validatedLists;
+        req.quote_sub_total = quote_sub_total;
+        next();
+      })
+      .catch((err) => {
+        return res.status(400).json({ message: err.message });
+      });
+  },
+  (req, res) => {
+    const stringify_quote_product_lists = JSON.stringify(
+      req.formated_quote_product_lists
+    );
+    const {
+      quote_name,
+      quote_client_name,
+      quote_client_contact,
+      quote_discount,
+      quote_address,
+      quote_prop_type,
+    } = req.body;
+    const { user_id } = req.user;
+    const { quote_id } = req.params;
+    const { quote_sub_total } = req;
 
     const updateQuery =
       "UPDATE quotation SET quote_name = ?, quote_client_name = ?, quote_client_contact = ?, quote_address =?, quote_prop_type = ?, quote_product_lists = ?, quote_sub_total = ?, quote_discount = ? WHERE pic_id = ? AND quote_id = ?;";
@@ -350,8 +437,7 @@ router.get(
   },
   (req, res, next) => {
     const { quoteData, productArray } = req;
-    let { quote_id, created_at, pic_id, last_edit_time, ...newQuoteData } =
-      quoteData;
+    let { pic_id, last_edit_time, ...newQuoteData } = quoteData;
 
     let formatedProductArray = productArray.reduce((productObj, product) => {
       const stringProductId = String(product.id);
@@ -368,7 +454,7 @@ router.get(
           );
           return {
             ...product,
-            product_name: referProduct.name,
+            product_name: product.product_name || referProduct.name,
             product_description: newProductDescription,
           };
         });

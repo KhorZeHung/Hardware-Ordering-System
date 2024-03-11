@@ -61,6 +61,12 @@
   display: grid;
   grid-template-rows: auto;
   gap: 1rem;
+  max-width: 750px;
+  margin: 0 auto;
+
+  &.grid {
+    grid-template-columns: repeat(2, minmax(300px, 1fr));
+  }
 }
 
 .formBody input[type="select"] {
@@ -76,7 +82,7 @@
 
 @media (max-width: 900px) {
   .formInputLists {
-    grid-template-columns: repeat(1, 1fr);
+    grid-template-columns: repeat(1, 1fr) !important;
     gap: 1rem;
   }
 }

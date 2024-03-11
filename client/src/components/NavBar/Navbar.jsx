@@ -22,6 +22,7 @@ const Navbar = () => {
     window.location.reload();
   };
 
+  
   return (
     isTokenExist() && (
       <>

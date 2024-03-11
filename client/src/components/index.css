@@ -41,6 +41,7 @@ html,
   width: 100%;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   transition: color 0.3s ease, background-color 0.3s ease;
+  margin-bottom: 2rem;
 }
 
 * ::selection {

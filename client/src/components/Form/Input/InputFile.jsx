@@ -29,7 +29,7 @@ const InputFile = ({ datas, formHandler }) => {
     <div
       style={{
         gridRow: "span 2",
-        width: "100%",
+        maxWidth: "100%",
       }}>
       <label htmlFor="file">{label}</label>
       <div style={{ width: "100%" }}>

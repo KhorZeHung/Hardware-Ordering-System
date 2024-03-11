@@ -20,6 +20,7 @@ const OrderInfo = () => {
   const { productInfo } = useProductInfo();
   const { openCustomModal } = useContext(CustomModalContext);
   const formatedOrderData = useRef();
+  const formatedOrderStmtData = useRef(orderData.orderStatementForm);
 
   useEffect(() => {
     axios
@@ -30,6 +31,9 @@ const OrderInfo = () => {
       })
       .then((res) => {
         const { data } = res.data;
+        formatedOrderStmtData.current.inputLists[5].defaultValue =
+          data.projectData["project id"];
+        formatedOrderStmtData.current.inputLists[4].defaultValue += ` ${data.supplierData["supplier company name"]}`;
         setTableData(data);
       })
       .catch((err) => {
@@ -63,12 +67,52 @@ const OrderInfo = () => {
             <table className="orderTable">
               <tbody>
                 {tableData.supplierData &&
-                  Object.entries(tableData.supplierData).map(([key, value]) => (
-                    <tr key={key}>
-                      <th>{key}</th>
-                      <td>{value}</td>
-                    </tr>
-                  ))}
+                  Object.entries(tableData.supplierData).map(([key, value]) => {
+                    if (key.includes("contact")) {
+                      return (
+                        <tr key={key}>
+                          <th>{key}</th>
+                          <a
+                            style={{
+                              color: "blue",
+                            }}
+                            href={`https://wa.me/${value
+                              .replace(/^(\+|6|\+6)?/g, "")
+                              .replace(/[^0-9]/g, "")}`}
+                            target="_blank"
+                            rel="noopener noreferrer">
+                            {value}
+                          </a>
+                        </tr>
+                      );
+                    }
+                    if (key.includes("location") || key.includes("address")) {
+                      return (
+                        <tr key={key}>
+                          <th>{key}</th>
+                          <a
+                            style={{
+                              color: "blue",
+                              textTransform: "underline",
+                            }}
+                            href={`https://www.google.com/maps/search/?api=1&query=${value.replace(
+                              / /g,
+                              "+"
+                            )}`}
+                            target="_blank"
+                            rel="noopener noreferrer">
+                            {value}
+                          </a>
+                        </tr>
+                      );
+                    }
+                    return (
+                      <tr key={key}>
+                        <th>{key}</th>
+                        <td>{value}</td>
+                      </tr>
+                    );
+                  })}
                 {tableData.projectData &&
                   Object.entries(tableData.projectData).map(([key, value]) => (
                     <tr key={key}>
@@ -128,6 +172,14 @@ const OrderInfo = () => {
               </tbody>
             </table>
           </div>
+          <Tooltip title="add statement">
+            <span
+              className="addNewItem"
+              style={{ bottom: "calc(5% + 50px)" }}
+              onClick={() => openCustomModal(formatedOrderStmtData.current)}>
+              <span className="material-symbols-outlined">contract</span>
+            </span>
+          </Tooltip>
           <Tooltip title="edit order status">
             <span
               className="addNewItem"

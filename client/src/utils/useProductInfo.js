@@ -25,18 +25,18 @@ const useProductInfo = (setter) => {
           let productBySupplier = {};
 
           // Process productInfo to create productByCategory, productDescription, and productBySupplier
-          productInfo = productInfo.map((product, index) => {
+          productInfo = productInfo.reduce((obj, product) => {
             product.category.forEach((categoryId) => {
               if (!productByCategory[categoryId]) {
                 productByCategory[categoryId] = [];
               }
-              productByCategory[categoryId].push(index);
+              productByCategory[categoryId].push(product.id);
             });
 
             if (!productBySupplier[product.supplier]) {
               productBySupplier[product.supplier] = [];
             }
-            productBySupplier[product.supplier].push(index);
+            productBySupplier[product.supplier].push(product.id);
 
             const { description, ...productWithoutDescription } = product;
 
@@ -47,8 +47,10 @@ const useProductInfo = (setter) => {
               productDescription[product.id].push(description);
             });
 
-            return productWithoutDescription;
-          });
+            obj[product.id] = productWithoutDescription;
+
+            return obj;
+          }, {});
 
           // Store data in localStorage
           localStorage.setItem("productInfo", JSON.stringify(productInfo));

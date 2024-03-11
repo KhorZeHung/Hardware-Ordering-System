@@ -30,8 +30,13 @@ router.post(
   isAdmin,
   uploadFiles,
   (req, res, next) => {
-    const { account_status_description, isDebit, amount, project_id } =
-      req.body;
+    const {
+      account_status_description,
+      isDebit,
+      amount,
+      project_id,
+      account_status_date,
+    } = req.body;
     const { fileNames } = req;
     if (
       !project_id ||
@@ -40,7 +45,8 @@ router.post(
       !fileNames ||
       !amount ||
       isNaN(amount) ||
-      !Array.isArray(fileNames)
+      !Array.isArray(fileNames) ||
+      !account_status_date
     )
       return res
         .status(400)
@@ -49,7 +55,7 @@ router.post(
     const binaryIsDebit = isDebit ? 1 : 0;
 
     const insertQuery =
-      "INSERT INTO account_status (account_status_description, isDebit, doc_refer, amount, project_id) VALUE (?,?, ?, ?, ?);";
+      "INSERT INTO account_status (account_status_description, isDebit, doc_refer, amount, project_id, account_status_date) VALUE (?,?, ?, ?, ?, ?);";
     db.query(
       insertQuery,
       [
@@ -58,6 +64,7 @@ router.post(
         JSON.stringify(fileNames),
         amount,
         project_id,
+        account_status_date,
       ],
       (err) => {
         if (err)

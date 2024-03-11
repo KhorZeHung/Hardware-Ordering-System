@@ -23,7 +23,14 @@ const Login = () => {
         const { token, message, options } = res.data;
         options.forEach((option) => {
           const key = Object.keys(option)[0];
-          const value = JSON.stringify(option[key]);
+          const value = JSON.stringify(
+            option[key].reduce((obj, value) => {
+              if (!obj[value.id]) {
+                obj[value.id] = value;
+              }
+              return obj;
+            }, {})
+          );
           localStorage.setItem(key, value);
         });
         setCookie("token", token, 12);

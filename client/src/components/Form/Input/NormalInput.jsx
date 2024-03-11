@@ -1,8 +1,10 @@
-import React, { useRef } from "react";
+import React, { useContext, useRef } from "react";
 import "../FormBody.css";
+import { SnackbarContext } from "../../Snackbar/SnackBarProvidor";
 
 const NormalInput = ({ datas, formHandler }) => {
   const inputRequirement = useRef();
+  const { setSnackbar } = useContext(SnackbarContext);
   const {
     type = "text",
     required = true,
@@ -45,6 +47,14 @@ const NormalInput = ({ datas, formHandler }) => {
     }
   };
 
+  const handleCopy = (event) => {
+    event.preventDefault();
+    if (event.target.readOnly) {
+      navigator.clipboard.writeText(event.target.value);
+      setSnackbar({ open: true, message: "copied", serverity: "success" });
+    }
+  };
+
   return (
     <div className={disable ? "normalInput disable" : "normalInput"}>
       <label htmlFor={name}>
@@ -55,14 +65,15 @@ const NormalInput = ({ datas, formHandler }) => {
         type={type}
         name={name}
         required={required}
-        defaultValue={defaultValue}
+        defaultValue={defaultValue || null}
         placeholder={placeholder}
         onChange={formHandler}
         id={name}
         min={min}
         max={max}
-        disabled={disable}
+        readOnly={disable}
         onKeyUp={onKeyUpCheck ? checkInputRequirements : null}
+        onClick={handleCopy}
       />
       {onKeyUpCheck && (
         <span className="inputRequirement" ref={inputRequirement}>

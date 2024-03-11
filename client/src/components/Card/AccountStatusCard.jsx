@@ -1,5 +1,7 @@
 import React, { useEffect, useState, useRef, useContext } from "react";
-import { Dialog, DialogContent, Button } from "@mui/material";
+import { Dialog, DialogContent, DialogActions } from "@mui/material";
+import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { APIGateway, ImgPathWay } from "../../data";
 import "./AccountStatusCard.css";
 import { getCookie } from "../../utils/cookie";
@@ -13,6 +15,7 @@ const AccountStatusCard = ({ data }) => {
     debitTotal: 0,
     creditTotal: 0,
   });
+  let cumulativeBalance = 0;
   const { setSnackbar } = useContext(SnackbarContext);
 
   const [openDialogIndex, setOpenDialogIndex] = useState(-1); // State to track which dialog is open
@@ -53,12 +56,6 @@ const AccountStatusCard = ({ data }) => {
     newDefaultValue.current = defaultValue.map((value) => {
       if (value.isDebit) newObj.debitTotal += value.amount;
       else newObj.creditTotal += value.amount;
-
-      const date = new Date(value.date);
-      const options = { timeZone: "Asia/Kuala_Lumpur" };
-      const malaysiaTime = date.toLocaleString("en-MY", options);
-
-      value.date = String(malaysiaTime).split(",")[0];
       return value;
     });
 
@@ -84,30 +81,30 @@ const AccountStatusCard = ({ data }) => {
             </thead>
             <tbody>
               {newDefaultValue.current.map((value, index) => {
+                if (value.isDebit)
+                  cumulativeBalance += parseFloat(value.amount);
+                else cumulativeBalance -= parseFloat(value.amount);
+
                 return (
-                  <>
-                    <tr key={`account-status-row-${index + 1}`}>
-                      <td>{value.date}</td>
-                      <td
-                        className="doc_link"
-                        onClick={() => getImage(value.id)}>
-                        doc refer
-                      </td>
-                      <td>{value.description}</td>
-                      {value.isDebit ? (
-                        <>
-                          <td>{parseFloat(value.amount).toFixed(2)}</td>
-                          <td></td>
-                        </>
-                      ) : (
-                        <>
-                          <td></td>
-                          <td>{parseFloat(value.amount).toFixed(2)}</td>
-                        </>
-                      )}
-                      <td>{parseFloat(value.amount).toFixed(2)}</td>
-                    </tr>
-                  </>
+                  <tr key={`account-status-row-${index + 1}`}>
+                    <td>{value.date}</td>
+                    <td className="doc_link" onClick={() => getImage(value.id)}>
+                      doc refer
+                    </td>
+                    <td>{value.description}</td>
+                    {value.isDebit ? (
+                      <>
+                        <td>{parseFloat(value.amount).toFixed(2)}</td>
+                        <td></td>
+                      </>
+                    ) : (
+                      <>
+                        <td></td>
+                        <td>{parseFloat(value.amount).toFixed(2)}</td>
+                      </>
+                    )}
+                    <td>{cumulativeBalance.toFixed(2)}</td>
+                  </tr>
                 );
               })}
 
@@ -132,26 +129,45 @@ const AccountStatusCard = ({ data }) => {
       {imageUrls.length > 0 &&
         imageUrls.map((imageUrl, index) => (
           <Dialog
-            key={index}
+            key={`img-${index}`}
             open={openDialogIndex === index}
             onClose={() => {
               setOpenDialogIndex(-1);
             }}>
-            <DialogContent>
+            <DialogContent
+              style={{
+                padding: "0 80px",
+              }}>
               <img
                 src={APIGateway + ImgPathWay + imageUrl}
-                alt={`Preview ${index + 1}`}
+                alt={`Preview-${index + 1}`}
                 style={{ maxWidth: "100%" }}
               />
             </DialogContent>
+            {imageUrls.length > 1 && (
+              <DialogActions
+                style={{
+                  width: "100%",
+                  boxSizing: "border-box",
+                  position: "absolute",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}>
+                <ArrowBackIosIcon
+                  onClick={handlePrevDialog}
+                  style={{ cursor: "pointer" }}
+                />
+                <ArrowForwardIosIcon
+                  onClick={handleNextDialog}
+                  style={{ cursor: "pointer" }}
+                />
+              </DialogActions>
+            )}
           </Dialog>
         ))}
-      {openDialogIndex !== -1 && (
-        <>
-          <Button onClick={handlePrevDialog}>Previous Image</Button>
-          <Button onClick={handleNextDialog}>Next Image</Button>
-        </>
-      )}
     </>
   );
 };

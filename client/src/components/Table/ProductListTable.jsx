@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import "./FilterTable.css";
 import TableCheckBox from "../Form/Input/TableCheckBox";
 import useProductInfo from "../../utils/useProductInfo";
@@ -10,12 +10,11 @@ const ProductListTable = ({
   productDescriptionHandler,
   disable = false,
 }) => {
-  const { productDescription } = useProductInfo();
+  const { productDescription, productInfo } = useProductInfo();
 
   if (!productDescription) {
     return <div>Loading...</div>;
   }
-
   return (
     <table>
       <thead>
@@ -35,8 +34,13 @@ const ProductListTable = ({
               <td>
                 <input
                   type="text"
-                  value={product.product_name}
-                  onChange={(e) =>
+                  defaultValue={
+                    product.product_name || productInfo[product.product_id].name
+                  }
+                  name={"product_name"}
+                  onBlur={(e) =>
+                    !disable &&
+                    product.product_name !== e.target.value &&
                     changeProductHandler("product_name", index, e)
                   }
                   readOnly={disable}
@@ -141,4 +145,4 @@ const ProductListTable = ({
   );
 };
 
-export default ProductListTable;
+export default memo(ProductListTable);

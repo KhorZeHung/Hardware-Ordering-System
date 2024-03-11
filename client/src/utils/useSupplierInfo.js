@@ -15,9 +15,18 @@ const useSupplierInfo = () => {
             },
           });
 
+          let formatedSupplierInfo = response.data.option.reduce(
+            (obj, supplier) => {
+              if (!obj[supplier.value]) {
+                obj[supplier.value] = supplier;
+              }
+              return obj;
+            },
+            {}
+          );
           localStorage.setItem(
             "supplierInfo",
-            JSON.stringify(response.data.option)
+            JSON.stringify(formatedSupplierInfo)
           );
         } catch (error) {
           console.error("Error fetching supplier info:", error);

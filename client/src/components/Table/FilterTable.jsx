@@ -44,6 +44,7 @@ const FilterTable = (props) => {
           APIEndpoint += `filteroption=${encodeURIComponent(filterOption)}`;
         }
         const token = getCookie("token");
+
         const response = await axios.get(APIEndpoint, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -113,7 +114,7 @@ const FilterTable = (props) => {
                 {filter.options.map((value) => {
                   return (
                     <option
-                      key={`option-${value}`}
+                      key={`option-${value.value}`}
                       value={value.value}
                       selected={
                         filterValue.filterOption === value.value
@@ -151,9 +152,53 @@ const FilterTable = (props) => {
                   {tableData.tbody.map((rowData, rowIndex) => {
                     return (
                       <tr key={`row-${rowIndex}`}>
-                        {Object.values(rowData).map((cellData, cellIndex) => (
-                          <td key={`cell-${cellIndex}`}>{cellData}</td>
-                        ))}
+                        {Object.values(rowData).map((cellData, cellIndex) => {
+                          const theadValue = tableData.thead[cellIndex];
+                          if (theadValue.includes("contact")) {
+                            const phoneNo = cellData
+                              .replace(/^(\+|6|\+6)?/g, "")
+                              .replace(/[^0-9]/g, "");
+                            return (
+                              <td key={`cell-${theadValue}-${cellIndex}`}>
+                                <a
+                                  style={{
+                                    color: "blue",
+                                    textTransform: "underline",
+                                  }}
+                                  href={`https://wa.me/${phoneNo}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer">
+                                  {cellData}
+                                </a>
+                              </td>
+                            );
+                          }
+                          if (
+                            theadValue.includes("address") ||
+                            theadValue.includes("location")
+                          ) {
+                            const address = cellData.replace(/ /g, "+");
+                            return (
+                              <td key={`cell-${theadValue}-${cellIndex}`}>
+                                <a
+                                  style={{
+                                    color: "blue",
+                                    textTransform: "underline",
+                                  }}
+                                  href={`https://www.google.com/maps/search/?api=1&query=${address}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer">
+                                  {cellData}
+                                </a>
+                              </td>
+                            );
+                          }
+                          return (
+                            <td key={`cell-${theadValue}-${cellIndex}`}>
+                              {cellData}
+                            </td>
+                          );
+                        })}
                         {checkBox.handlerArray && (
                           <td className="tableAction">
                             {checkBox.handlerArray.map((value, index) => {

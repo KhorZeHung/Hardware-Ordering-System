@@ -75,6 +75,15 @@ function App() {
             }
           />
           <Route
+            path="/contact/:subPages"
+            element={
+              <PrivateRoute path="contact">
+                <Contact />
+              </PrivateRoute>
+            }
+          />
+
+          <Route
             path="/contact/supplier/:supplier_id"
             element={
               <PrivateRoute path="contact">

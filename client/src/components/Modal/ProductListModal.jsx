@@ -27,13 +27,9 @@ const ProductListModal = (props) => {
 
   useEffect(() => {
     if (supplierInfo && productInfo) {
-      oriTableData.current = productInfo.map((product) => {
-        const supplier = supplierInfo.find(
-          (supplier) => supplier.value === product.supplier
-        );
-
-        product.supplier = supplier.name;
-        return product;
+      oriTableData.current = Object.entries(productInfo).map(([_, value]) => {
+        value.supplier = supplierInfo[value.supplier].name;
+        return value;
       });
 
       setTableData(oriTableData.current);
@@ -59,7 +55,7 @@ const ProductListModal = (props) => {
 
     setCheckedBox(newCheckedBoxArray);
     let subtotal = 0;
-    const newProductListArray = tableData
+    const newProductListArray = productInfo
       .filter((product) => newCheckedBoxArray.includes(String(product.id)))
       .map((product) => {
         subtotal += parseFloat(product.unit_price);
@@ -145,7 +141,7 @@ const ProductListModal = (props) => {
                   style={{ minWidth: "50px" }}
                   onChange={filterHander}>
                   <option value="all">all</option>
-                  {supplierInfo &&
+                  {/* {supplierInfo &&
                     supplierInfo.map((value) => {
                       return (
                         <option
@@ -154,7 +150,7 @@ const ProductListModal = (props) => {
                           {value.name}
                         </option>
                       );
-                    })}
+                    })} */}
                 </select>
               </>
             }

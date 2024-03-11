@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import "../index.css";
 import TableWithSmlCard from "../../components/Table/TableWithSmlCard";
 import { contactData, APIGateway } from "../../data";
@@ -6,14 +6,23 @@ import { CustomModalContext } from "../../components/Modal/CustomModalProvider";
 import { ConfirmModalContext } from "../../components/Modal/ConfirmModalProvider";
 import { SnackbarContext } from "../../components/Snackbar/SnackBarProvidor";
 import { getCookie } from "../../utils/cookie";
+import { useParams, useNavigate } from "react-router-dom";
+import useSupplierInfo from "../../utils/useSupplierInfo";
 import axios from "axios";
 
 const Contact = () => {
-  const [isSupplierPage, setIsSupplierPage] = useState("supplier");
+  const { subPages = "supplier" } = useParams();
   const { openCustomModal } = useContext(CustomModalContext);
   const { setSnackbar } = useContext(SnackbarContext);
   const { openModal } = useContext(ConfirmModalContext);
   const token = getCookie("token");
+  const navigate = useNavigate();
+  const [newModalFormData, setNewModalFormData] = useState({
+    product: contactData.product.newModalForm,
+    supplier: contactData.supplier.newModalForm,
+  });
+  const [formLoaded, setFormLoaded] = useState(false);
+  const supplierInfo = useSupplierInfo();
 
   const deleteHandler = (id) => {
     openModal(
@@ -26,9 +35,7 @@ const Contact = () => {
   const deleteRequest = async (id) => {
     await axios
       .delete(
-        APIGateway +
-          contactData[isSupplierPage].tableData.endPoint +
-          `/delete/${id}`,
+        APIGateway + contactData[subPages].tableData.endPoint + `/delete/${id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -53,7 +60,7 @@ const Contact = () => {
     await axios
       .get(
         APIGateway +
-          contactData[isSupplierPage].newModalForm.getDefaultValueEndPoint +
+          contactData[subPages].newModalForm.getDefaultValueEndPoint +
           id,
         {
           headers: {
@@ -63,12 +70,12 @@ const Contact = () => {
       )
       .then((res) => {
         const newValue = {
-          title: `edit ${isSupplierPage}`,
-          submitValue: `update ${isSupplierPage}`,
-          endPoint: `/${isSupplierPage}/edit`,
+          title: `edit ${subPages}`,
+          submitValue: `update ${subPages}`,
+          endPoint: `/${subPages}/edit`,
         };
         let dataWithDefaultValue = {
-          ...contactData[isSupplierPage].newModalForm,
+          ...contactData[subPages].newModalForm,
           ...newValue,
         };
 
@@ -76,7 +83,7 @@ const Contact = () => {
         const option = res.data.option || null;
 
         dataWithDefaultValue.inputLists = contactData[
-          isSupplierPage
+          subPages
         ].newModalForm.inputLists.map((field) => {
           let returnField = field;
           if (data.hasOwnProperty(field.name)) {
@@ -107,42 +114,26 @@ const Contact = () => {
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (!localStorage.getItem("supplierInfo")) {
-        try {
-          const response = await axios.get(APIGateway + "/supplier/options", {
-            headers: {
-              Authorization: `Bearer ${getCookie("token")}`,
-            },
-          });
-          const supplierInfo = JSON.stringify(response.data.option);
-          localStorage.setItem("supplierInfo", supplierInfo);
-        } catch (error) {
-          console.error("Error fetching supplier info:", error);
-        }
-      }
-      const storedSupplierInfo = localStorage.getItem("supplierInfo");
-      if (storedSupplierInfo) {
-        const supplierInfo = JSON.parse(storedSupplierInfo);
-        contactData.product.newModalForm.inputLists.forEach((input) => {
+    if (supplierInfo) {
+      setNewModalFormData((prev) => {
+        prev[subPages].inputLists = prev[subPages].inputLists.map((input) => {
           if (input.name === "supplier_id") {
-            input.options = supplierInfo;
+            input.options = Object.values(supplierInfo);
           }
+          return input;
         });
-      }
-    };
-
-    fetchData();
-
+        return prev;
+      });
+      setFormLoaded(true);
+    }
     return () => {};
-  }, []);
+  }, [supplierInfo]);
+  console.log(newModalFormData);
 
-  contactData[
-    isSupplierPage
-  ].tableData.checkBox.handlerArray[0].onClickHandler = editRequest;
-  contactData[
-    isSupplierPage
-  ].tableData.checkBox.handlerArray[1].onClickHandler = deleteHandler;
+  contactData[subPages].tableData.checkBox.handlerArray[0].onClickHandler =
+    editRequest;
+  contactData[subPages].tableData.checkBox.handlerArray[1].onClickHandler =
+    deleteHandler;
   return (
     <>
       <div className="contentMainBody">
@@ -150,18 +141,23 @@ const Contact = () => {
           {["supplier", "product"].map((pages, index) => (
             <li
               key={index}
-              onClick={() => setIsSupplierPage(pages)}
-              className={isSupplierPage === pages ? "selected" : ""}>
+              onClick={() => {
+                navigate(`/contact/${pages}`);
+              }}
+              className={subPages === pages ? "selected" : ""}>
               {pages}
             </li>
           ))}
         </ul>
-        <TableWithSmlCard datas={contactData[isSupplierPage]} />
+        {subPages === "supplier" && (
+          <TableWithSmlCard datas={contactData.supplier} />
+        )}
+        {subPages === "product" && (
+          <TableWithSmlCard datas={contactData.product} />
+        )}
         <span
           className="addNewItem"
-          onClick={() =>
-            openCustomModal(contactData[isSupplierPage].newModalForm)
-          }>
+          onClick={() => openCustomModal(newModalFormData[subPages])}>
           +
         </span>
       </div>

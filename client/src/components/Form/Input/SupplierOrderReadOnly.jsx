@@ -18,17 +18,12 @@ const RoomMaterialReadOnly = ({ datas }) => {
 
   useEffect(() => {
     if (defaultOrderList && productInfo) {
-      const productNamesMap = {};
-      productInfo.forEach((product) => {
-        productNamesMap[product.id] = product.name;
-      });
-
       const newProjectOrderProductLists =
         defaultOrderList.project_order_product_lists.map((product) => {
           return {
             ...product,
             product_name:
-              productNamesMap[product.product_id] || "Unknown Product",
+              productInfo[product.product_id].name || "Unknown Product",
           };
         });
 

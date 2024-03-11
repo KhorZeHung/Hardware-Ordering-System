@@ -135,12 +135,12 @@ export const contactData = {
         ],
       },
     },
-    cardData: [
-      {
-        value: "15",
-        title: "total supplier",
-      },
-    ],
+    // cardData: [
+    //   {
+    //     value: "15",
+    //     title: "total supplier",
+    //   },
+    // ],
     newModalForm: {
       title: "new supplier",
       submitValue: "add supplier",
@@ -210,14 +210,27 @@ export const contactData = {
           },
         ],
       },
+      filter: {
+        options: [
+          { name: "Interior Design", value: 1 },
+          { name: "Kitchen Renovation", value: 2 },
+          { name: "Bathroom Remodeling", value: 3 },
+          { name: "Flooring", value: 4 },
+          { name: "Painting", value: 5 },
+          { name: "Roofing", value: 6 },
+          { name: "Electrical Work", value: 7 },
+          { name: "Plumbing", value: 8 },
+          { name: "Landscaping", value: 9 },
+        ],
+      },
       endPoint: "/product",
     },
-    cardData: [
-      {
-        value: "112",
-        title: "total product",
-      },
-    ],
+    // cardData: [
+    //   {
+    //     value: "112",
+    //     title: "total product",
+    //   },
+    // ],
     newModalForm: {
       title: "new product / service",
       submitValue: "add product",
@@ -228,7 +241,7 @@ export const contactData = {
           type: "text",
           name: "product_name",
           label: "Product/Service name",
-          placeholder: "Cement 50kg 1pack ...",
+          placeholder: "Nippon paint 1L",
         },
         {
           type: "text",
@@ -240,15 +253,8 @@ export const contactData = {
           type: "text",
           name: "product_unit_price",
           label: "Charging Price (RM)",
-          placeholder: "+15% to cost as default",
+          placeholder: "XXX.XX",
         },
-        // {
-        //   type: "text",
-        //   name: "product_brand",
-        //   label: "Product Brand ",
-        //   required: false,
-        //   default: 1,
-        // },
         {
           type: "option",
           name: "supplier_id",
@@ -274,7 +280,7 @@ export const contactData = {
           type: "multipletext",
           name: "product_description",
           label: "product description",
-          placeholder: "Description for Quotation, hit enter to record",
+          placeholder: "Description for Quotation, hit + to record",
         },
         {
           type: "hidden",
@@ -293,35 +299,46 @@ export const orderData = {
         },
       ],
     },
+    filter: {
+      options: [
+        { name: "Proceed to order", value: "Proceed to order" },
+        { name: "Order confirm", value: "Order confirm" },
+        { name: "Ready to pick-up", value: "Ready to pick-up" },
+        { name: "Paid", value: "Paid" },
+        { name: "Rejected", value: "Rejected" },
+        { name: "Problematic", value: "Problematic" },
+      ],
+    },
     endPoint: "/order",
   },
-  cardData: [
-    {
-      value: "RM 65,000.00",
-      title: "total order",
-      description: "last month",
-    },
-    {
-      value: "RM 30,000",
-      title: "unpaid amount",
-      description: "12 order",
-    },
-    {
-      value: "4",
-      title: "uncheck order",
-    },
-  ],
+  // cardData: [
+  //   {
+  //     value: "RM 65,000.00",
+  //     title: "total order",
+  //     description: "last month",
+  //   },
+  //   {
+  //     value: "RM 30,000",
+  //     title: "unpaid amount",
+  //     description: "12 order",
+  //   },
+  //   {
+  //     value: "4",
+  //     title: "uncheck order",
+  //   },
+  // ],
   orderRecordForm: {
     title: "edit order",
     submitValue: "save",
     endPoint: "/order/edit",
+    grid: false,
     inputLists: [
       {
         type: "option",
         name: "project_order_status",
         label: "Status",
         options: [
-          { name: "Ordering", value: "Ordering" },
+          { name: "Proceed to order", value: "Proceed to order" },
           { name: "Order confirm", value: "Order confirm" },
           { name: "Ready to pick-up", value: "Ready to pick-up" },
           { name: "Paid", value: "Paid" },
@@ -332,6 +349,44 @@ export const orderData = {
       {
         type: "hidden",
         name: "project_order_id",
+      },
+    ],
+  },
+  orderStatementForm: {
+    title: "payment",
+    submitValue: "add payment",
+    endPoint: "/account/add",
+    inputLists: [
+      {
+        type: "hidden",
+        name: "isDebit",
+        defaultValue: false,
+      },
+      {
+        type: "date",
+        name: "account_status_date",
+        label: "Date",
+      },
+      {
+        type: "file",
+        name: "doc_refer",
+        label: "Doc to refer",
+        limit: 2,
+      },
+      {
+        type: "number",
+        name: "amount",
+        label: "Amount",
+        placeholder: "RM XXX.XX",
+      },
+      {
+        type: "hidden",
+        name: "account_status_description",
+        defaultValue: "payment for ",
+      },
+      {
+        type: "hidden",
+        name: "project_id",
       },
     ],
   },
@@ -353,24 +408,34 @@ export const quoteData = {
         },
       ],
     },
+    filter: {
+      options: [
+        { name: "condo", value: "condo" },
+        { name: "shoplot", value: "shoplot" },
+        { name: "mall", value: "mall" },
+        { name: "terrace", value: "terrace" },
+        { name: "banglow", value: "banglow" },
+        { name: "semi-banglow", value: "semi-banglow" },
+      ],
+    },
   },
-  cardData: [
-    {
-      value: "13",
-      title: "new quote",
-      description: "last month",
-    },
-    {
-      value: "33.33%",
-      title: "convert rate",
-      description: "last month",
-    },
-    {
-      value: "RM 82,942.21",
-      title: "avg charge / proj",
-      description: "last month",
-    },
-  ],
+  // cardData: [
+  //   {
+  //     value: "13",
+  //     title: "new quote",
+  //     description: "last month",
+  //   },
+  //   {
+  //     value: "33.33%",
+  //     title: "convert rate",
+  //     description: "last month",
+  //   },
+  //   {
+  //     value: "RM 82,942.21",
+  //     title: "avg charge / proj",
+  //     description: "last month",
+  //   },
+  // ],
 };
 export const projectData = {
   endPoint: "/project",
@@ -386,28 +451,28 @@ export const projectData = {
       ],
     },
   },
-  cardData: [
-    {
-      value: "5",
-      title: "new proj",
-      description: "last month",
-    },
-    {
-      value: "85.33%",
-      title: "avg prog rate",
-      description: "acive proj",
-    },
-    {
-      value: "RM 6,342.21",
-      title: "cash flow",
-      description: "last month",
-    },
-    {
-      value: "RM 22,942.21",
-      title: "avg cost / proj",
-      description: "last month",
-    },
-  ],
+  // cardData: [
+  //   {
+  //     value: "5",
+  //     title: "new proj",
+  //     description: "last month",
+  //   },
+  //   {
+  //     value: "85.33%",
+  //     title: "avg prog rate",
+  //     description: "acive proj",
+  //   },
+  //   {
+  //     value: "RM 6,342.21",
+  //     title: "cash flow",
+  //     description: "last month",
+  //   },
+  //   {
+  //     value: "RM 22,942.21",
+  //     title: "avg cost / proj",
+  //     description: "last month",
+  //   },
+  // ],
   inputLists: [
     {
       type: "text",
@@ -465,7 +530,13 @@ export const userData = {
       ],
     },
     endPoint: "/user",
-    filter: { options: ["superuser", "admin", "manager"] },
+    filter: {
+      options: [
+        { name: "super user", value: 1 },
+        { name: "admin", value: 2 },
+        { name: "manager", value: 3 },
+      ],
+    },
   },
   newModalForm: {
     title: "new user",
@@ -658,16 +729,21 @@ export const accountData = {
         ],
       },
       {
-        type: "file",
-        name: "doc_refer",
-        label: "Doc to refer",
-        limit: 2,
+        type: "date",
+        name: "account_status_date",
+        label: "Date",
       },
       {
         type: "number",
         name: "amount",
         label: "Amount",
         placeholder: "RM XXX.XX",
+      },
+      {
+        type: "file",
+        name: "doc_refer",
+        label: "Doc to refer",
+        limit: 2,
       },
       {
         type: "text",
