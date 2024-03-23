@@ -18,34 +18,50 @@ const { getCategoryInfo } = require("../function/getInfo.js");
 
 //get user info
 router.get("", validateJWT, isAdmin, (req, res) => {
-  const searchTerm = req.query.searchterm || "";
-  const filterOption = req.query.filteroption || "";
-
+  const { searchterm, filteroption, sort, desc, page } = req.query;
   let selectQuery = `SELECT u.user_id AS 'id', u.user_email AS 'emil', u.user_contact AS 'contact number', u.user_name AS 'name',p.pos_name AS 'position' FROM \`user\`AS u INNER JOIN position AS p ON u.user_authority = p.pos_id`;
   let queryParams = [];
 
-  if (searchTerm) {
+  if (searchterm) {
     selectQuery += ` WHERE (u.user_name LIKE ?
       OR u.user_email LIKE ?
       OR u.user_contact LIKE ?
       OR u.user_id LIKE ?)`;
     queryParams.push(
-      `%${searchTerm}%`,
-      `%${searchTerm}%`,
-      `%${searchTerm}%`,
-      `%${searchTerm}%`
+      `%${searchterm}%`,
+      `%${searchterm}%`,
+      `%${searchterm}%`,
+      `%${searchterm}%`
     );
   }
 
-  if (filterOption) {
-    if (searchTerm) selectQuery += " AND";
+  if (filteroption) {
+    if (searchterm) selectQuery += " AND";
     else selectQuery += " WHERE";
 
-    selectQuery += " p.pos_name LIKE ?";
-    queryParams.push(`%${filterOption}%`);
+    selectQuery += " u.user_authority = ?";
+    queryParams.push(filteroption);
+  }
+  if (sort) {
+    const sortColumnNameMap = {
+      id: "u.user_id",
+      emil: "u.user_email",
+      "contact number": "u.user_contact",
+      name: "u.user_name",
+      position: "p.pos_name",
+    };
+
+    if (sortColumnNameMap[sort]) {
+      selectQuery += ` ORDER BY ${sortColumnNameMap[sort]} ${
+        desc ? "DESC" : "ASC"
+      }`;
+    }
   }
 
-  selectQuery += " ORDER BY user_id DESC;";
+  // if (page) {
+  //   const limit = 25 * page;
+  //   selectQuery += " LIMIT " + limit + ";";
+  // }
 
   db.query(selectQuery, queryParams, (err, results) => {
     if (err)
@@ -191,8 +207,6 @@ router.post("/forgot-password/1", getUserInfo, async (req, res) => {
         "Here is your verification pin : " + temp_password
       );
 
-      console.log("Here is your verification pin : " + temp_password);
-
       if (!sendEmailSuccess) {
         const { insertId } = result1;
         const deleteQuery =
@@ -232,12 +246,12 @@ router.post("/forgot-password/2", (req, res) => {
     const { token, expiredAt } = result1[0];
     const correctPassword = bcrypt.compare(user_password, token);
 
-    const expiredAtDate = new Date(expiredAt);
+    // const expiredAtDate = new Date(expiredAt);
 
-    const currentTimeInMalaysia = moment().tz("Asia/Kuala_Lumpur");
+    // const currentTimeInMalaysia = moment().tz("Asia/Kuala_Lumpur");
 
-    if (expiredAtDate > currentTimeInMalaysia)
-      return res.status(401).json({ message: "Token expired" });
+    // if (expiredAtDate > currentTimeInMalaysia)
+    //   return res.status(401).json({ message: "Token expired" });
 
     if (!correctPassword)
       return res.status(401).json({ message: "Wrong verification code" });
@@ -351,7 +365,7 @@ router.delete("/delete/:user_id", validateJWT, isAdmin, async (req, res) => {
   const arrayOfQueries = [
     "UPDATE project SET admin_in_charge_id = NULL WHERE admin_in_charge_id = ?;",
     "UPDATE project SET manager_in_charge_id = NULL WHERE manager_in_charge_id = ?;",
-    "UPDATE project SET last_edit_pic_id = NULL WHERE last_edit_pic_id = ?;",
+    "UPDATE project SET last_edit_pic = NULL WHERE last_edit_pic = ?;",
     "UPDATE quotation SET pic_id = NULL WHERE pic_id = ?;",
     "DELETE FROM `user` WHERE user_id = ?",
   ];
@@ -361,7 +375,7 @@ router.delete("/delete/:user_id", validateJWT, isAdmin, async (req, res) => {
       const queryPromises = arrayOfQueries.map((query) => {
         return new Promise((resolve, reject) => {
           db.query(query, [user_id], (err) => {
-            if (err) reject(err);
+            if (err) return reject(err);
             resolve();
           });
         });

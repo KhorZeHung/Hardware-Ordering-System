@@ -52,9 +52,37 @@ const Quotation = () => {
     navigate(des);
   };
 
+  const duplciateQuotationRequest = async (id) => {
+    console.log(APIGateway + quoteData.tableData.endPoint + `/duplicate/${id}`);
+    await axios
+      .get(APIGateway + quoteData.tableData.endPoint + `/duplicate/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        const message = res.data.message;
+        const quote_id = res.data.data.quote_id;
+        setSnackbar({
+          severity: "success",
+          message: message,
+          open: true,
+        });
+        setTimeout(() => {
+          navigate(`/quotation/${quote_id}`);
+        }, 2000);
+      })
+      .catch((err) => {
+        const message = err.response.data.message || err.message;
+        setSnackbar({ open: true, message: message, severity: "error" });
+      });
+  };
+
   quoteData.tableData.checkBox.handlerArray[0].onClickHandler =
     editQuotationRequest;
   quoteData.tableData.checkBox.handlerArray[1].onClickHandler =
+    duplciateQuotationRequest;
+  quoteData.tableData.checkBox.handlerArray[2].onClickHandler =
     deleteQuotationHandler;
   return (
     <div className="contentMainBody">

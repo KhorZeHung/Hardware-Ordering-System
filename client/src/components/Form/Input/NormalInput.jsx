@@ -39,16 +39,16 @@ const NormalInput = ({ datas, formHandler }) => {
       returnTxt += " 1 special character";
     }
 
-    if (returnTxt !== "Atleast ") {
+    if (returnTxt !== "Atleast") {
       inputRequirement.current.innerHTML = returnTxt;
     } else {
+      inputRequirement.current.classList.remove("fail");
       inputRequirement.current.classList.add("success");
       inputRequirement.current.innerHTML = "Valid Password";
     }
   };
 
   const handleCopy = (event) => {
-    event.preventDefault();
     if (event.target.readOnly) {
       navigator.clipboard.writeText(event.target.value);
       setSnackbar({ open: true, message: "copied", serverity: "success" });

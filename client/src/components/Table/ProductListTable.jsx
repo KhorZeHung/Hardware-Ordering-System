@@ -119,7 +119,7 @@ const ProductListTable = ({
                         name: description,
                       })
                     ),
-                    disable: { disable },
+                    disable: disable,
                     defaultValue: productDescription[
                       String(product.product_id)
                     ].map((_, index) => index),

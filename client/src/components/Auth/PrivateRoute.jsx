@@ -11,6 +11,10 @@ const PrivateRoute = ({ children, path }) => {
       path === "dashboard" ||
       path === "profile");
 
+  if (!isLoggedIn) {
+    sessionStorage.setItem("intendedUrl", window.location.href);
+  }
+
   return isLoggedIn && allowAccess ? (
     children
   ) : (

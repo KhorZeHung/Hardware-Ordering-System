@@ -103,6 +103,33 @@ export const dashBoardData = {
       },
     ],
   },
+  filterForm: {
+    submitValue: "filter",
+    endPoint: "/dashboard",
+    formSize: "xs",
+    inputLists: [
+      {
+        type: "date",
+        name: "startDate",
+        label: "start date",
+        required: false,
+        defaultValue: new Date(
+          new Date().getFullYear(),
+          new Date().getMonth() === 0 ? 11 : new Date().getMonth() - 1,
+          2
+        )
+          .toISOString()
+          .substring(0, 10),
+      },
+      {
+        type: "number",
+        name: "duration",
+        label: "duration (months)",
+        required: false,
+        defaultValue: 1,
+      },
+    ],
+  },
 };
 
 export const contactData = {
@@ -330,7 +357,8 @@ export const orderData = {
   orderRecordForm: {
     title: "edit order",
     submitValue: "save",
-    endPoint: "/order/edit",
+    endPoint: "/order/edit/",
+    formSize: "xs",
     grid: false,
     inputLists: [
       {
@@ -345,10 +373,6 @@ export const orderData = {
           { name: "Rejected", value: "Rejected" },
           { name: "Problematic", value: "Problematic" },
         ],
-      },
-      {
-        type: "hidden",
-        name: "project_order_id",
       },
     ],
   },
@@ -388,6 +412,10 @@ export const orderData = {
         type: "hidden",
         name: "project_id",
       },
+      {
+        type: "hidden",
+        name: "order_id",
+      },
     ],
   },
 };
@@ -400,11 +428,12 @@ export const quoteData = {
       handlerArray: [
         {
           name: "edit",
-          endPoint: "/edit",
+        },
+        {
+          name: "duplicate",
         },
         {
           name: "delete",
-          endPoint: "/delete",
         },
       ],
     },
@@ -513,6 +542,31 @@ export const projectData = {
       disable: true,
     },
   ],
+  proceedToDataForm: {
+    submitValue: "continue",
+    endPoint: "/order/edit/",
+    formSize: "sm",
+    grid: false,
+    inputLists: [
+      {
+        type: "date",
+        name: "project_order_delivery_date",
+        label: "Delivery Date",
+      },
+      {
+        type: "textarea",
+        name: "project_order_remark",
+        label: "Remark",
+        placeholder: "Anything to remark in this order?",
+        required: false,
+      },
+      {
+        type: "hidden",
+        name: "project_order_status",
+        defaultValue: "Proceed to order",
+      },
+    ],
+  },
 };
 export const userData = {
   tableData: {

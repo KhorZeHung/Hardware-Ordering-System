@@ -7,6 +7,7 @@ import { setCookie } from "../../utils/cookie";
 import axios from "axios";
 import LoadableBtn from "../../components/Form/Button/LoadableBtn";
 import { SnackbarContext } from "../../components/Snackbar/SnackBarProvidor";
+import logo from "../../assets/logo.png";
 import "../index.css";
 
 const Login = () => {
@@ -40,8 +41,10 @@ const Login = () => {
           open: true,
         });
         setTimeout(() => {
-          window.location = "../";
-        }, 2000);
+          var newLocation = sessionStorage.getItem("intendedUrl");
+          sessionStorage.removeItem("intendedUrl");
+          window.location = newLocation || "../";
+        }, 500);
       })
       .catch((err) => {
         const message =
@@ -58,7 +61,7 @@ const Login = () => {
       <div className="center centerFormContainer">
         <div className="formBody">
           <form method="post" name="loginForm" onSubmit={submitHandler}>
-            <p className="title">login</p>
+            <img src={logo} alt="reno_tech_logo" />
             {constructInput(loginData, null)}
             <Link to="../forgot-password" target="_self">
               forgot password?

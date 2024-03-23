@@ -6,6 +6,28 @@ const { getProductInfo } = require("../function/getInfo");
 const db = require("../function/conn");
 const { createQuotation } = require("../function/pdfFactory");
 
+const generateQuotePK = (req, res, next) => {
+  const { user_id } = req.user;
+  const selectQuery =
+    "SELECT quote_id FROM quotation WHERE pic_id = ? ORDER BY created_at DESC LIMIT 1;";
+
+  db.query(selectQuery, [user_id], (err, result) => {
+    if (err)
+      return res.status(500).json({ message: "Something went wrong " + err });
+
+    let newQuoteId = user_id;
+    if (result.length !== 0) {
+      const { quote_id } = result[0];
+      const incrementPart = parseInt(quote_id.slice(6)) + 1;
+      newQuoteId += incrementPart.toString().padStart(3, "0");
+    } else {
+      newQuoteId += "001";
+    }
+    req.newQuoteId = newQuoteId;
+    next();
+  });
+};
+
 //create new quotation
 router.post(
   "/add",
@@ -121,27 +143,7 @@ router.post(
         res.status(400).json({ message: err.message });
       });
   },
-  (req, res, next) => {
-    const { user_id } = req.user;
-    const selectQuery =
-      "SELECT quote_id FROM quotation WHERE pic_id = ? ORDER BY created_at DESC LIMIT 1;";
-
-    db.query(selectQuery, [user_id], (err, result) => {
-      if (err)
-        return res.status(500).json({ message: "Something went wrong " + err });
-
-      let newQuoteId = user_id;
-      if (result.length !== 0) {
-        const { quote_id } = result[0];
-        const incrementPart = parseInt(quote_id.slice(6)) + 1;
-        newQuoteId += incrementPart.toString().padStart(3, "0");
-      } else {
-        newQuoteId += "001";
-      }
-      req.newQuoteId = newQuoteId;
-      next();
-    });
-  },
+  generateQuotePK,
   (req, res) => {
     const {
       quote_discount,
@@ -190,10 +192,74 @@ router.post(
 
 //get all quotation info, with filter function
 router.get("", validateJWT, isManager, (req, res) => {
-  const { searchterm, filteroption } = req.query;
+  const { searchterm, filteroption, sort, desc, page } = req.query;
   const { user_id } = req.user;
 
   let selectQuery = `SELECT quote_id AS "id", quote_name AS 'quotation name', quote_client_name AS "client name", quote_client_contact AS "contact", quote_sub_total AS "total charge", quote_address AS location FROM quotation WHERE pic_id = ? `;
+  let queryParams = [user_id];
+
+  if (searchterm) {
+    selectQuery += ` AND (quote_name LIKE ?
+      OR quote_client_name LIKE ?
+      OR quote_id LIKE ?
+      OR quote_client_contact LIKE ?
+      OR quote_address LIKE ?)`;
+    queryParams.push(
+      `%${searchterm}%`,
+      `%${searchterm}%`,
+      `%${searchterm}%`,
+      `%${searchterm}%`,
+      `%${searchterm}%`
+    );
+  }
+
+  if (filteroption) {
+    selectQuery += " AND quote_prop_type = ?";
+    queryParams.push(filteroption);
+  }
+
+  if (sort) {
+    const sortColumnNameMap = {
+      id: "quote_id",
+      "quotation name": "quote_name",
+      "client name": "quote_client_name",
+      contact: "quote_client_contact",
+      "total charge": "quote_sub_total",
+      location: "quote_address",
+    };
+
+    if (sortColumnNameMap[sort]) {
+      selectQuery += ` ORDER BY ${sortColumnNameMap[sort]} ${
+        desc ? "DESC" : "ASC"
+      }`;
+    }
+  }
+
+  // if (page) {
+  //   const limit = 25 * page;
+  //   selectQuery += " LIMIT " + limit + ";";
+  // }
+
+  db.query(selectQuery, queryParams, (err, results) => {
+    if (err)
+      return res.status(500).json({ message: "Something went wrong" + err });
+
+    const thead = results.length > 0 ? Object.keys(results[0]) : [];
+    const responseBody = {
+      thead: thead,
+      tbody: results,
+    };
+    return res.status(200).json({ data: responseBody });
+  });
+});
+//get all quotation info, with filter function
+router.get("/options", validateJWT, isManager, (req, res) => {
+  const { searchterm, filteroption } = req.query;
+  const { user_id } = req.user;
+
+  let selectQuery = `SELECT quote_id AS 'id', quote_name AS 'quotation name', quote_client_name AS "client name", quote_client_contact AS "contact", quote_sub_total AS "total charge" FROM quotation WHERE pic_id = ? AND quote_id NOT IN (
+    SELECT project_id
+    FROM project)`;
   let queryParams = [user_id];
 
   if (searchterm) {
@@ -248,6 +314,39 @@ router.get("/:quote_id", validateJWT, isManager, (req, res) => {
     return res.status(200).json({ data: returnObj });
   });
 });
+
+// duplicate a quotation
+router.get(
+  "/duplicate/:quote_id",
+  validateJWT,
+  isManager,
+  generateQuotePK,
+  (req, res) => {
+    const { quote_id } = req.params;
+    const { newQuoteId } = req;
+
+    const duplicateQuery = `INSERT INTO quotation (quote_id, quote_name, quote_client_name, quote_client_contact, quote_address, pic_id, quote_product_lists, quote_sub_total, quote_prop_type, quote_discount)
+        SELECT ?, quote_name, quote_client_name, quote_client_contact, quote_address, pic_id, quote_product_lists, quote_sub_total, quote_prop_type, quote_discount
+        FROM quotation
+        WHERE quote_id = ?;`;
+
+    db.query(duplicateQuery, [newQuoteId, quote_id], (err, result) => {
+      if (err)
+        return res.status(500).json({ message: "Something went wrong " + err });
+
+      if (result.affectedRows !== 1) {
+        return res
+          .status(500)
+          .json({ message: "No such quotation / duplicate failed" });
+      }
+
+      return res.status(200).json({
+        data: { quote_id: newQuoteId },
+        message: "Duplicate successful, redirect in 2 seconds",
+      });
+    });
+  }
+);
 
 //update specific quotation
 router.post(

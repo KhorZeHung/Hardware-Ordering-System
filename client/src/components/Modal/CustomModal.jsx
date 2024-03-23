@@ -12,7 +12,7 @@ const CustomModal = (props) => {
       open={open}
       onClose={closeFunc}
       scroll="body"
-      maxWidth="md"
+      maxWidth= {formStructure.formSize || "md"}
       fullWidth={true}>
       {formStructure && (
         <FormBody

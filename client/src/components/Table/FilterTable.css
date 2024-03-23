@@ -44,9 +44,7 @@
 }
 
 .tableSec {
-  max-height: 90vh;
   min-height: 300px;
-  margin: 10px 0;
   overflow: auto;
 }
 
@@ -55,27 +53,27 @@
   margin: 0 auto;
   table-layout: auto;
   border-collapse: collapse;
+  margin-bottom: 2rem !important;
+}
 
-  tr {
-    height: 40px;
-    cursor: pointer;
-  }
+.tableSec thead th {
+  position: sticky;
+  top: 0;
+  background-color: var(--primary-color-5);
+  color: white;
+}
+.tableSec tr {
+  height: 40px;
+  cursor: pointer;
+}
 
-  tr:nth-child(odd) {
-    background-color: var(--bckgrd-2);
-  }
+.tableSec tr:nth-child(odd) {
+  background-color: var(--bckgrd-2);
+}
 
-  tbody tr:nth-child(even),
-  tr:hover {
-    background-color: var(--bckgrd-3);
-  }
-
-  thead th {
-    position: sticky;
-    top: 0;
-    background-color: var(--primary-color-5);
-    color: white;
-  }
+.tableSec tbody tr:nth-child(even),
+.tableSec tr:hover {
+  background-color: var(--bckgrd-3);
 }
 
 .tableSec th,
@@ -100,18 +98,45 @@
   cursor: pointer;
   word-wrap: unset;
   user-select: none;
+}
+.tableAction span:not(:last-child) {
+  padding-right: 10px;
+}
 
-  span:not(:last-child) {
-    padding-right: 10px;
-  }
-
-  span.delete {
-    color: rgb(217, 13, 13);
-  }
+.tableAction span.delete {
+  color: rgb(217, 13, 13);
 }
 
 .deleteRowIcon {
   color: rgb(217, 13, 13);
   user-select: none;
   cursor: pointer;
+}
+
+.sortSign {
+  font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 24;
+  font-size: 0.7rem;
+  padding: 0 7px;
+}
+
+.desc {
+  transform: rotate(180deg);
+}
+
+.tableSec .pageControl {
+  display: flex;
+  justify-content: flex-end;
+  margin: -1rem 0 5rem auto;
+  max-width: 200px;
+}
+
+.tableSec .pageControl span {
+  color: blue;
+  font-weight: 600;
+  font-size: 13px;
+  user-select: none;
+  cursor: pointer;
+  height: 20px;
+  line-height: 20px;
+  margin: 0 10px;
 }

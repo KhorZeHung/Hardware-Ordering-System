@@ -1,19 +1,41 @@
 import React, { useContext, useState, useEffect } from "react";
 import "./ReportCard.css";
-import { APIGateway } from "../../data";
+import { APIGateway, dashBoardData } from "../../data";
 import TableWithSmlCard from "../Table/TableWithSmlCard";
 import axios from "axios";
 import { getCookie } from "../../utils/cookie";
 import { SnackbarContext } from "../Snackbar/SnackBarProvidor";
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, Dialog } from "@mui/material";
+import { constructInput } from "../Form/FormBody";
+import "../Form/FormBody.css";
 
 const ReportCard = () => {
   const [subPages, setSubPages] = useState("marketing");
   const [dashBoardInfo, setDashBoardInfo] = useState({});
+  const [modalOpen, setModalOpen] = useState(false);
+  const [filterValue, setFilterValue] = useState({});
   const { setSnackbar } = useContext(SnackbarContext);
+
   useEffect(() => {
+    fetchData();
+
+    return () => {};
+    // eslint-disable-next-line
+  }, [setSnackbar]);
+
+  const fetchData = () => {
     const token = getCookie("token");
-    const url = APIGateway + "/dashboard";
+    let url = APIGateway + "/dashboard";
+    if (Object.keys(filterValue).length !== 0) {
+      Object.entries(filterValue).forEach(([key, value], index) => {
+        if (index === 0) {
+          url += "?";
+        } else {
+          url += "&";
+        }
+        url += `${key}=${value}`;
+      });
+    }
     axios
       .get(url, {
         headers: {
@@ -22,6 +44,7 @@ const ReportCard = () => {
       })
       .then((res) => {
         const { data } = res.data;
+        console.log(data);
         setDashBoardInfo(data);
       })
       .catch((err) => {
@@ -29,10 +52,19 @@ const ReportCard = () => {
         console.log(err.message);
         setSnackbar({ open: true, message: message, severity: "error" });
       });
+  };
 
-    return () => {};
-  }, [setSnackbar]);
+  const inputHandler = (e) => {
+    const value = e.target.value;
+    const name = e.target.name;
+    setFilterValue((prev) => ({ ...prev, [name]: value }));
+  };
 
+  const updateFilterValue = () => {
+    setModalOpen(false);
+    fetchData();
+  };
+  console.log(filterValue);
   return (
     <>
       <div id="reportSec">
@@ -48,14 +80,9 @@ const ReportCard = () => {
               </li>
             ))}
           </ul>
-          {/* <input type="date" name="start_date" id="start_date" />
-          <select name="duration" id="duration">
-            <option value="1">1 month</option>
-            <option value="3">3 month</option>
-            <option value="6">6 month</option>
-            <option value="9">9 month</option>
-            <option value="12">1 years</option>
-          </select> */}
+          <div className="filterSec">
+            <button onClick={() => setModalOpen(true)}>filter</button>
+          </div>
           <div className="content center">
             {!dashBoardInfo[subPages] ? (
               <div
@@ -69,6 +96,25 @@ const ReportCard = () => {
           </div>
         </div>
       </div>
+      <Dialog
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        scroll="body"
+        maxWidth={"xs"}>
+        <div className="formBody">
+          <div className={`formInputLists`}>
+            {dashBoardData.filterForm.inputLists &&
+              constructInput(
+                dashBoardData.filterForm.inputLists,
+                inputHandler,
+                null
+              )}
+          </div>
+          <div className="formAction">
+            <button onClick={updateFilterValue}>filter</button>
+          </div>
+        </div>
+      </Dialog>
     </>
   );
 };

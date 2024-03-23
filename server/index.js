@@ -7,7 +7,7 @@ const cors = require("cors");
 //variable part
 var env = process.env;
 var port = env.PORT || 8080;
-var ipAddress = env.IPADDRESS || "192.168.0.194"; // Specify the IP address here
+var ipAddress = env.IPADDRESS || "192.168.1.109";
 
 //Here we are configuring express to use body-parser as middle-ware.
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -42,3 +42,8 @@ app.listen(port, (err) => {
     return console.log("error : ", err);
   }
 });
+// app.listen(port, ipAddress, (err) => {
+//   if (err) {
+//     return console.log("error : ", err);
+//   }
+// });

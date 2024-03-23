@@ -2,6 +2,7 @@ import React from "react";
 import Chart from "react-apexcharts";
 
 const DonutChart = ({ datas }) => {
+  const { labels, data } = datas;
   const chartInfo = {
     options: {
       dataLabels: {
@@ -17,14 +18,14 @@ const DonutChart = ({ datas }) => {
         "#27413e",
         "#1a2b2a",
       ],
-      labels: ["< 100k", "100k - 200k", "200k - 400k", "> 400k"],
+      labels: labels,
       legend: {
         fontSize: "9px",
         horizontalAlign: "right",
         verticalAlign: "middle",
       },
     },
-    series: datas,
+    series: data,
   };
   return (
     <Chart

@@ -32,7 +32,7 @@ router.post(
   (req, res, next) => {
     const {
       account_status_description,
-      isDebit,
+      isDebit = false,
       amount,
       project_id,
       account_status_date,
@@ -75,13 +75,30 @@ router.post(
       }
     );
   },
-  (req, res) => {
+  (req, res, next) => {
     const { isDebit, amount, project_id } = req.body;
     if (isDebit) {
       const updateQuery =
         "UPDATE project SET project_outstanding = project_outstanding - ? WHERE project_id = ?;";
 
       db.query(updateQuery, [amount, project_id], (err) => {
+        if (err)
+          return res
+            .status(500)
+            .json({ message: "Something went wrong " + err });
+        next();
+      });
+    } else {
+      next();
+    }
+  },
+  (req, res) => {
+    const { order_id, amount } = req.body;
+    if (order_id) {
+      const updateQuery =
+        "UPDATE project_order SET project_order_total_paid = project_order_total_paid + ?, project_order_status = CASE WHEN project_order_total_paid + ? >= project_order_subtotal THEN 'Paid' ELSE project_order_status END WHERE project_order_id = ?;";
+
+      db.query(updateQuery, [amount, amount, order_id], (err) => {
         if (err)
           return res
             .status(500)

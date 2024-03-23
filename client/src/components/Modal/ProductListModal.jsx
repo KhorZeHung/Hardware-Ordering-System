@@ -13,11 +13,12 @@ const ProductListModal = (props) => {
     searchTerm: null,
     filterOption: null,
   });
-  const { productInfo, productBySupplier, productDescription } =
+  const { productInfo, productByCategory, productDescription } =
     useProductInfo();
   const searchTermRef = useRef();
   const supplierInfo = useSupplierInfo();
   const oriTableData = useRef();
+  const categoryInfo = JSON.parse(localStorage.getItem("categoryInfo"));
 
   useEffect(() => {
     if (defaultValue.length > 0) setCheckedBox(defaultValue);
@@ -91,14 +92,14 @@ const ProductListModal = (props) => {
     setFilterValue((prev) => ({ ...prev, searchTerm: checkValue }));
   };
 
-  const filterHander = (e) => {
+  const filterHandler = (e) => {
     const value = String(e.target.value).toLowerCase();
     if (value === "all") {
       setTableData(oriTableData.current);
 
       setFilterValue((prev) => ({ ...prev, filterOption: null }));
     } else {
-      var newTableData = productBySupplier[value].map((id) => {
+      var newTableData = productByCategory[value].map((id) => {
         return productInfo[id];
       });
       if (filterValue.searchTerm) {
@@ -139,18 +140,16 @@ const ProductListModal = (props) => {
                 <select
                   name="tableFilter"
                   style={{ minWidth: "50px" }}
-                  onChange={filterHander}>
+                  onChange={filterHandler}>
                   <option value="all">all</option>
-                  {/* {supplierInfo &&
-                    supplierInfo.map((value) => {
+                  {categoryInfo &&
+                    Object.entries(categoryInfo).map(([key, value]) => {
                       return (
-                        <option
-                          key={`option-${value.name}`}
-                          value={value.value}>
+                        <option key={`option-${value.name}`} value={value.id}>
                           {value.name}
                         </option>
                       );
-                    })} */}
+                    })}
                 </select>
               </>
             }

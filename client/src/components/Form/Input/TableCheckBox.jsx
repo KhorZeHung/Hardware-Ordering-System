@@ -11,6 +11,7 @@ const TableCheckBox = ({ datas, formHandler }) => {
     defaultValue = [],
     tm = true,
   } = datas;
+
   const [checkedBox, setCheckedBox] = useState(
     defaultValue.map((val) => String(val))
   );
@@ -47,8 +48,6 @@ const TableCheckBox = ({ datas, formHandler }) => {
       }
       return null;
     });
-
-    console.log(newText.filter(Boolean).join(", "));
     input.current.value = newText.filter(Boolean).join(", ");
     setCheckedBox(newCheckedBoxArray);
     formHandler(e, newCheckedBoxArray, name);
@@ -87,6 +86,7 @@ const TableCheckBox = ({ datas, formHandler }) => {
                   type="checkbox"
                   name={name}
                   value={String(option.value)}
+                  disabled={disable}
                   onChange={checkBoxHandler}
                   checked={checkedBox.includes(String(option.value))}
                 />

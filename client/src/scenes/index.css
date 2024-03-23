@@ -56,57 +56,70 @@
 }
 
 .centerFormContainer {
-  height: 100vh;
+  min-height: 100vh;
   width: 100vw;
   background-color: var(--bckgrd-3);
+  position: relative;
+}
+.prevPageBtn {
+  position: absolute;
+  top: 10px;
+  left: 30px;
+}
 
-  .pageLink {
-    font-size: 0.7rem;
-    cursor: pointer;
+.prevPageBtn span {
+  color: var(--primary-color-6);
+  user-select: none;
+  cursor: pointer;
+}
+.centerFormContainer .pageLink {
+  font-size: 0.7rem;
+  cursor: pointer;
 
-    &.onPages {
-      color: var(--primary-color-8);
-      font-weight: bold;
-    }
-  }
-
-  .formBody {
-    max-width: 400px;
-    max-height: 600px;
-    box-shadow: var(--box-shadow-1);
-    border-radius: 10px;
-  }
-
-  a {
-    margin: 10px;
-    color: navy;
-    font-size: 0.7rem;
-    display: block;
+  &.onPages {
+    color: var(--primary-color-8);
+    font-weight: bold;
   }
 }
 
-.projectInfo {
-  .userOption {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
+.centerFormContainer .formBody {
+  max-width: 400px;
+  max-height: 600px;
+  box-shadow: var(--box-shadow-1);
+  border-radius: 10px;
+}
 
-    p {
-      padding: 5px 10px;
-      border-bottom: 2px solid transparent;
-      user-select: none;
-      cursor: pointer;
+.centerFormContainer .formBody img {
+  width: 50%;
+  display: block;
+  margin: 0 auto;
+}
 
-      &:not(:last-child) {
-        margin-right: 20px;
-      }
+.centerFormContainer a {
+  margin: 10px;
+  color: navy;
+  font-size: 0.7rem;
+  display: block;
+}
 
-      &.selected {
-        border-color: black;
-      }
-    }
-  }
+.projectInfo .userOption {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+.projectInfo p {
+  padding: 5px 10px;
+  border-bottom: 2px solid transparent;
+  user-select: none;
+  cursor: pointer;
+}
+.projectInfo p:not(:last-child) {
+  margin-right: 20px;
+}
+
+.projectInfo p.selected {
+  border-color: black;
 }
 
 .materialSummary {
@@ -115,53 +128,39 @@
   align-items: center;
   height: 60px;
   margin: 10px;
-
-  table {
-    tr {
-      text-align: right;
-      color: var(--primary-color-6);
-      font-size: 12px;
-
-      td:last-child {
-        padding: 5px 0 5px 20px;
-      }
-    }
-  }
+}
+.materialSummary table tr {
+  text-align: right;
+  color: var(--primary-color-6);
+  font-size: 12px;
+}
+.materialSummary td:last-child {
+  padding: 5px 0 5px 20px;
 }
 
 .orderInfo {
-  .orderTable,
-  .supplierTable {
-    border-collapse: collapse;
-    text-align: center;
-    margin: 40px auto 20px;
-    width: 80%;
-    box-shadow: var(--box-shadow-1);
+  position: relative;
+  margin: 0;
+}
+.orderInfo .orderTable,
+.orderInfo .supplierTable {
+  border-collapse: collapse;
+  text-align: center;
+  margin: 40px auto;
+  width: 80%;
+  box-shadow: var(--box-shadow-1);
+}
+.orderInfo td,
+.orderInfo th {
+  padding: 10px;
+}
 
-    td,
-    th {
-      padding: 10px;
-    }
+.orderInfo th {
+  background-color: var(--primary-color-6);
+  color: white;
+}
 
-    th {
-      background-color: var(--primary-color-6);
-      color: white;
-      width: 30%;
-    }
-
-    td:hover {
-      background-color: var(--bckgrd-3);
-    }
-  }
-
-  .summaryTable {
-    font-size: 12px;
-    width: 80%;
-    padding-left: 60%;
-    margin: 0 auto;
-
-    tr {
-      height: 24px;
-    }
-  }
+.orderInfo td:hover,
+.orderInfo td:active {
+  background-color: var(--bckgrd-3);
 }

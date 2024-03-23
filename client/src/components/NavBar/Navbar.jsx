@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { Outlet, Link, NavLink } from "react-router-dom";
-import "./Navbar.css";
 import { getCookie, deleteCookie } from "../../utils/cookie";
 import { allowAccessLink } from "../../utils/allowAccessLink";
+import logo from "../../assets/logo.png";
+import "./Navbar.css";
 
 const Navbar = () => {
   const [openNavBar, setOpenNavBar] = useState(false);
@@ -22,16 +23,16 @@ const Navbar = () => {
     window.location.reload();
   };
 
-  
   return (
     isTokenExist() && (
       <>
         <div className="spaceBetween navBar">
           <div>
             <Link to="/" id="logo">
-              LOGO
+              <img src={logo} alt="reno_tech_logo" />
             </Link>
           </div>
+          <div id="google_translate_element"></div>
           <div
             className={`hamburger ${openNavBar ? "open" : ""}`}
             onClick={navBarHandler}>

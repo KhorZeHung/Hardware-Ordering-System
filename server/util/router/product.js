@@ -92,8 +92,7 @@ router.get(
   "",
   validateJWT,
   (req, res, next) => {
-    const searchterm = req.query.searchterm || "";
-    const filterOption = req.query.filteroption || "";
+    const { searchterm, filteroption, page, sort, desc } = req.query;
 
     let selectQuery = `SELECT p.product_id AS 'id', p.product_name AS 'name', p.product_unit_price AS 'unit price (RM)', p.product_category AS category, p.product_description AS 'description', s.supplier_cmp_name as supplier FROM product AS p INNER JOIN supplier AS s ON p.supplier_id = s.supplier_id`;
     let queryParams = [];
@@ -111,15 +110,34 @@ router.get(
       );
     }
 
-    if (filterOption) {
+    if (filteroption) {
       if (searchterm) selectQuery += " AND";
       else selectQuery += " WHERE";
 
       selectQuery += " product_category LIKE ?";
-      queryParams.push(`%${filterOption}%`);
+      queryParams.push(`%${filteroption}%`);
+    }
+    if (sort) {
+      const sortColumnNameMap = {
+        id: "p.product_id",
+        name: "p.product_name",
+        "unit price (RM)": "p.product_unit_price",
+        category: "p.product_category",
+        description: "p.product_description",
+        supplier: "s.supplier_cmp_name",
+      };
+
+      if (sortColumnNameMap[sort]) {
+        selectQuery += ` ORDER BY ${sortColumnNameMap[sort]} ${
+          desc ? "DESC" : "ASC"
+        }`;
+      }
     }
 
-    selectQuery += " ORDER BY product_id DESC;";
+    // if (page) {
+    //   const limit = 25 * page;
+    //   selectQuery += " LIMIT " + limit + ";";
+    // }
 
     db.query(selectQuery, queryParams, (err, results) => {
       if (err)

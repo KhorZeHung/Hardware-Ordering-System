@@ -15,9 +15,14 @@
 }
 
 #logo {
-  padding: 10px;
-  color: var(--primary-color-4);
+  padding: 10px 0 10px 20px;
   cursor: pointer;
+  width: 120px;
+  display: block;
+}
+
+#logo img {
+  width: 100%;
 }
 
 .navBar li {

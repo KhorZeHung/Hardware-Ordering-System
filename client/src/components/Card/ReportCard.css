@@ -44,3 +44,16 @@
   min-height: 300px;
   flex-direction: column;
 }
+
+#reportSec .filterSec {
+  display: flex;
+  width: 95%;
+  flex-direction: row;
+  justify-content: flex-end;
+  margin-top: 0.5rem;
+}
+
+#reportSec .filterSec button {
+  border-radius: 2px;
+  box-shadow: none;
+}

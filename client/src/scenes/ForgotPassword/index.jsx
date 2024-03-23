@@ -8,6 +8,8 @@ import { forgotPasswordData, APIGateway } from "../../data";
 import LoadableBtn from "../../components/Form/Button/LoadableBtn";
 import axios from "axios";
 import { SnackbarContext } from "../../components/Snackbar/SnackBarProvidor";
+import logo from "../../assets/logo.png";
+import "../index.css";
 
 const ForgotPassword = () => {
   const [onPages, setOnPages] = useState(1);
@@ -31,7 +33,7 @@ const ForgotPassword = () => {
       .post(APIGateway + "/user/forgot-password/" + onPages, formData)
       .then((res) => {
         console.log(res);
-        const message = res.data;
+        const { message } = res.data;
         setSnackbar({ open: true, message: message, severity: "success" });
 
         setTimeout(() => {
@@ -43,7 +45,7 @@ const ForgotPassword = () => {
         }, 2000);
       })
       .catch((err) => {
-        const message = err.response.data || err.message;
+        const message = err.response.data.message || "Something went wrong";
         console.log(err);
         setSnackbar({ open: true, message: message, severity: "error" });
       })
@@ -64,12 +66,23 @@ const ForgotPassword = () => {
 
   return (
     <div className="center centerFormContainer">
+      <div className="prevPageBtn">
+        <span
+          className="material-symbols-outlined"
+          onClick={() => navigate("./login")}>
+          arrow_back
+        </span>
+      </div>
       <div>
         <form
           className="formBody"
           onSubmit={forgotPasswordHandler}
           key={onPages}
           style={{ minWidth: "350px" }}>
+          <img
+            src={logo}
+            alt="reno_tech_logo"
+          />
           <div className="center">
             <Breadcrumbs
               separator={<NavigateNextIcon fontSize="small" />}

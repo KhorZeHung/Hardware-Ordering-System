@@ -6,8 +6,13 @@ require("dotenv").config();
 //function to get customer info
 function getUserInfo(req, res, next) {
   const { user_email } = req.body;
+  if (!user_email)
+    return res
+      .status(400)
+      .json({ message: "Please provide email for validation" });
+  const trimEmail = user_email.trim();
   const query = `SELECT * FROM \`user\` WHERE user_email = ?`;
-  db.query(query, [user_email], (err, result) => {
+  db.query(query, [trimEmail], (err, result) => {
     if (err) return res.status(500).json("Something went wrong " + err);
     req.mysqlRes = result;
     next();

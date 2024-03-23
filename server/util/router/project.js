@@ -3,6 +3,7 @@ const router = express.Router();
 const { validateJWT } = require("../function/validation");
 const { isManager } = require("../function/authorization");
 const { getProductInfo } = require("../function/getInfo");
+const { createOrderSpreadSheet } = require("../function/excelFactory");
 const db = require("../function/conn");
 
 //create new project
@@ -178,7 +179,7 @@ router.post(
 
 //get all project info, with filter function
 router.get("", validateJWT, (req, res) => {
-  const { searchterm, filteroption } = req.query;
+  const { searchterm, filteroption, sort, desc, page } = req.query;
 
   let selectQuery = `SELECT project_id AS "id", project_name AS 'project name', project_client_name AS "client name", project_client_contact AS "contact", project_grand_total AS "total charge", project_address AS location FROM project`;
   let queryParams = [];
@@ -186,7 +187,7 @@ router.get("", validateJWT, (req, res) => {
   if (searchterm) {
     selectQuery += ` WHERE (project_name LIKE ?
       OR project_client_name LIKE ?
-      OR project_client_phone LIKE ?
+      OR project_client_contact LIKE ?
       OR project_address LIKE ?)`;
     queryParams.push(
       `%${searchterm}%`,
@@ -201,7 +202,36 @@ router.get("", validateJWT, (req, res) => {
     queryParams.push(filteroption);
   }
 
-  selectQuery += " ORDER BY created_at DESC;";
+  const { user_authority, user_id } = req.user;
+
+  if (user_authority === 3) {
+    if (searchterm || filteroption) selectQuery += " AND";
+    else selectQuery += " WHERE";
+    selectQuery += "  manager_in_charge_id = ?";
+    queryParams.push(user_id);
+  }
+
+  if (sort) {
+    const sortColumnNameMap = {
+      id: "project_id",
+      "project name": "project_name",
+      "client name": "project_client_name",
+      contact: "project_client_contact",
+      "total charge": "project_grand_total",
+      location: "project_address",
+    };
+
+    if (sortColumnNameMap[sort]) {
+      selectQuery += ` ORDER BY ${sortColumnNameMap[sort]} ${
+        desc ? "DESC" : "ASC"
+      }`;
+    }
+  }
+  // if (page) {
+  //   const limit = 25 * page;
+  //   selectQuery += " LIMIT " + limit + ";";
+  // }
+
   db.query(selectQuery, queryParams, (err, results) => {
     if (err)
       return res.status(500).json({ message: "Something went wrong" + err });
@@ -292,6 +322,73 @@ router.get(
       });
     });
   }
+);
+
+router.get(
+  "/order-spreadsheet/:project_id",
+  validateJWT,
+  getProductInfo,
+  (req, res, next) => {
+    const { project_id } = req.params;
+    if (!project_id)
+      return res
+        .status(400)
+        .json({ message: "Project identification is not provided" });
+
+    const selectQuery = `SELECT p.project_order_product_lists, s.supplier_cmp_name FROM project_order AS p INNER JOIN supplier AS s ON p.supplier_id = s.supplier_id WHERE p.project_id = ?;`;
+    db.query(selectQuery, [project_id], (err, result) => {
+      if (err)
+        return res.status(500).json({ message: "Something went wrong " + err });
+      if (result.length === 0)
+        return res.status(400).json({ message: "Order not found / not exist" });
+
+      let returnObj = result;
+
+      const { productArray } = req;
+
+      let formatedProductArray = productArray.reduce((productObj, product) => {
+        const stringProductId = String(product.id);
+        productObj[stringProductId] = product;
+        return productObj;
+      }, {});
+
+      returnObj = returnObj.map((obj) => {
+        obj.project_order_product_lists = JSON.parse(
+          obj.project_order_product_lists
+        ).map((product) => {
+          const { product_id, product_name, unit_cost, total_quantity } =
+            product;
+          let returnProduct = [];
+
+          if (!product_id || !total_quantity || !unit_cost)
+            return res.status(400).json({ message: "Message is not complete" });
+
+          returnProduct.push(product_id);
+          returnProduct.push(
+            product_name || formatedProductArray[String(product_id)].name
+          );
+          returnProduct.push(parseFloat(unit_cost).toFixed(2));
+          returnProduct.push(parseInt(total_quantity));
+          returnProduct.push(
+            (parseInt(total_quantity) * parseFloat(unit_cost)).toFixed(2)
+          );
+          return returnProduct;
+        });
+        return obj;
+      });
+
+      req.excelData = returnObj;
+      req.excelHeader = [
+        "id",
+        "product/service name",
+        "unit price (RM)",
+        "quantity",
+        "subtotal",
+      ];
+      next();
+    });
+  },
+  createOrderSpreadSheet
 );
 
 module.exports = router;

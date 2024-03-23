@@ -58,7 +58,7 @@ const Project = () => {
         },
       ],
     },
-    endPoint: "/quote",
+    endPoint: "/quote/options",
   };
 
   const editProjectHandler = (id) => {

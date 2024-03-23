@@ -8,53 +8,50 @@
   padding: 1rem;
   box-sizing: border-box;
   border-radius: 10px;
+}
+/* Chrome, Safari, Edge, Opera */
+.formBody input::-webkit-outer-spin-button,
+.formBody input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
 
-  /* Chrome, Safari, Edge, Opera */
-  input::-webkit-outer-spin-button,
-  input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
+.formBody button:hover {
+  background-color: var(--primary-color-6);
+}
 
-  button:hover {
-    background-color: var(--primary-color-6);
-  }
+.formBody .addRoom {
+  display: block;
+  margin: 0 auto;
+  font-size: 1.5rem;
+  border-radius: 100%;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+}
 
-  .addRoom {
-    display: block;
-    margin: 0 auto;
-    font-size: 1.5rem;
-    border-radius: 100%;
-    padding: 0;
-    width: 30px;
-    height: 30px;
-  }
+.formBody .subTotalSec {
+  color: var(--primary-color-6);
+  margin-top: 30px;
+  display: flex;
+  justify-content: flex-end;
+  font-size: 0.9rem;
+}
+.formBody .subTotalSec input[type="number"] {
+  margin-left: 3px;
+  width: 60px;
+  padding: 5px;
+}
 
-  .subTotalSec {
-    color: var(--primary-color-6);
-    margin-top: 30px;
-    display: flex;
-    justify-content: flex-end;
-    font-size: 0.9rem;
+.formBody .subTotalSec tr {
+  height: 34px;
+}
+.formBody .subTotalSec tr td:first-child {
+  width: 150px;
+}
 
-    input[type="number"] {
-      margin-left: 3px;
-      width: 60px;
-      padding: 5px;
-    }
-
-    tr {
-      height: 34px;
-
-      td:first-child {
-        width: 150px;
-      }
-
-      &:last-child {
-        font-weight: 500;
-      }
-    }
-  }
+.formBody .subTotalSec tr :last-child {
+  font-weight: 500;
 }
 
 .formInputLists {
@@ -63,10 +60,9 @@
   gap: 1rem;
   max-width: 750px;
   margin: 0 auto;
-
-  &.grid {
-    grid-template-columns: repeat(2, minmax(300px, 1fr));
-  }
+}
+.formInputLists .grid {
+  grid-template-columns: repeat(2, minmax(300px, 1fr));
 }
 
 .formBody input[type="select"] {
@@ -107,16 +103,14 @@
   position: relative;
   background-color: inherit;
   margin-top: 20px;
-
-  .inputRequirement {
-    font-size: 0.7rem;
-    color: red;
-    margin-left: 0.3rem;
-
-    &.success {
-      color: green;
-    }
-  }
+}
+.formBody .normalInput .inputRequirement {
+  font-size: 0.7rem;
+  color: red;
+  margin-left: 0.3rem;
+}
+.formBody .normalInput .inputRequirement.success {
+  color: green !important;
 }
 
 .formBody .normalInput input:not([type="checkbox"]),
@@ -189,11 +183,11 @@
   overflow-y: auto;
   background-color: var(--bckgrd-2);
   box-shadow: var(--box-shadow-1);
-
-  &.show {
-    display: flex !important;
-    flex-direction: column;
-  }
+}
+.formBody .checkBoxList .scrollable.show {
+  display: flex !important;
+  flex-direction: column;
+  max-height: 250px;
 }
 
 .formBody .multiTxt .scrollable {
@@ -243,24 +237,23 @@
   list-style: none;
   white-space: nowrap;
   height: 50px;
+}
+.filesName ul {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
 
-  ul {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-
-    li {
-      display: inline-block;
-      position: relative;
-      margin: 0.5rem;
-      padding-right: 10px;
-      width: 90%;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      overflow-wrap: unset;
-    }
-  }
+.filesName ul li {
+  display: inline-block;
+  position: relative;
+  margin: 0.5rem;
+  padding-right: 10px;
+  width: 90%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  overflow-wrap: unset;
 }
 
 .descriptionList > li {
@@ -307,116 +300,109 @@
   height: 40px;
 }
 
-.formBody {
-  .mainBar {
-    background-color: var(--bckgrd-3);
-    box-shadow: var(--box-shadow-1);
-    box-sizing: border-box;
-    position: relative;
-    width: 100%;
-    color: var(--primary-color-5);
-    min-height: 50px;
-
-    .subTotal {
-      position: absolute;
-      top: 19px;
-      right: 80px;
-      font-size: 0.7rem;
-    }
-
-    .mainBarAction {
-      background: inherit;
-      position: absolute;
-      width: 26px;
-      aspect-ratio: 1/1;
-      border-radius: 40px;
-      line-height: 26px;
-      text-align: center;
-      top: 14px;
-      right: 40px;
-      cursor: pointer;
-      user-select: none;
-      font-size: 1rem;
-
-      &:hover {
-        background-color: rgb(161, 160, 160);
-      }
-    }
-
-    .actionMenu {
-      position: absolute;
-      font-size: 0.7rem;
-      background-color: var(--bckgrd-1);
-      box-shadow: var(--box-shadow-1);
-      top: 40px;
-      z-index: 9;
-      right: 50px;
-      border-radius: 4px;
-      display: none;
-
-      div {
-        height: 36px;
-        padding: 0 10px;
-        display: flex;
-        justify-content: center;
-        color: rgb(43, 45, 46);
-        cursor: pointer;
-
-        p {
-          display: inline;
-          line-height: 36px;
-        }
-
-        span {
-          font-size: 1rem;
-          padding-right: 4px;
-          line-height: 36px;
-        }
-
-        &:last-child {
-          color: red;
-        }
-
-        &:hover,
-        &:active {
-          background-color: rgb(161, 160, 160);
-        }
-      }
-    }
-    .secClose {
-      font-size: 1.5rem;
-      position: absolute;
-      right: 10px;
-      top: 15px;
-      cursor: pointer;
-      user-select: none;
-      transition: all 0.2s ease-in;
-    }
-
-    .rotate {
-      transform: rotate(180deg);
-    }
-
-    input[type="text"] {
-      font: inherit;
-      font-size: 1.2rem;
-      border: none;
-      background-color: inherit;
-      color: inherit;
-      margin: 0.5rem 1rem;
-      border-bottom: 1.5px solid transparent;
-      width: 40%;
-      max-width: 400px;
-
-      &:focus {
-        outline: none;
-        border-color: var(--primary-color-5);
-      }
-    }
-  }
+.formBody .mainBar {
+  background-color: var(--bckgrd-3);
+  box-shadow: var(--box-shadow-1);
+  box-sizing: border-box;
+  position: relative;
+  width: 100%;
+  color: var(--primary-color-5);
+  min-height: 50px;
+}
+.formBody .subTotal {
+  position: absolute;
+  top: 19px;
+  right: 80px;
+  font-size: 0.7rem;
 }
 
-.addProduct {
+.formBody .mainBarAction {
+  background: inherit;
+  position: absolute;
+  width: 26px;
+  aspect-ratio: 1/1;
+  border-radius: 40px;
+  line-height: 26px;
+  text-align: center;
+  top: 14px;
+  right: 40px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 1rem;
+}
+.formBody .mainBarAction:hover {
+  background-color: rgb(161, 160, 160);
+}
+
+.formBody .actionMenu {
+  position: absolute;
+  font-size: 0.7rem;
+  background-color: var(--bckgrd-1);
+  box-shadow: var(--box-shadow-1);
+  top: 40px;
+  z-index: 9;
+  right: 50px;
+  border-radius: 4px;
+  display: none;
+}
+.formBody .actionMenu div {
+  height: 36px;
+  padding: 0 10px;
+  display: flex;
+  justify-content: center;
+  color: rgb(43, 45, 46);
+  cursor: pointer;
+}
+.formBody .actionMenu div p {
+  display: inline;
+  line-height: 36px;
+}
+
+.formBody .actionMenu div span {
+  font-size: 1rem;
+  padding-right: 4px;
+  line-height: 36px;
+}
+
+.formBody .actionMenu div:last-child {
+  color: red;
+}
+
+.formBody .actionMenu div:hover,
+.formBody .actionMenu div:active {
+  background-color: rgb(161, 160, 160);
+}
+.formBody .secClose {
+  font-size: 1.5rem;
+  position: absolute;
+  right: 10px;
+  top: 15px;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease-in;
+}
+
+.formBody .rotate {
+  transform: rotate(180deg);
+}
+
+.formBody .mainBar input[type="text"] {
+  font: inherit;
+  font-size: 1.2rem;
+  border: none;
+  background-color: inherit;
+  color: inherit;
+  margin: 0.5rem 1rem;
+  border-bottom: 1.5px solid transparent;
+  width: 40%;
+  max-width: 400px;
+}
+.formBody .mainBar input[type="text"]:focus {
+  outline: none;
+  border-color: var(--primary-color-5);
+}
+
+.formBody .addProduct {
   background-color: var(--primary-color-4);
   color: var(--bckgrd-2);
   box-shadow: var(--box-shadow-1);
@@ -431,8 +417,8 @@
   margin: 20px auto 0;
 }
 
-.addProduct:hover,
-.addProduct:active {
+.formBody .addProduct:hover,
+.formBody .addProduct:active {
   background-color: var(--primary-color-5);
 }
 
@@ -443,106 +429,104 @@
   overflow: hidden;
   position: relative;
   transition: all 0.2s ease-in;
+}
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 600px;
+.formBody .barContent.open {
+  max-height: 500px;
+  overflow: auto !important;
+  padding: 10px 0;
+}
+.formBody .barContent table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px;
+}
 
-    thead {
-      background-color: var(--primary-color-5);
-      color: var(--bckgrd-3);
-      th {
-        padding: 0.5rem 0.2rem;
-        cursor: pointer;
-      }
-    }
+.formBody .barContent table thead {
+  background-color: var(--primary-color-5);
+  color: var(--bckgrd-3);
+}
+.formBody .barContent table th {
+  padding: 0.5rem 0.2rem;
+  cursor: pointer;
+}
 
-    tr {
-      height: 30px;
+.formBody .barContent table tr {
+  height: 30px;
+}
+.formBody .barContent table tr input[type="text"],
+.formBody .barContent table tr input[type="number"],
+.formBody .barContent table tr p {
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  overflow-wrap: unset;
+}
 
-      input[type="text"],
-      input[type="number"],
-      p {
-        font-size: 0.9rem;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        width: 100%;
-        overflow-wrap: unset;
-      }
+.formBody .barContent table tr input[type="text"] {
+  padding: 5px;
+  width: 80% !important;
+}
 
-      input[type="text"] {
-        padding: 5px;
-        width: 80% !important;
-      }
+.formBody .barContent table tr input[type="number"] {
+  border: none;
+  font-size: 0.9rem;
+  background-color: inherit;
+  width: 100px;
+  text-align: center;
+  color: inherit;
+}
 
-      input[type="number"] {
-        border: none;
-        font-size: 0.9rem;
-        background-color: inherit;
-        width: 100px;
-        text-align: center;
-        color: inherit;
-      }
+.formBody .barContent table tr input[type="number"]:focus {
+  outline: none;
+}
 
-      input[type="number"]:focus {
-        outline: none;
-      }
-    }
+.formBody .barContent table tr:not(:last-child) {
+  border-bottom: 1px solid var(--primary-color-5);
+}
 
-    tr:not(:last-child) {
-      border-bottom: 1px solid var(--primary-color-5);
-    }
+.formBody .barContent table td:not(:nth-child(2)) {
+  text-align: center;
+}
 
-    td:not(:nth-child(2)) {
-      text-align: center;
-    }
+.formBody .barContent .productListAction {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.formBody .barContent input[type="number"] {
+  outline: none;
+  background-color: inherit;
+  border: 1px solid var(--primary-color-5);
+  color: var(--primary-color-5);
+  border-radius: 3px;
+  width: 30px;
+  padding: 3px;
+  text-align: center;
+  margin: 0 5px;
+}
 
-    .productListAction {
-      display: flex;
-      align-items: center;
-      justify-content: center;
+.formBody .barContent button {
+  border-radius: 100%;
+  border: none;
+  background-color: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-align: center;
+  padding: 0;
+  box-shadow: none;
+}
 
-      input[type="number"] {
-        outline: none;
-        background-color: inherit;
-        border: 1px solid var(--primary-color-5);
-        color: var(--primary-color-5);
-        border-radius: 3px;
-        width: 30px;
-        padding: 3px;
-        text-align: center;
-        margin: 0 5px;
-      }
+.formBody .barContent button:active {
+  background-color: #999999;
+  transition: all 0.1s ease-in;
+}
 
-      button {
-        border-radius: 100%;
-        border: none;
-        background-color: inherit;
-        color: inherit;
-        cursor: pointer;
-        text-align: center;
-        padding: 0;
-        box-shadow: none;
-      }
-
-      button:active {
-        background-color: #999999;
-        transition: all 0.1s ease-in;
-      }
-    }
-  }
-
-  &.open {
-    max-height: 500px;
-    overflow: auto !important;
-    padding: 10px 0;
-  }
-  &.open .addProduct {
-    display: block;
-    bottom: 0px;
-  }
+.formBody .barContent.open .addProduct {
+  display: block;
+  bottom: 0px;
 }
 
 .orderStatus {
@@ -550,12 +534,11 @@
   color: rgb(255, 115, 0);
   padding-right: 10px;
   text-transform: capitalize;
+}
+.orderStatus .success {
+  color: green;
+}
 
-  &.success {
-    color: green;
-  }
-
-  &.failed {
-    color: red;
-  }
+.orderStatus .failed {
+  color: red;
 }

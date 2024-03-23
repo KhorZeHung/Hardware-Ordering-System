@@ -6,21 +6,20 @@ const db = require("../function/conn");
 
 const malaysiaTimezoneOffset = 8 * 60;
 const malaysiaDateTime = new Date(Date.now() + malaysiaTimezoneOffset * 60000);
-const currentMonth = malaysiaDateTime.getMonth() + 1;
+const currentMonth = malaysiaDateTime.getMonth();
 const currentYear = malaysiaDateTime.getFullYear();
 const previousMonth = currentMonth === 1 ? 12 : currentMonth - 1;
 const previousYear = currentMonth === 1 ? currentYear - 1 : currentYear;
-const lastDayOfPreviousMonth = new Date(previousYear, previousMonth, 0)
+const lastDayOfPreviousMonth = new Date(previousYear, previousMonth, 2)
   .toISOString()
   .split("T")[0];
 
 const getnewQuoteOverall = (req, res, next) => {
-  const { startDate = lastDayOfPreviousMonth, duration = 1 } = req.body;
+  const { startDate = lastDayOfPreviousMonth, duration = 1 } = req.query;
   const selectQuery = `SELECT COUNT(quote_id) AS new_quote, ROUND(AVG(quote_sub_total), 2) AS average_quote_sub_total 
   FROM quotation 
-  WHERE created_at BETWEEN DATE_SUB(?, INTERVAL ? MONTH) AND ?;`;
-  const queryParams = [startDate, duration, startDate];
-
+  WHERE created_at BETWEEN ? AND DATE_ADD(?, INTERVAL ? MONTH);`;
+  const queryParams = [startDate, startDate, duration];
   db.query(selectQuery, queryParams, (err, result) => {
     if (err)
       return res.status(500).json({ message: "Something went wrong " + err });
@@ -31,7 +30,7 @@ const getnewQuoteOverall = (req, res, next) => {
 };
 
 const getnewProjectOverall = (req, res, next) => {
-  const { startDate = lastDayOfPreviousMonth, duration = 1 } = req.body;
+  const { startDate = lastDayOfPreviousMonth, duration = 1 } = req.query;
   const selectQuery = `SELECT 
   COUNT(project_id) AS new_project, 
   ROUND(AVG(project_sub_total), 2) AS average_project_sub_total,
@@ -41,9 +40,9 @@ const getnewProjectOverall = (req, res, next) => {
 FROM 
   project 
 WHERE 
-  created_at BETWEEN DATE_SUB(?, INTERVAL ? MONTH) AND ?;
+  created_at BETWEEN ? AND DATE_ADD(?, INTERVAL ? MONTH);
 `;
-  const queryParams = [startDate, duration, startDate];
+  const queryParams = [startDate, startDate, duration];
 
   db.query(selectQuery, queryParams, (err, result) => {
     if (err)
@@ -55,17 +54,17 @@ WHERE
 };
 
 const getnewAccountOverall = (req, res, next) => {
-  const { startDate = lastDayOfPreviousMonth, duration = 1 } = req.body;
+  const { startDate = lastDayOfPreviousMonth, duration = 1 } = req.query;
   const selectQuery = `SELECT 
   COALESCE(SUM(CASE WHEN isDebit = 1 THEN amount ELSE 0 END), 0) AS debit_total,
   COALESCE(SUM(CASE WHEN isDebit = 0 THEN amount ELSE 0 END), 0) AS credit_total
 FROM 
   account_status 
 WHERE 
-  created_at BETWEEN DATE_SUB(?, INTERVAL ? MONTH) AND ?;
+  created_at BETWEEN ? AND DATE_ADD(?, INTERVAL ? MONTH);
 
       `;
-  const queryParams = [startDate, duration, startDate];
+  const queryParams = [startDate, startDate, duration];
 
   db.query(selectQuery, queryParams, (err, result) => {
     if (err)
@@ -113,44 +112,68 @@ const getAverageQuote = (req, res, next) => {
 };
 
 const getDonutChart = (req, res, next) => {
-  const { startDate = lastDayOfPreviousMonth, duration = 1 } = req.body;
+  const { startDate = lastDayOfPreviousMonth, duration = 1 } = req.query;
   let selectQuery = `SELECT 
-  SUM(CASE WHEN project_sub_total BETWEEN 0 AND 100000 THEN 1 ELSE 0 END) AS range_0_to_100000,
-  SUM(CASE WHEN project_sub_total BETWEEN 100001 AND 200000 THEN 1 ELSE 0 END) AS range_100001_to_200000,
-  SUM(CASE WHEN project_sub_total BETWEEN 200001 AND 400000 THEN 1 ELSE 0 END) AS range_200001_to_400000,
-  SUM(CASE WHEN project_sub_total > 400000 THEN 1 ELSE 0 END) AS range_400000_plus
+  SUM(CASE WHEN project_sub_total BETWEEN 0 AND 50000 THEN 1 ELSE 0 END) AS "< 50k",
+  SUM(CASE WHEN project_sub_total BETWEEN 50000 AND 100000 THEN 1 ELSE 0 END) AS "50k-100k",
+  SUM(CASE WHEN project_sub_total BETWEEN 100001 AND 250000 THEN 1 ELSE 0 END) AS "100k-250k",
+  SUM(CASE WHEN project_sub_total BETWEEN 250001 AND 500000 THEN 1 ELSE 0 END) AS "250k-500k",
+  SUM(CASE WHEN project_sub_total > 500000 THEN 1 ELSE 0 END) AS ">500k"
 FROM 
   project
 WHERE 
-  created_at BETWEEN DATE_SUB(?, INTERVAL ? MONTH) AND ?`;
-  let queryParams = [startDate, duration, startDate];
+  created_at BETWEEN ? AND DATE_ADD(?, INTERVAL ? MONTH)`;
+  let queryParams = [startDate, startDate, duration];
 
   db.query(selectQuery, queryParams, (err, result) => {
     if (err)
       return res.status(500).json({ message: "Something went wrong " + err });
 
-    const returnArray = Object.values(result[0]);
-    req.bonutChartData = returnArray;
+    const returnData = Object.values(result[0]);
+    const returnLabel = Object.keys(result[0]);
+    req.bonutChartData = { labels: returnLabel, data: returnData };
     next();
   });
 };
 
 const getBarChart = (req, res, next) => {
   let selectQuery = `SELECT 
-  DATE_FORMAT(DATE(t1.created_at), '%m-%Y') AS month,
-  COUNT(DISTINCT t1.project_id) AS project_count,
-  COUNT(DISTINCT t2.quote_id) AS quote_count
-FROM 
-  project AS t1
-LEFT JOIN 
-  quotation t2 ON DATE(t1.created_at) = DATE(t2.created_at)
-WHERE 
-  t1.created_at >= DATE_SUB(CURRENT_DATE(), INTERVAL 12 MONTH)
-  AND t2.created_at >= DATE_SUB(CURRENT_DATE(), INTERVAL 12 MONTH)
-GROUP BY 
-  MONTH(t1.created_at), YEAR(t1.created_at)
+  DATE_FORMAT(month_date, '%m-%Y') AS month,
+  COALESCE(project_count, 0) AS project_count,
+  COALESCE(quote_count, 0) AS quote_count
+FROM (
+  SELECT 
+    DATE_SUB(DATE_FORMAT(CURRENT_DATE(), '%Y-%m-01'), INTERVAL n MONTH) AS month_date
+  FROM 
+    (SELECT 0 AS n UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3
+     UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7
+     UNION ALL SELECT 8 UNION ALL SELECT 9 UNION ALL SELECT 10 UNION ALL SELECT 11) AS months
+) AS all_months
+LEFT JOIN (
+  SELECT 
+    DATE_FORMAT(created_at, '%Y-%m-01') AS month,
+    COUNT(DISTINCT project_id) AS project_count
+  FROM 
+    project
+  WHERE 
+    created_at >= DATE_SUB(CURRENT_DATE(), INTERVAL 12 MONTH)
+  GROUP BY 
+    month
+) AS project_counts ON all_months.month_date = project_counts.month
+LEFT JOIN (
+  SELECT 
+    DATE_FORMAT(created_at, '%Y-%m-01') AS month,
+    COUNT(DISTINCT quote_id) AS quote_count
+  FROM 
+    quotation
+  WHERE 
+    created_at >= DATE_SUB(CURRENT_DATE(), INTERVAL 12 MONTH)
+  GROUP BY 
+    month
+) AS quote_counts ON all_months.month_date = quote_counts.month
 ORDER BY 
-  YEAR(t1.created_at), MONTH(t1.created_at);`;
+  month_date;
+`;
 
   let queryParams = [];
 
@@ -196,6 +219,10 @@ router.get(
       newAccountOverallData,
     } = req;
 
+    const { duration } = req.query;
+    const lastMonthTxt =
+      duration && duration > 1 ? `last ${duration} month` : "last month";
+
     const returnObj = {
       sales: {
         cardData: [
@@ -203,7 +230,7 @@ router.get(
             value: `RM ${parseFloat(newProjectOverallData.new_sales).toFixed(
               2
             )}`,
-            description: "last month",
+            description: lastMonthTxt,
             title: "new sales",
           },
           {
@@ -217,7 +244,7 @@ router.get(
                 newQuoteOverallData.new_quote) *
                 100
             ).toFixed(2)}%`,
-            description: "last month",
+            description: lastMonthTxt,
             title: "avg deal rate",
           },
         ],
@@ -226,13 +253,13 @@ router.get(
         donutChartData: {
           title: "Sales chart",
           datas: bonutChartData,
-          description: "last month",
+          description: lastMonthTxt,
         },
         barChartData: barChartData,
         cardData: [
           {
             value: newQuoteOverallData.new_quote,
-            description: "last month",
+            description: lastMonthTxt,
             title: "new quote",
           },
           {
@@ -241,7 +268,7 @@ router.get(
                 newQuoteOverallData.new_quote) *
                 100
             ).toFixed(2)}%`,
-            description: "last month",
+            description: lastMonthTxt,
             title: "deal rate",
           },
           {
@@ -266,7 +293,7 @@ router.get(
         cardData: [
           {
             value: String(newProjectOverallData.new_project),
-            description: "last month",
+            description: lastMonthTxt,
             title: "new project",
           },
           {
@@ -287,8 +314,15 @@ router.get(
             value: `RM ${parseFloat(newAccountOverallData.debit_total).toFixed(
               2
             )}`,
-            description: "per month",
-            title: "new inflow",
+            description: lastMonthTxt,
+            title: "in-flow",
+          },
+          {
+            value: `RM ${parseFloat(newAccountOverallData.credit_total).toFixed(
+              2
+            )}`,
+            description: lastMonthTxt,
+            title: "out-flow",
           },
           {
             value: `RM ${parseFloat(averageProjectData.average_sales).toFixed(

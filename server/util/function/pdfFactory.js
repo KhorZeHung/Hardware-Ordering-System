@@ -136,7 +136,7 @@ function createQuotation(data, start, end) {
     let subtotal = 0.0;
 
     doc.x = 50;
-    if (doc.y + 30 > maxPageHeight) {
+    if (doc.y + 50 > maxPageHeight) {
       doc.addPage();
     }
     doc

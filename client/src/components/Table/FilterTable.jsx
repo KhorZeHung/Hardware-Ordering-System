@@ -6,20 +6,27 @@ import { APIGateway } from "../../data";
 import { getCookie } from "../../utils/cookie";
 import { SnackbarContext } from "../../components/Snackbar/SnackBarProvidor";
 
-const FilterTable = (props) => {
+const FilterTable = ({ datas }) => {
   const {
     checkBox = {
       handlerArray: [],
     },
     endPoint,
     filter = null,
-  } = props.datas;
+  } = datas;
 
   const [tableData, setTableData] = useState(null);
+  const [tableHeader, setTableHeader] = useState(null);
   const [tableIsLoading, setTableIsLoading] = useState(true);
+  const [pages, setPages] = useState(1);
   const [filterValue, setFilterValue] = useState({
     searchTerm: null,
     filterOption: null,
+    page: 1,
+    sort: {
+      value: "id",
+      isDesc: true,
+    },
   });
   const searchTermRef = useRef();
   const { setSnackbar } = useContext(SnackbarContext);
@@ -27,22 +34,29 @@ const FilterTable = (props) => {
     setTableIsLoading(true);
     const fetchData = async () => {
       try {
-        var APIEndpoint = `${APIGateway}${endPoint}`;
+        var APIEndpoint = `${APIGateway}${endPoint}?`;
 
-        const { searchTerm, filterOption } = filterValue;
+        const { searchTerm, filterOption, page, sort } = filterValue;
+        const { value, isDesc } = sort;
 
         if (searchTerm !== null && searchTerm.length > 1) {
-          APIEndpoint += `?searchterm=${encodeURIComponent(searchTerm)}`;
+          APIEndpoint += `searchterm=${encodeURIComponent(searchTerm)}&`;
         }
 
         if (filterOption !== null) {
-          if (searchTerm !== null && searchTerm.length > 1) {
-            APIEndpoint += "&";
-          } else {
-            APIEndpoint += "?";
-          }
-          APIEndpoint += `filteroption=${encodeURIComponent(filterOption)}`;
+          APIEndpoint += `filteroption=${encodeURIComponent(filterOption)}&`;
         }
+        if (page) {
+          APIEndpoint += `page=${page || 1}&`;
+        }
+        if (value) {
+          APIEndpoint += `sort=${value}&`;
+        }
+        if (isDesc) {
+          APIEndpoint += `desc=${!isDesc}&`;
+        }
+
+        APIEndpoint = APIEndpoint.slice(0, -1);
         const token = getCookie("token");
 
         const response = await axios.get(APIEndpoint, {
@@ -51,8 +65,9 @@ const FilterTable = (props) => {
           },
         });
 
-        const datas = response.data.data;
-        setTableData(datas);
+        const { thead, tbody } = response.data.data;
+        setTableData(tbody);
+        if (!tableHeader || !thead.equals(tableHeader)) setTableHeader(thead);
       } catch (error) {
         const message =
           error.response.data.message ||
@@ -67,6 +82,7 @@ const FilterTable = (props) => {
     fetchData();
 
     return () => {};
+    //eslint-disable-next-line
   }, [filterValue, setSnackbar, endPoint]);
 
   const clearSearch = () => {
@@ -86,6 +102,19 @@ const FilterTable = (props) => {
     else selectedValue = value;
 
     setFilterValue((prev) => ({ ...prev, filterOption: selectedValue }));
+  };
+
+  const sortHandler = (value) => {
+    setFilterValue((prev) => {
+      const isDesc = prev.sort.value === value ? !prev.sort.isDesc : false;
+      return {
+        ...prev,
+        sort: {
+          value,
+          isDesc,
+        },
+      };
+    });
   };
 
   return (
@@ -138,88 +167,99 @@ const FilterTable = (props) => {
           </div>
         ) : (
           <>
-            {tableData && tableData.tbody.length > 0 ? (
-              <table>
-                <thead>
-                  <tr>
-                    {tableData.thead.map((value, index) => (
-                      <th key={`thead-${value}`}>{value}</th>
-                    ))}
-                    {checkBox.handlerArray && <th>Action</th>}
-                  </tr>
-                </thead>
-                <tbody>
-                  {tableData.tbody.map((rowData, rowIndex) => {
-                    return (
-                      <tr key={`row-${rowIndex}`}>
-                        {Object.values(rowData).map((cellData, cellIndex) => {
-                          const theadValue = tableData.thead[cellIndex];
-                          if (theadValue.includes("contact")) {
-                            const phoneNo = cellData
-                              .replace(/^(\+|6|\+6)?/g, "")
-                              .replace(/[^0-9]/g, "");
-                            return (
-                              <td key={`cell-${theadValue}-${cellIndex}`}>
-                                <a
-                                  style={{
-                                    color: "blue",
-                                    textTransform: "underline",
-                                  }}
-                                  href={`https://wa.me/${phoneNo}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer">
-                                  {cellData}
-                                </a>
+            {tableHeader && tableData && tableData.length > 0 ? (
+              <>
+                <table>
+                  <thead>
+                    <tr>
+                      {tableHeader.map((value) => (
+                        <th
+                          key={`thead-${value}`}
+                          onClick={() => sortHandler(value)}>
+                          {value}
+                          {filterValue.sort.value === value && (
+                            <span
+                              className={`material-symbols-outlined sortSign ${
+                                filterValue.sort.value === value &&
+                                filterValue.sort.isDesc &&
+                                "desc"
+                              }`}>
+                              change_history
+                            </span>
+                          )}
+                        </th>
+                      ))}
+                      {checkBox.handlerArray && <th>Action</th>}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {tableData
+                      .slice(50 * (pages - 1), pages * 50 - 1)
+                      .map((rowData, rowIndex) => {
+                        return (
+                          <tr key={`row-${rowIndex}`}>
+                            {Object.values(rowData).map(
+                              (cellData, cellIndex) => {
+                                const theadValue = tableHeader[cellIndex];
+                                if (theadValue.includes("contact")) {
+                                  const phoneNo = cellData
+                                    .replace(/^(\+|6|\+6)?/g, "")
+                                    .replace(/[^0-9]/g, "");
+                                  return (
+                                    <td key={`cell-${theadValue}-${cellIndex}`}>
+                                      <a
+                                        style={{
+                                          color: "blue",
+                                          textTransform: "underline",
+                                        }}
+                                        href={`https://wa.me/${phoneNo}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer">
+                                        {cellData}
+                                      </a>
+                                    </td>
+                                  );
+                                }
+                                return (
+                                  <td key={`cell-${theadValue}-${cellIndex}`}>
+                                    {cellData}
+                                  </td>
+                                );
+                              }
+                            )}
+                            {checkBox.handlerArray && (
+                              <td className="tableAction">
+                                {checkBox.handlerArray.map((value, index) => {
+                                  return (
+                                    <span
+                                      key={index}
+                                      onClick={() =>
+                                        value.onClickHandler(rowData.id)
+                                      }
+                                      className={`${value.name || ""}`}>
+                                      {value.name}
+                                    </span>
+                                  );
+                                })}
                               </td>
-                            );
-                          }
-                          if (
-                            theadValue.includes("address") ||
-                            theadValue.includes("location")
-                          ) {
-                            const address = cellData.replace(/ /g, "+");
-                            return (
-                              <td key={`cell-${theadValue}-${cellIndex}`}>
-                                <a
-                                  style={{
-                                    color: "blue",
-                                    textTransform: "underline",
-                                  }}
-                                  href={`https://www.google.com/maps/search/?api=1&query=${address}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer">
-                                  {cellData}
-                                </a>
-                              </td>
-                            );
-                          }
-                          return (
-                            <td key={`cell-${theadValue}-${cellIndex}`}>
-                              {cellData}
-                            </td>
-                          );
-                        })}
-                        {checkBox.handlerArray && (
-                          <td className="tableAction">
-                            {checkBox.handlerArray.map((value, index) => {
-                              return (
-                                <span
-                                  key={index}
-                                  onClick={() =>
-                                    value.onClickHandler(rowData.id)
-                                  }
-                                  className={`${value.name || ""}`}>
-                                  {value.name}
-                                </span>
-                              );
-                            })}
-                          </td>
-                        )}
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                            )}
+                          </tr>
+                        );
+                      })}
+                  </tbody>
+                </table>
+                {tableData.length / 50 > 1 && (
+                  <div className="pageControl">
+                    {pages > 1 && (
+                      <span onClick={() => setPages(pages - 1)}>previous</span>
+                    )}
+                    <span id="pageNumber">{pages}</span>
+                    {tableData.length / 50 > pages && (
+                      <span onClick={() => setPages(pages + 1)}>next</span>
+                    )}
+                  </div>
+                )}
+              </>
             ) : (
               <div
                 className="center"

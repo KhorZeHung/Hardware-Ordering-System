@@ -120,6 +120,21 @@ const AccountStatusCard = ({ data }) => {
                   ).toFixed(2)}
                 </th>
               </tr>
+              <tr>
+                <td></td>
+                <td></td>
+                <th style={{ textAlign: "right" }}>Profit Margin: </th>
+                <th>
+                  {parseFloat(
+                    ((accountSummary.debitTotal - accountSummary.creditTotal) /
+                      accountSummary.debitTotal) *
+                      100
+                  ).toFixed(2)}{" "}
+                  %
+                </th>
+                <td></td>
+                <td></td>
+              </tr>
             </tbody>
           </table>
         ) : (

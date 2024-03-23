@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
-import CircularProgress from "@mui/material-next/CircularProgress";
 import RoomMaterialInput, {
   calculateSubTotal,
 } from "../../components/Form/Input/RoomMaterialInput";
@@ -7,15 +6,24 @@ import { APIGateway, newQuoteData } from "../../data";
 import { constructInput } from "../../components/Form/FormBody";
 import { getCookie } from "../../utils/cookie";
 import { SnackbarContext } from "../../components/Snackbar/SnackBarProvidor";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import QuoteProjSummary from "../../components/Card/QuoteProjSummary";
+import {
+  CircularProgress,
+  Tooltip,
+  SwipeableDrawer,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  List,
+  ListItem,
+} from "@mui/material";
 import axios from "axios";
 
 const QuoteForm = ({ datas }) => {
   const { isQuote = false, isNew = false } = datas;
 
   const [isLoading, setIsLoading] = useState(false);
-  const [isBtnLoading, setIsBtnLoading] = useState(false);
   const [formInputValue, setFormInputValue] = useState({
     quote_product_lists: [
       {
@@ -30,10 +38,9 @@ const QuoteForm = ({ datas }) => {
   const { quote_id } = useParams();
   const { setSnackbar } = useContext(SnackbarContext);
   const newQuoteDataCopy = useRef(newQuoteData);
-
+  const navigate = useNavigate();
   const submitHandler = async (e) => {
     e.preventDefault();
-    setIsBtnLoading(true);
 
     const token = getCookie("token");
 
@@ -54,9 +61,6 @@ const QuoteForm = ({ datas }) => {
         const msg =
           err.response.data.message || err.message || "Something went wrong";
         setSnackbar({ open: true, message: msg, severity: "error" });
-      })
-      .finally(() => {
-        setIsBtnLoading(false);
       });
   };
 
@@ -275,51 +279,109 @@ const QuoteForm = ({ datas }) => {
     return () => {};
   }, [isNew, quote_id, setSnackbar]);
 
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const toggleDrawer = () => {
+    setDrawerOpen(!drawerOpen);
+  };
+
+  const handleSwipe = (open) => (event) => {
+    if (
+      event &&
+      event.type === "keydown" &&
+      (event.key === "Tab" || event.key === "Shift")
+    ) {
+      return;
+    }
+    setDrawerOpen(open);
+  };
   return (
     <>
       {!isLoading ? (
-        <form method="post" className="formBody" style={{ width: "80%" }}>
-          <p className="title">{newQuoteDataCopy.current.title}</p>
-          <div className="formInputLists" style={{ marginBottom: "3rem" }}>
-            {constructInput(newQuoteDataCopy.current.inputLists, formHandler)}
+        <div style={{ position: "relative" }}>
+          <div className="prevPageBtn">
+            <span
+              className="material-symbols-outlined"
+              onClick={() => navigate(-1)}>
+              arrow_back
+            </span>
           </div>
-          <div style={{ margin: "1rem 0" }}>{createRoomHandler()}</div>
-          <button className="addRoom" onClick={addRoomHandler}>
-            +
-          </button>
-          <QuoteProjSummary
-            formInputValue={formInputValue}
-            discountHandler={discountHandler}
-          />
-          <div
-            className="formAction"
-            style={{ margin: "2rem auto 0", maxWidth: "500px" }}>
-            {quote_id && (
-              <button className="center" onClick={getQuoteListHandler}>
-                <span
-                  className="material-symbols-outlined"
-                  style={{ paddingRight: "0.5rem", fontSize: "1rem" }}>
-                  picture_as_pdf
-                </span>
-                create pdf
-              </button>
-            )}
-            <button className="center" type="submit" onClick={submitHandler}>
-              {isBtnLoading ? (
-                <CircularProgress size={18} color="inherit" />
-              ) : (
-                <>
-                  <span
-                    className="material-symbols-outlined"
-                    style={{ paddingRight: "0.5rem", fontSize: "1rem" }}>
-                    file_save
-                  </span>
-                  save quote
-                </>
-              )}
+          <form method="post" className="formBody" style={{ width: "80%" }}>
+            <p className="title">{newQuoteDataCopy.current.title}</p>
+            <div className="formInputLists" style={{ marginBottom: "3rem" }}>
+              {constructInput(newQuoteDataCopy.current.inputLists, formHandler)}
+            </div>
+            <div style={{ margin: "1rem 0" }}>{createRoomHandler()}</div>
+            <button className="addRoom" onClick={addRoomHandler}>
+              +
             </button>
-          </div>
-        </form>
+            <QuoteProjSummary
+              formInputValue={formInputValue}
+              discountHandler={discountHandler}
+            />
+          </form>
+          <Tooltip title="edit quotation">
+            <span className="addNewItem" onClick={() => setDrawerOpen(true)}>
+              <span className="material-symbols-outlined">edit</span>
+            </span>
+          </Tooltip>
+          <SwipeableDrawer
+            anchor="bottom"
+            open={drawerOpen}
+            onClose={toggleDrawer}
+            onOpen={() => {}}
+            swipeAreaWidth={20}
+            disableBackdropTransition={true}
+            disableDiscovery={true}>
+            <div
+              role="presentation"
+              onClick={toggleDrawer}
+              onKeyDown={handleSwipe(false)}>
+              <List>
+                {quote_id && formInputValue.quote_client_contact && (
+                  <ListItem disablePadding>
+                    <ListItemButton
+                      onClick={() => {
+                        window.open(
+                          `https://wa.me/${formInputValue.quote_client_contact
+                            .replace(/^(\+|6|\+6)?/g, "")
+                            .replace(/[^0-9]/g, "")}`
+                        );
+                      }}>
+                      <ListItemIcon>
+                        <span className="material-symbols-outlined">call</span>
+                      </ListItemIcon>
+                      <ListItemText primary={"whatsapp customer"} />
+                    </ListItemButton>
+                  </ListItem>
+                )}
+
+                {quote_id && (
+                  <ListItem disablePadding>
+                    <ListItemButton onClick={getQuoteListHandler}>
+                      <ListItemIcon>
+                        <span className="material-symbols-outlined">
+                          picture_as_pdf
+                        </span>
+                      </ListItemIcon>
+                      <ListItemText primary={"generate quotation list"} />
+                    </ListItemButton>
+                  </ListItem>
+                )}
+                <ListItem disablePadding>
+                  <ListItemButton onClick={submitHandler}>
+                    <ListItemIcon>
+                      <span className="material-symbols-outlined">
+                        file_save
+                      </span>
+                    </ListItemIcon>
+                    <ListItemText primary={"save quotation list"} />
+                  </ListItemButton>
+                </ListItem>
+              </List>
+            </div>
+          </SwipeableDrawer>
+        </div>
       ) : (
         <div className="center" style={{ height: "400px", width: "100%" }}>
           <CircularProgress />

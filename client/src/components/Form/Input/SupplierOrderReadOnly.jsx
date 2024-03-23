@@ -1,9 +1,7 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
 import useProductInfo from "../../../utils/useProductInfo";
-import axios from "axios";
-import { APIGateway } from "../../../data";
-import { getCookie } from "../../../utils/cookie";
-import { SnackbarContext } from "../../Snackbar/SnackBarProvidor";
+import { CustomModalContext } from "../../Modal/CustomModalProvider";
+import { projectData } from "../../../data";
 import "../FormBody.css";
 
 const RoomMaterialReadOnly = ({ datas }) => {
@@ -14,7 +12,7 @@ const RoomMaterialReadOnly = ({ datas }) => {
   const [isActionMenuOpen, setIsActionMenuOpen] = useState(false);
   const mainBarActionRef = useRef(null);
   const { productInfo } = useProductInfo();
-  const { setSnackbar } = useContext(SnackbarContext);
+  const { openCustomModal } = useContext(CustomModalContext);
 
   useEffect(() => {
     if (defaultOrderList && productInfo) {
@@ -60,30 +58,11 @@ const RoomMaterialReadOnly = ({ datas }) => {
   }, [open, numOfRoom]);
 
   const updateOrderHandler = (id) => {
-    const url = APIGateway + "/order/edit";
-    const formData = {
-      project_order_status: "Proceed to order",
-      project_order_id: id,
-    };
+    let formatedOrderForm = projectData.proceedToDataForm;
 
-    axios
-      .post(url, formData, {
-        headers: {
-          Authorization: `Bearer ${getCookie("token")}`,
-        },
-      })
-      .then((res) => {
-        const { message } = res.data;
-        console.log(message);
-        setSnackbar({ open: true, message: message, severity: "success" });
-      })
-      .catch((err) => {
-        const message = err.response.data.message || "Something went wrong";
-        setSnackbar({ open: true, message: message, severity: "error" });
-      })
-      .finally(() => {
-        setIsActionMenuOpen(false);
-      });
+    if (formatedOrderForm.endPoint.slice(-1) === "/")
+      formatedOrderForm.endPoint += id;
+    openCustomModal(formatedOrderForm);
   };
 
   return (
@@ -98,7 +77,7 @@ const RoomMaterialReadOnly = ({ datas }) => {
             style={{ padding: "5px" }}
             readOnly
           />
-          {defaultOrderList.status === "under process" && (
+          {defaultOrderList.status.toLowerCase() === "under process" && (
             <>
               <span
                 ref={mainBarActionRef}
@@ -122,7 +101,16 @@ const RoomMaterialReadOnly = ({ datas }) => {
             </>
           )}
           <p className="subTotal">
-            <span className="orderStatus">{defaultOrderList.status}</span>
+            <span
+              className={`orderStatus ${
+                defaultOrderList.status === "Paid" && "success"
+              } ${
+                (defaultOrderList.status === "Problematic" ||
+                  defaultOrderList.status === "Rejected") &&
+                "failed"
+              }`}>
+              {defaultOrderList.status}
+            </span>
 
             {"RM " + parseFloat(orderLists.subtotal).toFixed(2)}
           </p>

@@ -21,7 +21,6 @@ const Contact = () => {
     product: contactData.product.newModalForm,
     supplier: contactData.supplier.newModalForm,
   });
-  const [formLoaded, setFormLoaded] = useState(false);
   const supplierInfo = useSupplierInfo();
 
   const deleteHandler = (id) => {
@@ -124,11 +123,10 @@ const Contact = () => {
         });
         return prev;
       });
-      setFormLoaded(true);
     }
     return () => {};
+    //eslint-disable-next-line
   }, [supplierInfo]);
-  console.log(newModalFormData);
 
   contactData[subPages].tableData.checkBox.handlerArray[0].onClickHandler =
     editRequest;

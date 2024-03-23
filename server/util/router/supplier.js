@@ -83,7 +83,7 @@ router.get(
   validateJWT,
   getCategoryInfo,
   (req, res, next) => {
-    const { searchterm = null, filteroption = null } = req.query;
+    const { searchterm, filteroption, sort, desc, page } = req.query;
 
     let selectQuery = `SELECT supplier_id AS 'id', supplier_cmp_name AS 'company name', supplier_pic AS 'person in charge', supplier_contact AS contact, supplier_category AS category, supplier_address AS address FROM supplier`;
     let queryParams = [];
@@ -109,7 +109,28 @@ router.get(
       queryParams.push(`%${filteroption}%`);
     }
 
-    selectQuery += " ORDER BY supplier_id DESC;";
+    if (sort) {
+      const sortColumnNameMap = {
+        id: "supplier_id",
+        "company name": "supplier_cmp_name",
+        "person in charge": "supplier_pic",
+        contact: "supplier_contact",
+        category: "supplier_category",
+        address: "supplier_address",
+      };
+
+      if (sortColumnNameMap[sort]) {
+        selectQuery += ` ORDER BY ${sortColumnNameMap[sort]} ${
+          desc ? "DESC" : "ASC"
+        }`;
+      }
+    }
+
+    // if (page) {
+    //   const limit = 25 * page;
+    //   selectQuery += " LIMIT " + limit + ";";
+    // }
+
     db.query(selectQuery, queryParams, (err, results) => {
       if (err)
         return res.status(500).json({ message: "Something went wrong" + err });
