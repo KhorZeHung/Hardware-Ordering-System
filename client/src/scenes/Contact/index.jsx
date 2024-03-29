@@ -9,6 +9,7 @@ import { getCookie } from "../../utils/cookie";
 import { useParams, useNavigate } from "react-router-dom";
 import useSupplierInfo from "../../utils/useSupplierInfo";
 import axios from "axios";
+import { decode } from "jsonwebtoken";
 
 const Contact = () => {
   const { subPages = "supplier" } = useParams();
@@ -22,6 +23,7 @@ const Contact = () => {
     supplier: contactData.supplier.newModalForm,
   });
   const supplierInfo = useSupplierInfo();
+  const position = decode(token).user_authority;
 
   const deleteHandler = (id) => {
     openModal(
@@ -128,10 +130,14 @@ const Contact = () => {
     //eslint-disable-next-line
   }, [supplierInfo]);
 
-  contactData[subPages].tableData.checkBox.handlerArray[0].onClickHandler =
-    editRequest;
-  contactData[subPages].tableData.checkBox.handlerArray[1].onClickHandler =
-    deleteHandler;
+  if (position === 3) {
+    contactData[subPages].tableData.checkBox.handlerArray = [];
+  } else {
+    contactData[subPages].tableData.checkBox.handlerArray[0].onClickHandler =
+      editRequest;
+    contactData[subPages].tableData.checkBox.handlerArray[1].onClickHandler =
+      deleteHandler;
+  }
   return (
     <>
       <div className="contentMainBody">
@@ -153,11 +159,13 @@ const Contact = () => {
         {subPages === "product" && (
           <TableWithSmlCard datas={contactData.product} />
         )}
-        <span
-          className="addNewItem"
-          onClick={() => openCustomModal(newModalFormData[subPages])}>
-          +
-        </span>
+        {position !== 3 && (
+          <span
+            className="addNewItem"
+            onClick={() => openCustomModal(newModalFormData[subPages])}>
+            +
+          </span>
+        )}
       </div>
     </>
   );

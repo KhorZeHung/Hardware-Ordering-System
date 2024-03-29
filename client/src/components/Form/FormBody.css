@@ -535,10 +535,10 @@
   padding-right: 10px;
   text-transform: capitalize;
 }
-.orderStatus .success {
+.subTotal .success {
   color: green;
 }
 
-.orderStatus .failed {
+.subTotal .failed {
   color: red;
 }

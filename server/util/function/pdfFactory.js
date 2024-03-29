@@ -1,5 +1,5 @@
-const { sign } = require("crypto");
 const PDFDocument = require("pdfkit");
+const qr = require("qr-image");
 
 function createQuotation(data, start, end) {
   // Create a new PDF document
@@ -300,7 +300,16 @@ function createQuotation(data, start, end) {
     align: "center",
   });
 
-  // Finalize the PDF and close the document
+  const qrSVG = qr.imageSync("https://wa.me/01776096446", { type: "png" });
+  doc.image(qrSVG, doc.page.width - 150, doc.page.height - 200, {
+    fit: [100, 100],
+  });
+  doc.fontSize(8).font("Helvetica").fillColor("#000");
+  doc.text("scan to whatsapp me", doc.page.width - 150, doc.page.height - 100, {
+    width: 100,
+    align: "center",
+  });
+
   doc.end();
 }
 

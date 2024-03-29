@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
 import useProductInfo from "../../../utils/useProductInfo";
+import { decode } from "jsonwebtoken";
 import { CustomModalContext } from "../../Modal/CustomModalProvider";
 import { projectData } from "../../../data";
 import "../FormBody.css";
+import { getCookie } from "../../../utils/cookie";
 
 const RoomMaterialReadOnly = ({ datas }) => {
   const { defaultOrderList, index } = datas;
@@ -13,6 +15,8 @@ const RoomMaterialReadOnly = ({ datas }) => {
   const mainBarActionRef = useRef(null);
   const { productInfo } = useProductInfo();
   const { openCustomModal } = useContext(CustomModalContext);
+  const token = getCookie("token");
+  const position = decode(token).user_authority;
 
   useEffect(() => {
     if (defaultOrderList && productInfo) {
@@ -77,37 +81,41 @@ const RoomMaterialReadOnly = ({ datas }) => {
             style={{ padding: "5px" }}
             readOnly
           />
-          {defaultOrderList.status.toLowerCase() === "under process" && (
-            <>
-              <span
-                ref={mainBarActionRef}
-                className="material-symbols-outlined mainBarAction"
-                onClick={() => setIsActionMenuOpen(!isActionMenuOpen)}>
-                more_vert
-              </span>
-              <span
-                className="actionMenu"
-                style={
-                  isActionMenuOpen ? { display: "block" } : { display: "none" }
-                }>
-                <div
-                  onClick={() => {
-                    updateOrderHandler(defaultOrderList.id);
-                  }}
-                  style={{ color: "black" }}>
-                  <p>proceed to order</p>
-                </div>
-              </span>
-            </>
-          )}
+          {defaultOrderList.status.toLowerCase() === "under process" &&
+            position !== 2 && (
+              <>
+                <span
+                  ref={mainBarActionRef}
+                  className="material-symbols-outlined mainBarAction"
+                  onClick={() => setIsActionMenuOpen(!isActionMenuOpen)}>
+                  more_vert
+                </span>
+                <span
+                  className="actionMenu"
+                  style={
+                    isActionMenuOpen
+                      ? { display: "block" }
+                      : { display: "none" }
+                  }>
+                  <div
+                    onClick={() => {
+                      updateOrderHandler(defaultOrderList.id);
+                    }}
+                    style={{ color: "black" }}>
+                    <p>proceed to order</p>
+                  </div>
+                </span>
+              </>
+            )}
           <p className="subTotal">
             <span
               className={`orderStatus ${
-                defaultOrderList.status === "Paid" && "success"
+                defaultOrderList.status.includes("Paid") ? "success" : ""
               } ${
-                (defaultOrderList.status === "Problematic" ||
-                  defaultOrderList.status === "Rejected") &&
-                "failed"
+                defaultOrderList.status.includes("Problematic") ||
+                defaultOrderList.status.includes("Rejected")
+                  ? "failed"
+                  : ""
               }`}>
               {defaultOrderList.status}
             </span>

@@ -67,6 +67,7 @@ const FilterTable = ({ datas }) => {
 
         const { thead, tbody } = response.data.data;
         setTableData(tbody);
+        setPages(1);
         if (!tableHeader || !thead.equals(tableHeader)) setTableHeader(thead);
       } catch (error) {
         const message =
@@ -189,12 +190,12 @@ const FilterTable = ({ datas }) => {
                           )}
                         </th>
                       ))}
-                      {checkBox.handlerArray && <th>Action</th>}
+                      {checkBox.handlerArray.length > 0 && <th>Action</th>}
                     </tr>
                   </thead>
                   <tbody>
                     {tableData
-                      .slice(50 * (pages - 1), pages * 50 - 1)
+                      .slice(25 * (pages - 1), pages * 25 - 1)
                       .map((rowData, rowIndex) => {
                         return (
                           <tr key={`row-${rowIndex}`}>
@@ -227,7 +228,7 @@ const FilterTable = ({ datas }) => {
                                 );
                               }
                             )}
-                            {checkBox.handlerArray && (
+                            {checkBox.handlerArray.length > 0 && (
                               <td className="tableAction">
                                 {checkBox.handlerArray.map((value, index) => {
                                   return (
@@ -248,14 +249,20 @@ const FilterTable = ({ datas }) => {
                       })}
                   </tbody>
                 </table>
-                {tableData.length / 50 > 1 && (
+                {tableData.length / 25 > 1 && (
                   <div className="pageControl">
                     {pages > 1 && (
                       <span onClick={() => setPages(pages - 1)}>previous</span>
                     )}
                     <span id="pageNumber">{pages}</span>
-                    {tableData.length / 50 > pages && (
-                      <span onClick={() => setPages(pages + 1)}>next</span>
+                    {tableData.length / 25 > pages && (
+                      <span
+                        onClick={() => {
+                          window.scrollTo({ top: 0, behavior: "smooth" });
+                          setPages(pages + 1);
+                        }}>
+                        next
+                      </span>
                     )}
                   </div>
                 )}
