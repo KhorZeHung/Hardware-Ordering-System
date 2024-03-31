@@ -18,13 +18,12 @@ const Contact = () => {
   const { openModal } = useContext(ConfirmModalContext);
   const token = getCookie("token");
   const navigate = useNavigate();
+  const supplierInfo = useSupplierInfo();
   const [newModalFormData, setNewModalFormData] = useState({
     product: contactData.product.newModalForm,
     supplier: contactData.supplier.newModalForm,
   });
-  const supplierInfo = useSupplierInfo();
   const position = decode(token).user_authority;
-
   const deleteHandler = (id) => {
     openModal(
       "Confirmation",
@@ -117,7 +116,7 @@ const Contact = () => {
   useEffect(() => {
     if (supplierInfo) {
       setNewModalFormData((prev) => {
-        prev[subPages].inputLists = prev[subPages].inputLists.map((input) => {
+        prev["product"].inputLists = prev["product"].inputLists.map((input) => {
           if (input.name === "supplier_id") {
             input.options = Object.values(supplierInfo);
           }
@@ -129,7 +128,6 @@ const Contact = () => {
     return () => {};
     //eslint-disable-next-line
   }, [supplierInfo]);
-
   if (position === 3) {
     contactData[subPages].tableData.checkBox.handlerArray = [];
   } else {

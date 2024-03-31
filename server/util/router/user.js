@@ -330,31 +330,69 @@ router.post(
 );
 
 //allow user to edit profile
-router.post("/edit-profile", validateJWT, uniqueEmail, (req, res) => {
-  const user_id = req.body.user_id || req.user.user_id;
-  const { user_email, user_contact, user_authority, user_name } = req.body;
+router.post(
+  "/edit-profile",
+  validateJWT,
+  getUserInfo,
+  async (req, res, next) => {
+    const { user_password } = req.body;
+    if (user_password) {
+      if (req.mysqlRes.length !== 1)
+        return res.status(404).json("No such user");
+      var validUser = await bcrypt.compare(
+        user_password,
+        req.mysqlRes[0].user_password
+      );
 
-  let updateQuery =
-    "UPDATE `user` SET user_email = ?, user_contact = ?, user_authority = ?, user_name = ?";
-  let queryParams = [user_email, user_contact, user_authority, user_name];
+      if (!validUser) return res.status(401).json("wrong password");
+      next();
+    } else {
+      next();
+    }
+  },
+  uniqueEmail,
+  async (req, res) => {
+    const user_id = req.body.user_id || req.user.user_id;
+    const {
+      user_email,
+      user_contact,
+      user_authority,
+      user_name,
+      user_password,
+      new_password,
+    } = req.body;
 
-  if (user_authority) {
-    if (req.user.user_authority > 2)
-      return res.status(400).json({ message: "Cannot update position" });
+    let updateQuery =
+      "UPDATE `user` SET user_email = ?, user_contact = ?, user_authority = ?, user_name = ?";
+    let queryParams = [user_email, user_contact, user_authority, user_name];
 
-    updateQuery += ", user_authority = ? ";
-    queryParams.push(user_authority);
+    if (user_authority) {
+      if (req.user.user_authority > 2)
+        return res.status(400).json({ message: "Cannot update position" });
+
+      updateQuery += ", user_authority = ? ";
+      queryParams.push(user_authority);
+    }
+
+    if (user_password && new_password) {
+      updateQuery += ", user_password = ? ";
+      const hashPassword = await bcrypt.hash(
+        new_password,
+        process.env.BCRYPT_HASH_SALT
+      );
+      queryParams.push(hashPassword);
+    }
+
+    updateQuery += "WHERE user_id = ?;";
+    queryParams.push(user_id);
+
+    db.query(updateQuery, queryParams, (err) => {
+      if (err)
+        return res.status(500).json({ message: "Something went wrong" + err });
+      return res.status(200).json({ message: "Profile update successfully" });
+    });
   }
-
-  updateQuery += "WHERE user_id = ?;";
-  queryParams.push(user_id);
-
-  db.query(updateQuery, queryParams, (err) => {
-    if (err)
-      return res.status(500).json({ message: "Something went wrong" + err });
-    return res.status(200).json({ message: "Profile update successfully" });
-  });
-});
+);
 
 // delete user account
 router.delete("/delete/:user_id", validateJWT, isAdmin, async (req, res) => {

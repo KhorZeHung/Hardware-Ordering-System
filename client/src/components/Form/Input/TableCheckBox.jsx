@@ -6,7 +6,7 @@ const TableCheckBox = ({ datas, formHandler }) => {
     name,
     label,
     required = true,
-    options = [],
+    options = {},
     disable = false,
     defaultValue = [],
     tm = true,
@@ -32,17 +32,16 @@ const TableCheckBox = ({ datas, formHandler }) => {
     return () => {};
   }, []);
 
-  const checkBoxHandler = (e) => {
+  const checkBoxHandler = (e, value) => {
     let newCheckedBoxArray = [...checkedBox];
-    const value = String(e.target.value);
-    if (e.target.checked) {
+    if (!newCheckedBoxArray.includes(String(value))) {
       newCheckedBoxArray.push(value);
     } else {
       newCheckedBoxArray = newCheckedBoxArray.filter(
         (checkedBox) => String(checkedBox) !== value
       );
     }
-    const newText = options.map((option) => {
+    const newText = optionsRef.current.map((option) => {
       if (newCheckedBoxArray.includes(String(option.value))) {
         return option.name;
       }
@@ -71,6 +70,7 @@ const TableCheckBox = ({ datas, formHandler }) => {
           whiteSpace: "nowrap",
           textOverflow: "ellipsis",
         }}
+        onClick={() => setOpenOption((prev) => !prev)}
       />
       <span
         className="displayOption"
@@ -81,13 +81,15 @@ const TableCheckBox = ({ datas, formHandler }) => {
         {options.length > 0 &&
           options.map((option) => {
             return (
-              <div key={`option-${option.value}`}>
+              <div
+                key={`option-${option.value}`}
+                onClick={(e) => checkBoxHandler(e, String(option.value))}>
                 <input
                   type="checkbox"
                   name={name}
                   value={String(option.value)}
                   disabled={disable}
-                  onChange={checkBoxHandler}
+                  onChange={(e) => checkBoxHandler(e, String(option.value))}
                   checked={checkedBox.includes(String(option.value))}
                 />
                 <p>{option.name}</p>

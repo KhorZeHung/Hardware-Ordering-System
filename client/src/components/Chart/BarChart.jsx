@@ -2,7 +2,6 @@ import React from "react";
 import Chart from "react-apexcharts";
 
 const BarChart = ({ datas }) => {
-  
   const chartInfo = {
     options: {
       xaxis: datas.xaxis,
@@ -23,7 +22,7 @@ const BarChart = ({ datas }) => {
       dataLabels: {
         enabled: false,
       },
-      colors: ["#74c2bb", "#27413e"],
+      colors: ["#99ccff", "#001d64"],
     },
     series: datas.series,
   };

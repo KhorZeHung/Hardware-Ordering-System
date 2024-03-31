@@ -328,6 +328,7 @@ export const orderData = {
     },
     filter: {
       options: [
+        { name: "Under Process", value: "Under Process" },
         { name: "Proceed to order", value: "Proceed to order" },
         { name: "Order confirm", value: "Order confirm" },
         { name: "Ready to pick-up", value: "Ready to pick-up" },
@@ -636,6 +637,7 @@ export const profileData = {
     submitValue: "update profile",
     endPoint: "/user/edit-profile",
     getDefaultValueEndPoint: "/user/",
+    grid: true,
     inputLists: [
       {
         type: "text",
@@ -664,6 +666,21 @@ export const profileData = {
         name: "user_contact",
         label: "Contact number",
         placeholder: "01X-XXX XXXX",
+      },
+      {
+        type: "password",
+        name: "user_password",
+        label: "Current Password",
+        placeholder: "Only required for reset password",
+        required: false,
+      },
+      {
+        type: "password",
+        name: "new_password",
+        label: "New Password",
+        placeholder: "Keep it private",
+        onKeyUpCheck: true,
+        required: false,
       },
       {
         type: "hidden",
@@ -814,4 +831,5 @@ export const accountData = {
 };
 
 export const APIGateway = "http://localhost:8080";
+// export const APIGateway = "http://192.168.1.113:8080";
 export const ImgPathWay = "/images/";

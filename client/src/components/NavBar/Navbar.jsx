@@ -20,7 +20,7 @@ const Navbar = () => {
     deleteCookie("token");
     localStorage.clear();
     closeNavBarHandler();
-    window.location.reload();
+    window.location.href = "./login";
   };
 
   return (

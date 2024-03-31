@@ -9,7 +9,7 @@ const { createQuotation } = require("../function/pdfFactory");
 const generateQuotePK = (req, res, next) => {
   const { user_id } = req.user;
   const selectQuery =
-    "SELECT quote_id FROM quotation WHERE pic_id = ? ORDER BY created_at DESC LIMIT 1;";
+    "SELECT quote_id FROM quotation WHERE pic_id = ? ORDER BY quote_id DESC LIMIT 1;";
 
   db.query(selectQuery, [user_id], (err, result) => {
     if (err)
@@ -115,7 +115,7 @@ router.post(
           quoteSubTotal +=
             parseInt(product_quantity) * parseFloat(product_unit_price);
 
-          if (product_name === formatedProductArray[product_id].name) {
+          if (product_name === productObj[product_id].name) {
             const { product_name, ...remainingObj } = product;
             product = remainingObj;
           }
@@ -140,7 +140,7 @@ router.post(
         next();
       })
       .catch((err) => {
-        res.status(400).json({ message: err.message });
+        res.status(400).json({ message: "Error here : " + err.message });
       });
   },
   generateQuotePK,

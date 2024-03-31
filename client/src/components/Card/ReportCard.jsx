@@ -44,12 +44,10 @@ const ReportCard = () => {
       })
       .then((res) => {
         const { data } = res.data;
-        console.log(data);
         setDashBoardInfo(data);
       })
       .catch((err) => {
         const message = err.message || "Something went wrong";
-        console.log(err.message);
         setSnackbar({ open: true, message: message, severity: "error" });
       });
   };
@@ -64,7 +62,6 @@ const ReportCard = () => {
     setModalOpen(false);
     fetchData();
   };
-  console.log(filterValue);
   return (
     <>
       <div id="reportSec">

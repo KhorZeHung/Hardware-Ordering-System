@@ -216,14 +216,14 @@ const FilterTable = ({ datas }) => {
                                         href={`https://wa.me/${phoneNo}`}
                                         target="_blank"
                                         rel="noopener noreferrer">
-                                        {cellData}
+                                        {String(cellData)}
                                       </a>
                                     </td>
                                   );
                                 }
                                 return (
                                   <td key={`cell-${theadValue}-${cellIndex}`}>
-                                    {cellData}
+                                    {String(cellData)}
                                   </td>
                                 );
                               }

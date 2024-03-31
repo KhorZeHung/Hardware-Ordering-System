@@ -9,13 +9,15 @@ const { createOrderSpreadSheet } = require("../function/excelFactory");
 
 router.get("", validateJWT, (req, res) => {
   const { searchterm, filteroption, page, sort, desc } = req.query;
-  let selectQuery = `SELECT p.project_order_id AS "id",  s.supplier_cmp_name AS "supplier", p.project_id AS "project", p.project_order_subtotal AS subtotal, p.project_order_status AS "status" FROM project_order AS p INNER JOIN supplier AS s ON p.supplier_id = s.supplier_id`;
+  let selectQuery = `SELECT p.project_order_id AS "id",  s.supplier_cmp_name AS "supplier", project.project_name AS "project", 
+  p.project_order_subtotal AS subtotal, p.project_order_status AS "status", IFNULL(DATE_FORMAT(DATE(p.project_order_delivery_date), '%Y-%m-%d'), "-") AS "due time" 
+  FROM project_order AS p INNER JOIN supplier AS s ON p.supplier_id = s.supplier_id INNER JOIN project ON p.project_id = project.project_id`;
   let queryParams = [];
 
   if (searchterm) {
     selectQuery += ` WHERE (s.supplier_cmp_name LIKE ?
     OR p.project_order_id LIKE ?
-    OR p.project_id LIKE ?)`;
+    OR project.project_name LIKE ?)`;
     queryParams.push(`%${searchterm}%`, `%${searchterm}%`, `%${searchterm}%`);
   }
   if (filteroption) {
@@ -38,7 +40,7 @@ router.get("", validateJWT, (req, res) => {
     const sortColumnNameMap = {
       id: "p.project_order_id",
       supplier: "s.supplier_cmp_name",
-      project: "p.project_id",
+      project: "project.project_name",
       subtotal: "p.project_order_subtotal",
       status: "p.project_order_status",
     };
@@ -78,7 +80,10 @@ router.get("/:order_id", validateJWT, (req, res) => {
 
   let selectQuery = `SELECT CONCAT(s.supplier_cmp_name, ', ', s.supplier_pic) AS "supplier", s.supplier_contact AS "supplier contact", s.supplier_address AS "supplier address",
   p.project_id AS "project id", p.project_address AS "project address", o.project_order_subtotal, 
-  o.project_order_product_lists, o.project_order_status, o.project_order_total_paid FROM project_order AS o INNER JOIN
+  o.project_order_product_lists, o.project_order_status, o.project_order_total_paid 
+  , IFNULL(DATE_FORMAT(DATE(o.project_order_delivery_date), '%Y-%m-%d'), "-") AS "due time",
+  IFNULL(o.project_order_remark, "-") AS "remark"
+  FROM project_order AS o INNER JOIN
   supplier AS s ON o.supplier_id = s.supplier_id INNER JOIN project AS p ON o.project_id = p.project_id WHERE project_order_id = ?`;
 
   let queryParams = [order_id];
@@ -129,7 +134,8 @@ router.get(
         .status(400)
         .json({ message: "Order identification is not provided" });
 
-    const selectQuery = `SELECT * FROM project_order INNER JOIN supplier 
+    const selectQuery = `SELECT *, DATE_FORMAT(project_order.project_order_delivery_date, "%d-%m-%Y") AS 'due_date' 
+    FROM project_order INNER JOIN supplier 
     ON project_order.supplier_id = supplier.supplier_id 
     INNER JOIN project
     ON project_order.project_id = project.project_id
@@ -138,6 +144,8 @@ router.get(
       if (err)
         return res.status(500).json({ message: "Something went wrong " + err });
       if (result.length !== 1)
+        return res.status(400).json({ message: "Order not found / not exist" });
+      if (result[0].due_date === null)
         return res.status(400).json({ message: "Order not found / not exist" });
 
       let returnObj = result[0];

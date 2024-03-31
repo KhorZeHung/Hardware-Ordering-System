@@ -21,6 +21,7 @@ const InputMultipleTxt = ({ datas, formHandler }) => {
 
   const updateDescriptions = (e) => {
     const inputEle = document.getElementById(name);
+    if (inputEle.value.length < 1) return;
     const newInputListsArray = [...inputLists, inputEle.value];
     setInputLists(newInputListsArray);
     inputEle.value = "";

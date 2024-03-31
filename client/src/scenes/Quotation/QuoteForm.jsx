@@ -24,6 +24,7 @@ const QuoteForm = ({ datas }) => {
   const { isQuote = false, isNew = false } = datas;
 
   const [isLoading, setIsLoading] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [formInputValue, setFormInputValue] = useState({
     quote_product_lists: [
       {
@@ -39,9 +40,9 @@ const QuoteForm = ({ datas }) => {
   const { setSnackbar } = useContext(SnackbarContext);
   const newQuoteDataCopy = useRef(newQuoteData);
   const navigate = useNavigate();
+
   const submitHandler = async (e) => {
     e.preventDefault();
-
     const token = getCookie("token");
 
     await axios
@@ -53,9 +54,6 @@ const QuoteForm = ({ datas }) => {
       .then((res) => {
         const { message } = res.data;
         setSnackbar({ open: true, severity: "success", message: message });
-        setTimeout(() => {
-          window.location.reload();
-        }, 2000);
       })
       .catch((err) => {
         const msg =
@@ -73,10 +71,8 @@ const QuoteForm = ({ datas }) => {
   ) => {
     const inputValue = value || e.target.value;
     const inputName = name || e.target.name;
-
     setFormInputValue((prev) => {
       const { quote_sub_total, quote_grand_total, ...rest } = prev;
-
       return {
         ...rest,
         [inputName]:
@@ -278,8 +274,6 @@ const QuoteForm = ({ datas }) => {
     }
     return () => {};
   }, [isNew, quote_id, setSnackbar]);
-
-  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const toggleDrawer = () => {
     setDrawerOpen(!drawerOpen);

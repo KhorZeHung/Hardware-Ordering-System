@@ -20,14 +20,14 @@ const ProductListTable = ({
       <thead>
         <tr>
           <th>Product</th>
-          <th style={{ maxWidth: "100px" }}>Quantity</th>
+          <th style={{ maxWidth: "60px" }}>Quantity</th>
           <th style={{ maxWidth: "100px" }}>Unit Price</th>
           <th style={{ maxWidth: "100px" }}>Sub-total</th>
           <th style={{ maxWidth: "200px" }}>Descriptions</th>
           {!disable && <th style={{ maxWidth: "40px" }}></th>}
         </tr>
       </thead>
-      <tbody>
+      <tbody style={{ color: "black" }}>
         {productList.map((product, index) => {
           return (
             <tr key={`${product.product_name}${index}`}>
@@ -69,6 +69,7 @@ const ProductListTable = ({
                     }
                     min={0}
                     readOnly={disable}
+                    style={{ width: "40px" }}
                   />
                   {!disable && (
                     <button>
@@ -105,7 +106,7 @@ const ProductListTable = ({
               </td>
               <td style={{ marginTop: "0 !important" }}>
                 <TableCheckBox
-                  formHandler={(e, value, name) => {
+                  formHandler={(e, value) => {
                     !disable && productDescriptionHandler(value, index);
                   }}
                   datas={{
@@ -120,9 +121,9 @@ const ProductListTable = ({
                       })
                     ),
                     disable: disable,
-                    defaultValue: productDescription[
-                      String(product.product_id)
-                    ].map((_, index) => index),
+                    defaultValue: productDescription[product.product_id].map(
+                      (_, index) => index
+                    ),
                   }}
                 />
               </td>

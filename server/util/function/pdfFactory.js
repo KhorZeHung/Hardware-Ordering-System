@@ -300,7 +300,7 @@ function createQuotation(data, start, end) {
     align: "center",
   });
 
-  const qrSVG = qr.imageSync("https://wa.me/01776096446", { type: "png" });
+  const qrSVG = qr.imageSync("https://wa.me/60176096446", { type: "png" });
   doc.image(qrSVG, doc.page.width - 150, doc.page.height - 200, {
     fit: [100, 100],
   });
@@ -410,7 +410,7 @@ function createPurchaseOrder(data, start, end) {
       continued: true,
     })
     .font("Helvetica")
-    .text(new Date().toLocaleDateString("en-GB"));
+    .text(data.due_date);
 
   doc.moveDown(3);
 
@@ -490,6 +490,16 @@ function createPurchaseOrder(data, start, end) {
       wrap: false,
     }
   );
+
+  const qrSVG = qr.imageSync("https://wa.me/60176096446", { type: "png" });
+  doc.image(qrSVG, doc.page.width - 150, doc.page.height - 200, {
+    fit: [100, 100],
+  });
+  doc.fontSize(8).font("Helvetica").fillColor("#000");
+  doc.text("scan to whatsapp me", doc.page.width - 150, doc.page.height - 100, {
+    width: 100,
+    align: "center",
+  });
   doc.end();
 }
 

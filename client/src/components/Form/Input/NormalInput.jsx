@@ -20,6 +20,7 @@ const NormalInput = ({ datas, formHandler }) => {
 
   const checkInputRequirements = (event) => {
     const inputValue = event.target.value;
+    if (!event.target.required) return;
 
     const isLengthValid = inputValue.length >= 8;
     const hasAlphabet = /[a-zA-Z]/.test(inputValue);
@@ -74,6 +75,11 @@ const NormalInput = ({ datas, formHandler }) => {
         readOnly={disable}
         onKeyUp={onKeyUpCheck ? checkInputRequirements : null}
         onClick={handleCopy}
+        pattern={
+          type === "tel"
+            ? "/^(?:+?(?:d{2})?)?s*(?:d{3}[s-]?d{4}[s-]?d{4}|d{2}[s-]?d{8}|d{3}[s-]?d{7}|d{11})$/"
+            : null
+        }
       />
       {onKeyUpCheck && (
         <span className="inputRequirement" ref={inputRequirement}>

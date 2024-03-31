@@ -4,6 +4,7 @@ import "../Table/FilterTable.css";
 import CircularProgress from "@mui/material-next/CircularProgress";
 import useProductInfo from "../../utils/useProductInfo";
 import useSupplierInfo from "../../utils/useSupplierInfo";
+import { Dialog } from "@mui/material";
 
 const ProductListModal = (props) => {
   const { open, closeFunc, addProductHandler, defaultValue } = props;
@@ -44,11 +45,9 @@ const ProductListModal = (props) => {
     setFilterValue((prev) => ({ searchTerm: null, filterOption: null }));
   };
 
-  const editCheckedBox = (event) => {
-    const checked = event.target.checked;
-    const value = event.target.value;
+  const editCheckedBox = (event, value) => {
     let newCheckedBoxArray = [...checkedBox];
-    if (checked) {
+    if (!newCheckedBoxArray.includes(value)) {
       newCheckedBoxArray.push(String(value));
     } else {
       newCheckedBoxArray = newCheckedBoxArray.filter((val) => val !== value);
@@ -56,9 +55,9 @@ const ProductListModal = (props) => {
 
     setCheckedBox(newCheckedBoxArray);
     let subtotal = 0;
-    const newProductListArray = productInfo
-      .filter((product) => newCheckedBoxArray.includes(String(product.id)))
-      .map((product) => {
+    const newProductListArray = Object.entries(productInfo)
+      .filter(([_, product]) => newCheckedBoxArray.includes(String(product.id)))
+      .map(([_, product]) => {
         subtotal += parseFloat(product.unit_price);
         return {
           product_id: product.id,
@@ -86,14 +85,18 @@ const ProductListModal = (props) => {
         containFilterValue = false;
       }
 
-      return containFilterValue && item.name.toLowerCase().includes(checkValue);
+      return (
+        containFilterValue &&
+        (item.name.toLowerCase().includes(checkValue) ||
+          item.supplier.toLowerCase().includes(checkValue))
+      );
     });
     setTableData(filteredData);
     setFilterValue((prev) => ({ ...prev, searchTerm: checkValue }));
   };
 
   const filterHandler = (e) => {
-    const value = String(e.target.value).toLowerCase();
+    const value = e.target.value;
     if (value === "all") {
       setTableData(oriTableData.current);
 
@@ -104,7 +107,10 @@ const ProductListModal = (props) => {
       });
       if (filterValue.searchTerm) {
         newTableData = newTableData.filter((data) => {
-          return data.name.includes(filterValue.searchTerm);
+          return (
+            data.name.includes(filterValue.searchTerm) ||
+            data.supplier.includes(filterValue.searchTerm)
+          );
         });
       }
       setTableData(newTableData);
@@ -116,10 +122,12 @@ const ProductListModal = (props) => {
   };
 
   return (
-    <div className={open ? "modal open" : "modal"}>
-      <span onClick={closeFunc} className="closeModal">
-        &#x2716;
-      </span>
+    <Dialog
+      open={open}
+      onClose={closeFunc}
+      scroll="body"
+      maxWidth="md"
+      fullWidth={true}>
       <div className="modalContentContainer">
         <div className="filterSec spaceBetween">
           <div className="searchBar">
@@ -176,13 +184,19 @@ const ProductListModal = (props) => {
                   <tbody>
                     {tableData.map((rowData, rowIndex) => {
                       return (
-                        <tr key={`row-${rowIndex}`}>
+                        <tr
+                          key={`row-${rowIndex}`}
+                          onClick={(e) =>
+                            editCheckedBox(e, String(rowData.id))
+                          }>
                           {
                             <td>
                               <input
                                 type="checkbox"
                                 value={rowData.id}
-                                onChange={editCheckedBox}
+                                onChange={(e) =>
+                                  editCheckedBox(e, String(rowData.id))
+                                }
                                 checked={checkedBox.includes(
                                   String(rowData.id)
                                 )}
@@ -212,7 +226,7 @@ const ProductListModal = (props) => {
           )}
         </div>
       </div>
-    </div>
+    </Dialog>
   );
 };
 

@@ -115,7 +115,7 @@ const OrderInfo = () => {
         });
       })
       .catch((err) => {
-        const message = err.response || "Something went wrong";
+        const message = err.response.statusText || "Something went wrong";
         setSnackbar({ open: true, message: message, severity: "error" });
       });
   };

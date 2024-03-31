@@ -222,12 +222,17 @@ const RoomMaterialInput = ({ datas }) => {
             }>
             <div
               onClick={(e) => {
+                setIsActionMenuOpen(false);
                 addRoomHandler(e, productLists.productList);
               }}>
               <span className="material-symbols-outlined">content_copy</span>
               <p>make a copy</p>
             </div>
-            <div onClick={() => deleteConfirm()}>
+            <div
+              onClick={() => {
+                setIsActionMenuOpen(false);
+                deleteConfirm();
+              }}>
               <span className="material-symbols-outlined">delete</span>
               <p>delete room</p>
             </div>

@@ -85,6 +85,11 @@ const FormBody = (props) => {
       })
       .then((res) => {
         const message = res.data.message;
+        localStorage.removeItem("supplierInfo");
+        localStorage.removeItem("productInfo");
+        localStorage.removeItem("productByCategory");
+        localStorage.removeItem("productBySupplier");
+        localStorage.removeItem("productDescription");
         setSnackbar((prev) => ({
           severity: "success",
           message: message,

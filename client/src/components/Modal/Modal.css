@@ -17,11 +17,9 @@
 }
 
 .modalContentContainer {
-  width: 80%;
   min-width: 400px;
   background-color: var(--bckgrd-1);
   border-radius: 10px;
-  box-shadow: var(--box-shadow-1);
   margin: 0 auto;
   padding: 1rem;
 }

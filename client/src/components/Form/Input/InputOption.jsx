@@ -6,12 +6,11 @@ const InputOption = ({ datas, formHandler }) => {
     label,
     name,
     required = true,
-    options = [],
+    options = {},
     disable = false,
     defaultValue = null,
   } = datas;
   const [selected, setSelected] = useState(defaultValue);
-
   const selectChangeHandler = (event) => {
     const { value } = event.target;
     setSelected(value);

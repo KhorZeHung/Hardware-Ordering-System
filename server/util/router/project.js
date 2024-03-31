@@ -181,7 +181,7 @@ router.post(
 router.get("", validateJWT, (req, res) => {
   const { searchterm, filteroption, sort, desc, page } = req.query;
 
-  let selectQuery = `SELECT project_id AS "id", project_name AS 'project name', project_client_name AS "client name", project_client_contact AS "contact", project_grand_total AS "total charge", project_address AS location FROM project`;
+  let selectQuery = `SELECT project_id AS "id", project_name AS 'project name', project_client_name AS "client name", project_client_contact AS "contact", project_grand_total AS "total charge", project_outstanding AS "outstanding", project_address AS location FROM project`;
   let queryParams = [];
 
   if (searchterm) {

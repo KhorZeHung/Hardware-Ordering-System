@@ -31,7 +31,7 @@
 }
 
 .formBody .subTotalSec {
-  color: var(--primary-color-6);
+  color: rgb(23, 21, 21);
   margin-top: 30px;
   display: flex;
   justify-content: flex-end;
@@ -61,7 +61,7 @@
   max-width: 750px;
   margin: 0 auto;
 }
-.formInputLists .grid {
+.grid {
   grid-template-columns: repeat(2, minmax(300px, 1fr));
 }
 
@@ -462,6 +462,8 @@
   overflow: hidden;
   text-overflow: ellipsis;
   width: 100%;
+  color: black !important;
+  box-sizing: border-box;
   overflow-wrap: unset;
 }
 
@@ -474,7 +476,6 @@
   border: none;
   font-size: 0.9rem;
   background-color: inherit;
-  width: 100px;
   text-align: center;
   color: inherit;
 }

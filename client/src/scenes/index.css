@@ -140,7 +140,7 @@
 
 .orderInfo {
   position: relative;
-  margin: 0;
+  margin: 20px 0;
 }
 .orderInfo .orderTable,
 .orderInfo .supplierTable {
@@ -156,7 +156,7 @@
 }
 
 .orderInfo th {
-  background-color: var(--primary-color-6);
+  background-color: var(--primary-color-5);
   color: white;
 }
 
