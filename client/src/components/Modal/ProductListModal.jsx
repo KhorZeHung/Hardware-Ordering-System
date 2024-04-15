@@ -42,7 +42,10 @@ const ProductListModal = (props) => {
   const clearSearch = () => {
     searchTermRef.current.value = "";
     setTableData(oriTableData.current);
-    setFilterValue((prev) => ({ searchTerm: null, filterOption: null }));
+    setFilterValue({
+      searchTerm: null,
+      filterOption: null,
+    });
   };
 
   const editCheckedBox = (event, value) => {

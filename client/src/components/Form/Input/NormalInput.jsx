@@ -49,11 +49,46 @@ const NormalInput = ({ datas, formHandler }) => {
     }
   };
 
+  const notificationCheck = () => {
+    if (onKeyUpCheck)
+      return (
+        <span className="inputRequirement" ref={inputRequirement}>
+          Atleast 8 character 1 alphabet 1 special character
+        </span>
+      );
+
+    if (type === "tel")
+      return (
+        <span className="inputRequirement">
+          Only input digit without space, dash, +6.
+        </span>
+      );
+
+    return;
+  };
+
   const handleCopy = (event) => {
     if (event.target.readOnly) {
       navigator.clipboard.writeText(event.target.value);
       setSnackbar({ open: true, message: "copied", serverity: "success" });
     }
+  };
+
+  const defaultValueHandler = () => {
+    if (defaultValue) {
+      if (type === "date") {
+        const parts = defaultValue.split("/");
+        const day = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1;
+        const year = parseInt(parts[2], 10);
+        const date = new Date(year, month, day);
+        const malaysiaTime = new Date(date.getTime() + 8 * 60 * 60 * 1000);
+        const formattedDate = malaysiaTime.toISOString().substr(0, 10);
+        return formattedDate;
+      }
+      return defaultValue;
+    }
+    return null;
   };
 
   return (
@@ -66,7 +101,7 @@ const NormalInput = ({ datas, formHandler }) => {
         type={type}
         name={name}
         required={required}
-        defaultValue={defaultValue || null}
+        defaultValue={defaultValueHandler()}
         placeholder={placeholder}
         onChange={formHandler}
         id={name}
@@ -75,17 +110,9 @@ const NormalInput = ({ datas, formHandler }) => {
         readOnly={disable}
         onKeyUp={onKeyUpCheck ? checkInputRequirements : null}
         onClick={handleCopy}
-        pattern={
-          type === "tel"
-            ? "/^(?:+?(?:d{2})?)?s*(?:d{3}[s-]?d{4}[s-]?d{4}|d{2}[s-]?d{8}|d{3}[s-]?d{7}|d{11})$/"
-            : null
-        }
+        pattern={type === "tel" ? "^\\d{10,13}$" : null}
       />
-      {onKeyUpCheck && (
-        <span className="inputRequirement" ref={inputRequirement}>
-          Atleast 8 character 1 alphabet 1 special character
-        </span>
-      )}
+      {notificationCheck()}
     </div>
   );
 };

@@ -56,8 +56,8 @@ WHERE
 const getnewAccountOverall = (req, res, next) => {
   const { startDate = lastDayOfPreviousMonth, duration = 1 } = req.query;
   const selectQuery = `SELECT 
-  COALESCE(SUM(CASE WHEN isDebit = 1 THEN amount ELSE 0 END), 0) AS debit_total,
-  COALESCE(SUM(CASE WHEN isDebit = 0 THEN amount ELSE 0 END), 0) AS credit_total
+  COALESCE(SUM(CASE WHEN account_status_payment_refer != 0 THEN amount ELSE 0 END), 0) AS debit_total,
+  COALESCE(SUM(CASE WHEN account_status_payment_refer = 0 THEN amount ELSE 0 END), 0) AS credit_total
 FROM 
   account_status 
 WHERE 
@@ -69,7 +69,6 @@ WHERE
   db.query(selectQuery, queryParams, (err, result) => {
     if (err)
       return res.status(500).json({ message: "Something went wrong " + err });
-
     req.newAccountOverallData = result[0];
     next();
   });

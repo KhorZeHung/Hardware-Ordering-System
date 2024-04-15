@@ -13,10 +13,10 @@ import Quotation from "./scenes/Quotation";
 import QuoteForm from "./scenes/Quotation/QuoteForm";
 import ForgotPassword from "./scenes/ForgotPassword";
 import Profile from "./scenes/Profile";
+import ProjectForm from "./scenes/Project/ProjectForm";
 
 //import component
 import Navbar from "./components/NavBar/Navbar";
-import ProjectInfo from "./scenes/Project/ProjectInfo";
 import PrivateRoute from "./components/Auth/PrivateRoute";
 import LoginRoute from "./components/Auth/LoginRoute";
 
@@ -120,7 +120,7 @@ function App() {
             path="/project/:project_id"
             element={
               <PrivateRoute path="project">
-                <ProjectInfo />
+                <ProjectForm />
               </PrivateRoute>
             }
           />

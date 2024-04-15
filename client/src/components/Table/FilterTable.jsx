@@ -203,9 +203,10 @@ const FilterTable = ({ datas }) => {
                               (cellData, cellIndex) => {
                                 const theadValue = tableHeader[cellIndex];
                                 if (theadValue.includes("contact")) {
-                                  const phoneNo = cellData
-                                    .replace(/^(\+|6|\+6)?/g, "")
-                                    .replace(/[^0-9]/g, "");
+                                  const phoneNo = cellData.replace(
+                                    /^\+?(?!6)/,
+                                    "6"
+                                  );
                                   return (
                                     <td key={`cell-${theadValue}-${cellIndex}`}>
                                       <a

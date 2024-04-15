@@ -1,7 +1,10 @@
-import React, { useState, useEffect, useRef, useContext } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import ProductListModal from "../../Modal/ProductListModal";
 import ProductListTable from "../../Table/ProductListTable";
 import { ConfirmModalContext } from "../../Modal/ConfirmModalProvider";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import Fade from "@mui/material/Fade";
 import "../FormBody.css";
 
 export const calculateSubTotal = (productLists) => {
@@ -23,49 +26,33 @@ const RoomMaterialInput = ({ datas }) => {
     formHandler = null,
     addRoomHandler = null,
     deleteRoomHandler = null,
+    isQuote = true,
   } = datas;
 
-  const numOfRoom = index + 1;
-  const indexOfArray = index;
-  const [open, setOpen] = useState(false);
   const [productLists, setProductLists] = useState(defaultProductList);
   const [subTotal, setSubTotal] = useState(
     calculateSubTotal(defaultProductList.productList) || 0
   );
-  const [isActionMenuOpen, setIsActionMenuOpen] = useState(false);
+  const numOfRoom = index + 1;
+  const indexOfArray = index;
+  const [menuBarOpen, setMenuBarOpen] = useState(false);
   const [isProductListModalOpen, setIsProductListModalOpen] = useState(false);
-  const mainBarActionRef = useRef(null);
   const { openModal } = useContext(ConfirmModalContext);
-
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (e) => {
+    setAnchorEl(e.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
   useEffect(() => {
     setProductLists(defaultProductList);
     setSubTotal(calculateSubTotal(defaultProductList.productList) || 0);
   }, [defaultProductList]);
-
-  useEffect(() => {
-    const handleOutsideClick = (event) => {
-      const mainBar = document.querySelector("#mainBar" + numOfRoom);
-
-      if (mainBar && !mainBar.contains(event.target)) {
-        setOpen(false);
-      }
-    };
-
-    const handleKeyPress = (event) => {
-      if (event.key === "Escape") {
-        setOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleOutsideClick);
-    document.addEventListener("keydown", handleKeyPress);
-
-    return () => {
-      document.removeEventListener("mousedown", handleOutsideClick);
-      document.removeEventListener("keydown", handleKeyPress);
-    };
-  }, [open, numOfRoom]);
-
+  const product_lists = isQuote
+    ? "quote_product_lists"
+    : "project_product_lists";
   const productDescriptionHandler = (newArray, index) => {
     setProductLists((prev) => ({
       ...prev,
@@ -127,7 +114,7 @@ const RoomMaterialInput = ({ datas }) => {
     setProductLists(newProductListsArray);
     formHandler(
       e,
-      "quote_product_lists",
+      product_lists,
       newProductListsArray,
       indexOfArray,
       changeValue
@@ -153,7 +140,7 @@ const RoomMaterialInput = ({ datas }) => {
     setProductLists(newProductListsArray);
     formHandler(
       e,
-      "quote_product_lists",
+      product_lists,
       newProductListsArray,
       indexOfArray,
       unit_price
@@ -165,7 +152,7 @@ const RoomMaterialInput = ({ datas }) => {
     const newProductListsArray = { ...productLists, roomName: newRoomName };
 
     setProductLists(newProductListsArray);
-    formHandler(e, "quote_product_lists", newProductListsArray, indexOfArray);
+    formHandler(e, product_lists, newProductListsArray, indexOfArray);
   };
 
   const addProductHandler = (e, arraysOfProduct, newSubTotal) => {
@@ -177,13 +164,7 @@ const RoomMaterialInput = ({ datas }) => {
     setProductLists(newProductListsArray);
     const netPlus = newSubTotal - subTotal;
     setSubTotal((prev) => prev + newSubTotal);
-    formHandler(
-      e,
-      "quote_product_lists",
-      newProductListsArray,
-      indexOfArray,
-      netPlus
-    );
+    formHandler(e, product_lists, newProductListsArray, indexOfArray, netPlus);
   };
 
   const deleteConfirm = () => {
@@ -210,44 +191,66 @@ const RoomMaterialInput = ({ datas }) => {
             onChange={changeRoomNameHandler}
           />
           <span
-            ref={mainBarActionRef}
             className="material-symbols-outlined mainBarAction"
-            onClick={() => setIsActionMenuOpen(!isActionMenuOpen)}>
+            id="fade-button"
+            aria-controls={open ? "fade-menu" : undefined}
+            aria-haspopup="true"
+            aria-expanded={open ? "true" : undefined}
+            onClick={handleClick}>
             more_vert
           </span>
-          <span
-            className="actionMenu"
-            style={
-              isActionMenuOpen ? { display: "block" } : { display: "none" }
-            }>
-            <div
+          <Menu
+            id="fade-menu"
+            anchorEl={anchorEl}
+            open={open}
+            onClose={handleClose}
+            TransitionComponent={Fade}
+            anchorOrigin={{
+              vertical: "bottom",
+              horizontal: "right",
+            }}
+            transformOrigin={{
+              vertical: "top",
+              horizontal: "right",
+            }}>
+            <MenuItem
               onClick={(e) => {
-                setIsActionMenuOpen(false);
+                handleClose();
                 addRoomHandler(e, productLists.productList);
               }}>
-              <span className="material-symbols-outlined">content_copy</span>
-              <p>make a copy</p>
-            </div>
-            <div
+              <span
+                className="material-symbols-outlined"
+                style={{ fontSize: "18px" }}>
+                content_copy
+              </span>
+              <p style={{ fontSize: "12px", margin: "0" }}>make a copy</p>
+            </MenuItem>
+            <MenuItem
               onClick={() => {
-                setIsActionMenuOpen(false);
+                handleClose();
                 deleteConfirm();
-              }}>
-              <span className="material-symbols-outlined">delete</span>
-              <p>delete room</p>
-            </div>
-          </span>
+              }}
+              style={{ color: "red" }}>
+              <span
+                className="material-symbols-outlined"
+                style={{ fontSize: "18px" }}>
+                delete
+              </span>
+              <p style={{ fontSize: "12px", margin: "0" }}>delete room</p>
+            </MenuItem>
+          </Menu>
+
           <p className="subTotal">{"RM " + parseFloat(subTotal).toFixed(2)}</p>
           <span
             className={
-              open
+              menuBarOpen
                 ? "material-symbols-outlined secClose rotate"
                 : "material-symbols-outlined secClose"
             }
-            onClick={() => setOpen(!open)}>
+            onClick={() => setMenuBarOpen(!menuBarOpen)}>
             keyboard_arrow_up
           </span>
-          <div className={open ? "barContent open" : "barContent"}>
+          <div className={menuBarOpen ? "barContent open" : "barContent"}>
             {productLists.productList.length > 0 ? (
               <ProductListTable
                 productList={productLists.productList}

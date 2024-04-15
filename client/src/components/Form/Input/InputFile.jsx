@@ -31,7 +31,7 @@ const InputFile = ({ datas, formHandler }) => {
         gridRow: "span 2",
         maxWidth: "100%",
       }}>
-      <label htmlFor="file">{label}</label>
+      <label htmlFor="file">{label}{required && <span>*</span>}</label>
       <div style={{ width: "100%" }}>
         <input
           type="file"

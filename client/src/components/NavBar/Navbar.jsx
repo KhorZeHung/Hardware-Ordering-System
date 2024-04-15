@@ -2,12 +2,12 @@ import React, { useState } from "react";
 import { Outlet, Link, NavLink } from "react-router-dom";
 import { getCookie, deleteCookie } from "../../utils/cookie";
 import { allowAccessLink } from "../../utils/allowAccessLink";
+import { decode } from "jsonwebtoken";
 import logo from "../../assets/logo.png";
 import "./Navbar.css";
 
 const Navbar = () => {
   const [openNavBar, setOpenNavBar] = useState(false);
-
   const navBarHandler = () => setOpenNavBar((prev) => !prev);
   const closeNavBarHandler = () => setOpenNavBar(false);
 
@@ -57,7 +57,9 @@ const Navbar = () => {
                 </li>
               ))}
               <li onClick={closeNavBarHandler}>
-                <NavLink to={"/profile"}>profile</NavLink>
+                <NavLink to={"/profile"}>
+                  profile : <b>{decode(getCookie("token")).user_name}</b>
+                </NavLink>
               </li>
               <li onClick={logOutHandler} id="logout">
                 Log out

@@ -2,14 +2,20 @@ import React, { useEffect, useState, useRef, useContext } from "react";
 import { Dialog, DialogContent, DialogActions } from "@mui/material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import { APIGateway, ImgPathWay } from "../../data";
+import { APIGateway, ImgPathWay, accountData } from "../../data";
 import "./AccountStatusCard.css";
 import { getCookie } from "../../utils/cookie";
 import { SnackbarContext } from "../Snackbar/SnackBarProvidor";
+import { ConfirmModalContext } from "../Modal/ConfirmModalProvider";
+import { CustomModalContext } from "../Modal/CustomModalProvider";
+import { useNavigate } from "react-router-dom";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import Fade from "@mui/material/Fade";
 import axios from "axios";
 
 const AccountStatusCard = ({ data }) => {
-  const { defaultValue } = data;
+  const { defaultValue, profitInfo } = data;
   const newDefaultValue = useRef([]);
   const [accountSummary, setAccountSummary] = useState({
     debitTotal: 0,
@@ -17,9 +23,19 @@ const AccountStatusCard = ({ data }) => {
   });
   let cumulativeBalance = 0;
   const { setSnackbar } = useContext(SnackbarContext);
-
-  const [openDialogIndex, setOpenDialogIndex] = useState(-1); // State to track which dialog is open
-  const [imageUrls, setImageUrls] = useState([]); // State to store image URLs
+  const [openDialogIndex, setOpenDialogIndex] = useState(-1);
+  const [imageUrls, setImageUrls] = useState([]);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const { openModal } = useContext(ConfirmModalContext);
+  const { openCustomModal } = useContext(CustomModalContext);
+  const navigate = useNavigate();
+  const open = Boolean(anchorEl);
+  const handleClick = (e) => {
+    setAnchorEl(e.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   const getImage = async (value) => {
     const token = getCookie("token");
@@ -51,10 +67,69 @@ const AccountStatusCard = ({ data }) => {
     );
   };
 
+  const deleteStmtHandler = (e, id) => {
+    e.preventDefault();
+    openModal(
+      "Confirmation",
+      [
+        "Are you sure you want to delete this statement",
+        "Deletion is permanent, and cannot be undo.",
+      ],
+      () => {
+        axios
+          .post(APIGateway + "/account/delete/" + id, null, {
+            headers: {
+              Authorization: `Bearer ${getCookie("token")}`,
+            },
+          })
+          .then((res) => {
+            const { message } = res.data;
+            setSnackbar({
+              severity: "success",
+              message: message,
+              open: true,
+            });
+            setTimeout(() => {
+              navigate(0);
+            }, 2000);
+          })
+          .catch((err) => {
+            const message = err.response.data.message || "Something went wrong";
+            setSnackbar({
+              open: true,
+              message: message,
+              severity: "error",
+            });
+          });
+      }
+    );
+  };
+
+  const editStmtHandler = (e, value) => {
+    e.preventDefault();
+    const nameRefer = {
+      typeOfPayment: "description",
+      account_status_date: "date",
+      amount: "amount",
+      account_status_description: "description",
+      account_status_id: "id",
+    };
+    var updatedEditAccountForm = {
+      ...accountData.editAccountForm,
+      inputLists: accountData.editAccountForm.inputLists.map((input) => {
+        return {
+          ...input,
+          defaultValue: value[nameRefer[input.name]],
+        };
+      }),
+    };
+    openCustomModal(updatedEditAccountForm);
+  };
+
   useEffect(() => {
     let newObj = { debitTotal: 0, creditTotal: 0 };
     newDefaultValue.current = defaultValue.map((value) => {
-      if (value.isDebit) newObj.debitTotal += value.amount;
+      if (value.typeOfPayment === null) newObj.debitTotal += value.amount;
       else newObj.creditTotal += value.amount;
       return value;
     });
@@ -63,7 +138,6 @@ const AccountStatusCard = ({ data }) => {
 
     return () => {};
   }, [defaultValue]);
-
   return (
     <>
       <div className="accountStatusSec center">
@@ -77,14 +151,14 @@ const AccountStatusCard = ({ data }) => {
                 <th>Debit (RM)</th>
                 <th>Credit (RM)</th>
                 <th>Balance</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
               {newDefaultValue.current.map((value, index) => {
-                if (value.isDebit)
+                if (value.typeOfPayment === 0 || value.typeOfPayment === null)
                   cumulativeBalance += parseFloat(value.amount);
                 else cumulativeBalance -= parseFloat(value.amount);
-
                 return (
                   <tr key={`account-status-row-${index + 1}`}>
                     <td>{value.date}</td>
@@ -92,7 +166,7 @@ const AccountStatusCard = ({ data }) => {
                       doc refer
                     </td>
                     <td>{value.description}</td>
-                    {value.isDebit ? (
+                    {value.typeOfPayment === null ? (
                       <>
                         <td>{parseFloat(value.amount).toFixed(2)}</td>
                         <td></td>
@@ -104,6 +178,61 @@ const AccountStatusCard = ({ data }) => {
                       </>
                     )}
                     <td>{cumulativeBalance.toFixed(2)}</td>
+                    <td>
+                      <span
+                        className="material-symbols-outlined menuIcon"
+                        id="fade-button"
+                        aria-controls={open ? "fade-menu" : undefined}
+                        aria-haspopup="true"
+                        aria-expanded={open ? "true" : undefined}
+                        onClick={handleClick}>
+                        more_vert
+                      </span>
+                      <Menu
+                        id="fade-menu"
+                        anchorEl={anchorEl}
+                        open={open}
+                        onClose={handleClose}
+                        anchorOrigin={{
+                          vertical: "bottom",
+                          horizontal: "right",
+                        }}
+                        transformOrigin={{
+                          vertical: "top",
+                          horizontal: "right",
+                        }}
+                        TransitionComponent={Fade}>
+                        <MenuItem
+                          onClick={(e) => {
+                            editStmtHandler(e, value);
+                            handleClose();
+                          }}>
+                          <span
+                            className="material-symbols-outlined"
+                            style={{ fontSize: "18px" }}>
+                            edit
+                          </span>
+                          <p style={{ fontSize: "12px", margin: "0" }}>
+                            edit statement
+                          </p>
+                        </MenuItem>
+                        <MenuItem
+                          onClick={(e) => {
+                            deleteStmtHandler(e, value.id);
+                            handleClose();
+                          }}
+                          style={{ color: "red" }}>
+                          <span
+                            className="material-symbols-outlined"
+                            style={{ fontSize: "18px" }}>
+                            delete
+                          </span>
+                          <p style={{ fontSize: "12px", margin: "0" }}>
+                            delete statement
+                          </p>
+                        </MenuItem>
+                      </Menu>
+                    </td>
                   </tr>
                 );
               })}
@@ -123,7 +252,7 @@ const AccountStatusCard = ({ data }) => {
               <tr>
                 <td></td>
                 <td></td>
-                <th style={{ textAlign: "right" }}>Profit Margin: </th>
+                <th style={{ textAlign: "right" }}>Realtime Profit %: </th>
                 <th>
                   {parseFloat(
                     ((accountSummary.debitTotal - accountSummary.creditTotal) /
@@ -132,6 +261,22 @@ const AccountStatusCard = ({ data }) => {
                   ).toFixed(2)}{" "}
                   %
                 </th>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td></td>
+                <th style={{ textAlign: "right" }}>Actual Profit : </th>
+                <th>RM {parseFloat(profitInfo.totalProfit).toFixed(2)}</th>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td></td>
+                <th style={{ textAlign: "right" }}>Actual Profit %: </th>
+                <th>{parseFloat(profitInfo.profitMargin).toFixed(2)} %</th>
                 <td></td>
                 <td></td>
               </tr>

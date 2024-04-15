@@ -46,3 +46,12 @@
   height: 40px;
   padding: 0 0.5rem;
 }
+
+.accountStatusSec .menuIcon {
+  height: 40px;
+  aspect-ratio: 1/1;
+  line-height: 40px;
+  border-radius: 100px;
+  user-select: none;
+  cursor: pointer;
+}

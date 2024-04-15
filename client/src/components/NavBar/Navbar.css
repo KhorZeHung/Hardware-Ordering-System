@@ -29,6 +29,7 @@
   list-style-type: none;
   display: inline-block;
   min-width: 65px;
+  padding: 0 5px;
   font-size: 0.8rem;
   text-align: center;
   user-select: none;

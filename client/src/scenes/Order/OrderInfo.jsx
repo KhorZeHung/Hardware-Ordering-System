@@ -53,7 +53,7 @@ const OrderInfo = () => {
               inputList.defaultValue +=
                 data.supplierData.supplier.split(",")[0];
 
-            if (inputList.name === "order_id")
+            if (inputList.name === "typeOfPayment")
               inputList.defaultValue = order_id;
 
             return inputList;

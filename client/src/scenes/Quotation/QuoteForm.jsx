@@ -19,6 +19,7 @@ import {
   ListItem,
 } from "@mui/material";
 import axios from "axios";
+import { cloneDeep } from "lodash";
 
 const QuoteForm = ({ datas }) => {
   const { isQuote = false, isNew = false } = datas;
@@ -77,9 +78,9 @@ const QuoteForm = ({ datas }) => {
         ...rest,
         [inputName]:
           Array.isArray(prev[inputName]) && index !== null
-            ? prev[inputName].map((item, i) =>
-                i === index ? { ...item, ...inputValue } : item
-              )
+            ? prev[inputName].map((item, i) => {
+                return i === index ? { ...item, ...inputValue } : item;
+              })
             : inputValue,
         quote_sub_total: quote_sub_total + changeSubTotalValue,
         quote_grand_total: quote_grand_total + changeSubTotalValue,
@@ -91,12 +92,13 @@ const QuoteForm = ({ datas }) => {
     e.preventDefault();
     const numOfRooms = formInputValue.quote_product_lists.length + 1 || 1;
     const changeValue = calculateSubTotal(defaultValue);
+    const copiedDefaultValue = cloneDeep(defaultValue);
 
     const productListArray = [
       ...formInputValue.quote_product_lists,
       {
         roomName: `room ${numOfRooms}`,
-        productList: defaultValue,
+        productList: copiedDefaultValue,
       },
     ];
     setFormInputValue((prev) => ({
@@ -141,7 +143,7 @@ const QuoteForm = ({ datas }) => {
     return formInputValue.quote_product_lists.map((value, index) => {
       return (
         <RoomMaterialInput
-          key={"room" + index}
+          key={"room_" + (index + 1)}
           datas={{
             index: index,
             formHandler: formHandler,
@@ -305,6 +307,7 @@ const QuoteForm = ({ datas }) => {
             <div className="formInputLists" style={{ marginBottom: "3rem" }}>
               {constructInput(newQuoteDataCopy.current.inputLists, formHandler)}
             </div>
+            <p className="title">material</p>
             <div style={{ margin: "1rem 0" }}>{createRoomHandler()}</div>
             <button className="addRoom" onClick={addRoomHandler}>
               +
@@ -338,7 +341,7 @@ const QuoteForm = ({ datas }) => {
                       onClick={() => {
                         window.open(
                           `https://wa.me/${formInputValue.quote_client_contact
-                            .replace(/^(\+|6|\+6)?/g, "")
+                            .replace(/^(\+|6|\+6)?/g, "6")
                             .replace(/[^0-9]/g, "")}`
                         );
                       }}>

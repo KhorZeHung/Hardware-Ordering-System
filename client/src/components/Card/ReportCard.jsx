@@ -47,7 +47,8 @@ const ReportCard = () => {
         setDashBoardInfo(data);
       })
       .catch((err) => {
-        const message = err.message || "Something went wrong";
+        console.log(err);
+        const message = err.response.data.message || "Something went wrong";
         setSnackbar({ open: true, message: message, severity: "error" });
       });
   };
@@ -77,9 +78,9 @@ const ReportCard = () => {
               </li>
             ))}
           </ul>
-          <div className="filterSec">
+          {/* <div className="filterSec">
             <button onClick={() => setModalOpen(true)}>filter</button>
-          </div>
+          </div> */}
           <div className="content center">
             {!dashBoardInfo[subPages] ? (
               <div

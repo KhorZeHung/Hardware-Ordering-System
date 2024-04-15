@@ -6,7 +6,7 @@ const InputOption = ({ datas, formHandler }) => {
     label,
     name,
     required = true,
-    options = {},
+    options = [],
     disable = false,
     defaultValue = null,
   } = datas;
@@ -34,11 +34,13 @@ const InputOption = ({ datas, formHandler }) => {
                 Select an option
               </option>
             )}
-            {options.map((option, index) => (
-              <option key={index} value={option.value} name={name}>
-                {option.name}
-              </option>
-            ))}
+            {options.map((option, index) => {
+              return (
+                <option key={index} value={option.value} name={name}>
+                  {option.name}
+                </option>
+              );
+            })}
           </>
         )}
       </select>

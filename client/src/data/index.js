@@ -213,7 +213,7 @@ export const contactData = {
           type: "tel",
           name: "supplier_contact",
           label: "Contact number",
-          placeholder: "03-XXXX XXXX",
+          placeholder: "01XXXXXXXX",
         },
         {
           type: "hidden",
@@ -384,8 +384,7 @@ export const orderData = {
     inputLists: [
       {
         type: "hidden",
-        name: "isDebit",
-        defaultValue: false,
+        name: "typeOfPayment",
       },
       {
         type: "date",
@@ -412,10 +411,6 @@ export const orderData = {
       {
         type: "hidden",
         name: "project_id",
-      },
-      {
-        type: "hidden",
-        name: "order_id",
       },
     ],
   },
@@ -543,6 +538,49 @@ export const projectData = {
       disable: true,
     },
   ],
+  editProjectForm: {
+    endPoint: "/project/edit",
+    title: "edit project",
+    inputLists: [
+      {
+        type: "text",
+        name: "project_name",
+        label: "project name",
+        placeholder: "Describe location or version",
+      },
+      {
+        type: "text",
+        name: "project_client_name",
+        label: "Client name",
+        placeholder: "Full name with title",
+      },
+      {
+        type: "tel",
+        name: "project_client_contact",
+        label: "Client contact number",
+        placeholder: "01X-XXX XXXX",
+      },
+      {
+        type: "text",
+        name: "project_address",
+        label: "address",
+        placeholder: "full address with unit",
+      },
+      {
+        type: "option",
+        name: "project_prop_type",
+        label: "Type",
+        options: [
+          { name: "condo", value: "condo" },
+          { name: "shoplot", value: "shoplot" },
+          { name: "mall", value: "mall" },
+          { name: "terrace", value: "terrace" },
+          { name: "banglow", value: "banglow" },
+          { name: "semi-banglow", value: "semi-banglow" },
+        ],
+      },
+    ],
+  },
   proceedToDataForm: {
     submitValue: "continue",
     endPoint: "/order/edit/",
@@ -792,12 +830,8 @@ export const accountData = {
     inputLists: [
       {
         type: "option",
-        name: "isDebit",
-        label: "Type of statement",
-        options: [
-          { name: "debit", value: true },
-          { name: "credit", value: false },
-        ],
+        name: "typeOfPayment",
+        label: "Type of Payment",
       },
       {
         type: "date",
@@ -825,6 +859,36 @@ export const accountData = {
       {
         type: "hidden",
         name: "project_id",
+      },
+    ],
+  },
+  editAccountForm: {
+    title: "edit statement",
+    submitValue: "udpate",
+    endPoint: "/account/edit",
+    formSize: "xs",
+    grid: false,
+    inputLists: [
+      {
+        type: "date",
+        name: "account_status_date",
+        label: "Date",
+      },
+      {
+        type: "number",
+        name: "amount",
+        label: "Amount",
+        placeholder: "RM XXX.XX",
+      },
+      {
+        type: "text",
+        name: "account_status_description",
+        label: "Description",
+        placeholder: "characteristic of statement",
+      },
+      {
+        type: "hidden",
+        name: "account_status_id",
       },
     ],
   },

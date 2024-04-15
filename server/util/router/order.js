@@ -26,6 +26,12 @@ router.get("", validateJWT, (req, res) => {
 
     selectQuery += " p.project_order_status = ?";
     queryParams.push(filteroption);
+  } else {
+    if (searchterm) selectQuery += " AND";
+    else selectQuery += " WHERE";
+
+    selectQuery += " p.project_order_status != ?";
+    queryParams.push("Under Process");
   }
   const { user_authority, user_id } = req.user;
 

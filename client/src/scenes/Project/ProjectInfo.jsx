@@ -31,14 +31,23 @@ const ProjectInfo = () => {
   const [isOrderSummary, setIsOrderSummary] = useState(false);
   const [roomMaterial, setRoomMaterial] = useState([]);
   const [accountInfo, setAccountInfo] = useState([]);
+  const [profitInfo, setprofitInfo] = useState(0);
   const [roomMaterialSummary, setRoomMaterialSummary] = useState({});
   const token = getCookie("token");
+  const { openCustomModal } = useContext(CustomModalContext);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   useEffect(() => {
     if (project_id) {
       setIsLoading(true);
       accountData.newAccountForm.inputLists =
         accountData.newAccountForm.inputLists.map((input) => {
+          if (input.name === "project_id")
+            return { ...input, defaultValue: project_id };
+          return input;
+        });
+      accountData.editAccountForm.inputLists =
+        accountData.editAccountForm.inputLists.map((input) => {
           if (input.name === "project_id")
             return { ...input, defaultValue: project_id };
           return input;
@@ -51,7 +60,7 @@ const ProjectInfo = () => {
           },
         })
         .then((res) => {
-          const { projectInfo, orderInfo, accountInfo } = res.data;
+          const { projectInfo, orderInfo, accountInfo, profitInfo } = res.data;
           const updatedInputLists = projectData.inputLists.map((field) => {
             let returnField = field;
             if (projectInfo.hasOwnProperty(field.name)) {
@@ -63,7 +72,7 @@ const ProjectInfo = () => {
             return returnField;
           });
           setInputLists(updatedInputLists);
-
+          setprofitInfo(profitInfo);
           setRoomMaterialSummary({
             subtotal: projectInfo.project_sub_total,
             discount: projectInfo.project_discount,
@@ -151,10 +160,6 @@ const ProjectInfo = () => {
       });
   };
 
-  const { openCustomModal } = useContext(CustomModalContext);
-
-  const [drawerOpen, setDrawerOpen] = useState(false);
-
   const toggleDrawer = () => {
     setDrawerOpen(!drawerOpen);
   };
@@ -169,6 +174,7 @@ const ProjectInfo = () => {
     }
     setDrawerOpen(open);
   };
+
   return isLoading ? (
     <div style={{ height: "90vh", width: "100vw" }} className="center">
       <CircularProgress />
@@ -230,7 +236,12 @@ const ProjectInfo = () => {
           )}
         </div>
 
-        <AccountStatusCard data={{ defaultValue: accountInfo }} />
+        <AccountStatusCard
+          data={{
+            defaultValue: accountInfo,
+            profitInfo: profitInfo,
+          }}
+        />
       </div>
       <Tooltip title="edit project">
         <span className="addNewItem" onClick={() => setDrawerOpen(true)}>
@@ -261,11 +272,47 @@ const ProjectInfo = () => {
 
             <ListItem disablePadding>
               <ListItemButton
-                onClick={() => openCustomModal(accountData.newAccountForm)}>
+                onClick={() => {
+                  axios
+                    .get(APIGateway + "/account/options/" + project_id, {
+                      headers: {
+                        Authorization: `Bearer ${token}`,
+                      },
+                    })
+                    .then((res) => {
+                      var options = res.data.options;
+                      const updatedNewAccountForm = {
+                        ...accountData.newAccountForm,
+                        inputLists: accountData.newAccountForm.inputLists.map(
+                          (input) => {
+                            if (input.name === "typeOfPayment") {
+                              return {
+                                ...input,
+                                options: options,
+                              };
+                            }
+                            return input;
+                          }
+                        ),
+                      };
+                      openCustomModal(updatedNewAccountForm);
+                    })
+                    .catch((err) => {
+                      const message =
+                        err.response.data.message ||
+                        err.message ||
+                        "Something went wrong";
+                      setSnackbar({
+                        open: true,
+                        message: message,
+                        severity: "error",
+                      });
+                    });
+                }}>
                 <ListItemIcon>
                   <span className="material-symbols-outlined">add</span>
                 </ListItemIcon>
-                <ListItemText primary={"edit order statement"} />
+                <ListItemText primary={"record order statement"} />
               </ListItemButton>
             </ListItem>
           </List>

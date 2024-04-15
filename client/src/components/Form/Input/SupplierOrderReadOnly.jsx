@@ -1,23 +1,31 @@
-import React, { useState, useEffect, useRef, useContext } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import useProductInfo from "../../../utils/useProductInfo";
 import { decode } from "jsonwebtoken";
 import { CustomModalContext } from "../../Modal/CustomModalProvider";
 import { projectData } from "../../../data";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import Fade from "@mui/material/Fade";
 import "../FormBody.css";
 import { getCookie } from "../../../utils/cookie";
 
 const RoomMaterialReadOnly = ({ datas }) => {
   const { defaultOrderList, index } = datas;
   const numOfRoom = index + 1;
-  const [open, setOpen] = useState(false);
+  const [openCollapes, setOpenCollapes] = useState(false);
   const [orderLists, setOrderLists] = useState(defaultOrderList || null);
-  const [isActionMenuOpen, setIsActionMenuOpen] = useState(false);
-  const mainBarActionRef = useRef(null);
   const { productInfo } = useProductInfo();
   const { openCustomModal } = useContext(CustomModalContext);
   const token = getCookie("token");
   const position = decode(token).user_authority;
-
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (e) => {
+    setAnchorEl(e.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
   useEffect(() => {
     if (defaultOrderList && productInfo) {
       const newProjectOrderProductLists =
@@ -36,30 +44,6 @@ const RoomMaterialReadOnly = ({ datas }) => {
     }
     return () => {};
   }, [defaultOrderList, productInfo]);
-
-  useEffect(() => {
-    const handleOutsideClick = (event) => {
-      const mainBar = document.querySelector("#mainBar" + numOfRoom);
-
-      if (mainBar && !mainBar.contains(event.target)) {
-        setOpen(false);
-      }
-    };
-
-    const handleKeyPress = (event) => {
-      if (event.key === "Escape") {
-        setOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleOutsideClick);
-    document.addEventListener("keydown", handleKeyPress);
-
-    return () => {
-      document.removeEventListener("mousedown", handleOutsideClick);
-      document.removeEventListener("keydown", handleKeyPress);
-    };
-  }, [open, numOfRoom]);
 
   const updateOrderHandler = (id) => {
     let formatedOrderForm = projectData.proceedToDataForm;
@@ -85,26 +69,43 @@ const RoomMaterialReadOnly = ({ datas }) => {
             position !== 2 && (
               <>
                 <span
-                  ref={mainBarActionRef}
                   className="material-symbols-outlined mainBarAction"
-                  onClick={() => setIsActionMenuOpen(!isActionMenuOpen)}>
+                  id="fade-button"
+                  aria-controls={open ? "fade-menu" : undefined}
+                  aria-haspopup="true"
+                  aria-expanded={open ? "true" : undefined}
+                  onClick={handleClick}>
                   more_vert
                 </span>
-                <span
-                  className="actionMenu"
-                  style={
-                    isActionMenuOpen
-                      ? { display: "block" }
-                      : { display: "none" }
-                  }>
-                  <div
-                    onClick={() => {
+                <Menu
+                  id="fade-menu"
+                  anchorEl={anchorEl}
+                  open={open}
+                  onClose={handleClose}
+                  TransitionComponent={Fade}
+                  anchorOrigin={{
+                    vertical: "bottom",
+                    horizontal: "right",
+                  }}
+                  transformOrigin={{
+                    vertical: "top",
+                    horizontal: "right",
+                  }}>
+                  <MenuItem
+                    onClick={(e) => {
+                      handleClose();
                       updateOrderHandler(defaultOrderList.id);
-                    }}
-                    style={{ color: "black" }}>
-                    <p>proceed to order</p>
-                  </div>
-                </span>
+                    }}>
+                    <span
+                      className="material-symbols-outlined"
+                      style={{ fontSize: "18px" }}>
+                      order_play
+                    </span>
+                    <p style={{ fontSize: "12px", margin: "0" }}>
+                      proceed to order
+                    </p>
+                  </MenuItem>
+                </Menu>
               </>
             )}
           <p className="subTotal">
@@ -124,14 +125,14 @@ const RoomMaterialReadOnly = ({ datas }) => {
           </p>
           <span
             className={
-              open
+              openCollapes
                 ? "material-symbols-outlined secClose rotate"
                 : "material-symbols-outlined secClose"
             }
-            onClick={() => setOpen(!open)}>
+            onClick={() => setOpenCollapes(!openCollapes)}>
             keyboard_arrow_up
           </span>
-          <div className={open ? "barContent open" : "barContent"}>
+          <div className={openCollapes ? "barContent open" : "barContent"}>
             {orderLists.project_order_product_lists.length > 0 ? (
               <>
                 <table>
